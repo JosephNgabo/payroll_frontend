@@ -4,7 +4,7 @@ export const MENU: MenuItem[] = [
     {
         id: 1,
         label: 'MENUITEMS.MENU.TEXT',
-        isTitle: true
+        // isTitle: true
     },
     {
         id: 2,
@@ -31,19 +31,33 @@ export const MENU: MenuItem[] = [
     // },
     {
         id: 4,
-        label: 'Access management',
-        icon: 'bx-chat',
-        link: '/chat',
+        label: 'Access Management',
+        icon: 'bx-user-circle',
         subItems: [
             {
                 id: 6,
-                label: 'Employees',
+                label: 'Users',
+                link: '/users',
+                parentId: 4
             },
             {
                 id: 7,
-                label: 'Employers',
+                label: 'Permissions',
+                parentId: 4
             },
+            {
+                id: 8,
+                label: 'Groups',
+                parentId: 4
+            }
         ]
+    },
+
+    {
+        id: 5,
+        label: 'Configuration',
+        icon: 'bx-cog',
+        subItems: []
     },
 
     /* Commented out menu items

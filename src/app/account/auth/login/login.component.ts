@@ -4,7 +4,7 @@ import { AuthenticationService } from '../../../core/services/auth.service';
 import { AuthfakeauthenticationService } from '../../../core/services/authfake.service';
 
 import { Store } from '@ngrx/store';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { login } from 'src/app/store/Authentication/authentication.actions';
 import { CommonModule } from '@angular/common';
 
@@ -13,7 +13,7 @@ import { CommonModule } from '@angular/common';
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
   standalone:true,
-  imports:[CommonModule,FormsModule,ReactiveFormsModule]
+  imports:[CommonModule,FormsModule,ReactiveFormsModule,RouterModule]
 })
 
 /**
