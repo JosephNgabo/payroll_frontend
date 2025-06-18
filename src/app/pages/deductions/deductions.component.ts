@@ -36,27 +36,14 @@ export class DeductionsComponent implements OnInit {
     this.deductionForm = this.formBuilder.group({
       name: ['', [Validators.required]],
       description: ['', [Validators.required]],
-      fixedValue: [0, [Validators.min(0)]],
-      percentageValue: [0, [Validators.min(0), Validators.max(100)]],
       isTaxApplied: [false],
       taxPercentage: [0, [Validators.min(0), Validators.max(100)]]
-    }, { validator: this.valueValidator });
+    });
 
     this.breadCrumbItems = [
       { label: 'Configuration' },
       { label: 'Deductions Management', active: true }
     ];
-  }
-
-  // Custom validator to ensure only one value type is filled
-  valueValidator(group: FormGroup) {
-    const fixedValue = group.get('fixedValue')?.value;
-    const percentageValue = group.get('percentageValue')?.value;
-
-    if (fixedValue > 0 && percentageValue > 0) {
-      return { bothValuesPresent: true };
-    }
-    return null;
   }
 
   ngOnInit(): void {
@@ -93,15 +80,11 @@ export class DeductionsComponent implements OnInit {
       this.deductionForm.patchValue({
         name: deduction.name,
         description: deduction.description,
-        fixedValue: deduction.fixedValue,
-        percentageValue: deduction.percentageValue,
         isTaxApplied: deduction.isTaxApplied,
         taxPercentage: deduction.taxPercentage
       });
     } else {
       this.deductionForm.reset({
-        fixedValue: 0,
-        percentageValue: 0,
         isTaxApplied: false,
         taxPercentage: 0
       });

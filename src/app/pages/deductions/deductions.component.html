@@ -61,8 +61,6 @@
                     </th>
                     <th class="align-middle">Name</th>
                     <th class="align-middle">Description</th>
-                    <th class="align-middle">Fixed Value</th>
-                    <th class="align-middle">Percentage Value</th>
                     <th class="align-middle">Tax Applied</th>
                     <th class="align-middle">Tax Percentage</th>
                     <th class="align-middle">View Details</th>
@@ -82,8 +80,6 @@
                       <a href="javascript: void(0);" class="text-body fw-bold">{{deduction.name}}</a>
                     </td>
                     <td>{{deduction.description}}</td>
-                    <td>{{deduction.fixedValue | currency}}</td>
-                    <td>{{deduction.percentageValue}}%</td>
                     <td>
                       <span class="badge badge-pill badge-soft-success font-size-11" [ngClass]="{'badge-soft-danger': !deduction.isTaxApplied}">
                         {{deduction.isTaxApplied ? 'Yes' : 'No'}}
@@ -128,14 +124,6 @@
           <tr>
             <td><strong>Description:</strong></td>
             <td>{{selectedDeduction?.description}}</td>
-          </tr>
-          <tr>
-            <td><strong>Fixed Value:</strong></td>
-            <td>{{selectedDeduction?.fixedValue | currency}}</td>
-          </tr>
-          <tr>
-            <td><strong>Percentage Value:</strong></td>
-            <td>{{selectedDeduction?.percentageValue}}%</td>
           </tr>
           <tr>
             <td><strong>Tax Applied:</strong></td>
@@ -187,26 +175,6 @@
             </div>}
           </div>
           <div class="mb-3">
-            <label for="fixed-value-field" class="form-label">Fixed Value</label>
-            <input type="number" id="fixed-value-field" class="form-control" placeholder="Enter fixed value" formControlName="fixedValue" [ngClass]="{ 'is-invalid': submitted && f['fixedValue'].errors }" />
-            @if(submitted && f['fixedValue'].errors){
-            <div class="invalid-feedback" align="left">
-              @if(f['fixedValue'].errors['min']){
-              <div>Value must be greater than or equal to 0.</div>}
-            </div>}
-          </div>
-          <div class="mb-3">
-            <label for="percentage-value-field" class="form-label">Percentage Value (%)</label>
-            <input type="number" id="percentage-value-field" class="form-control" placeholder="Enter percentage value" formControlName="percentageValue" [ngClass]="{ 'is-invalid': submitted && f['percentageValue'].errors }" />
-            @if(submitted && f['percentageValue'].errors){
-            <div class="invalid-feedback" align="left">
-              @if(f['percentageValue'].errors['min']){
-              <div>Value must be greater than or equal to 0.</div>}
-              @if(f['percentageValue'].errors['max']){
-              <div>Value must be less than or equal to 100.</div>}
-            </div>}
-          </div>
-          <div class="mb-3">
             <div class="form-check form-switch">
               <input class="form-check-input" type="checkbox" id="tax-applied-field" formControlName="isTaxApplied">
               <label class="form-check-label" for="tax-applied-field">Tax Applied</label>
@@ -225,10 +193,6 @@
           </div>
         </div>
       </div>
-      @if(deductionForm.errors?.['bothValuesPresent']){
-      <div class="alert alert-danger">
-        Only one of Fixed Value or Percentage Value can have a value greater than 0
-      </div>}
       <div class="modal-footer">
         <button type="button" class="btn btn-light" (click)="modalService.dismissAll()">Close</button>
         <button type="submit" class="btn btn-primary">Save</button>
