@@ -73,7 +73,7 @@
       "TEXT": "Dashboards",
       "BADGE": "04",
       "LIST": {
-        "DEFAULT": "Kuranga",
+        "DEFAULT": "Dashboard",
         "SAAS": "Saas",
         "CRYPTO": "Crypto",
         "BLOG": "Blog",

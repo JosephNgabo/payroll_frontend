@@ -1,0 +1,231 @@
+<div class="container-fluid">
+    <app-page-title title="Employee Management" [breadcrumbItems]="breadCrumbItems"></app-page-title>
+  
+    <div class="row">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-body">
+            <div class="row mb-2">
+              <div class="col-sm-4">
+                <div class="search-box me-2 mb-2 d-inline-block">
+                  <div class="position-relative">
+                    <input type="text" class="form-control" autocomplete="off" id="searchTableList" placeholder="Search users..." [(ngModel)]="term" (ngModelChange)="searchOrder()">
+                    <i class="bx bx-search-alt search-icon"></i>
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-8">
+                <div class="text-sm-end">
+                  <button type="button" class="btn btn-success btn-rounded mb-2 me-2" (click)="showModal.show()"><i class="mdi mdi-plus mr-1"></i>
+                    Add new employee</button>
+                </div>
+              </div>
+            </div>
+            <!-- Table data -->
+            <div class="table-responsive mb-0">
+              <table class="table align-middle table-nowrap dt-responsive nowrap w-100 table-check" id="user-list">
+                <thead class="table-light">
+                  <tr>
+                    <th style="width: 20px;">
+                      <div class="form-check font-size-16 align-middle">
+                        <input class="form-check-input" type="checkbox" id="transactionCheck01" [(ngModel)]="masterSelected" (change)="checkUncheckAll($event)">
+                        <label class="form-check-label" for="transactionCheck01"></label>
+                      </div>
+                    </th>
+                    <th class="align-middle">Employee ID</th>
+                    <th class="align-middle">Full Name</th>
+                    <th class="align-middle">Email</th>
+                    <th class="align-middle">Department</th>
+                    <th class="align-middle">Role</th>
+                    <th class="align-middle">Status</th>
+                    <th class="align-middle">View Details</th>
+                    <th class="align-middle">Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (data of orderlist; track $index) {
+                  <tr id="u_{{data.id}}">
+                    <td>
+                      <div class="form-check font-size-16">
+                        <input class="form-check-input" type="checkbox" id="transactionCheck{{data.index}}" value="{{data.id}}" [(ngModel)]="data.state">
+                        <label class="form-check-label" for="transactionCheck{{data.index}}"></label>
+                      </div>
+                    </td>
+                    <td>
+                      <a href="javascript: void(0);" class="text-body fw-bold">{{data.id}}</a>
+                    </td>
+                    <td>{{data.name}}</td>
+                    <td>{{data.email}}</td>
+                    <td>{{data.department}}</td>
+                    <td>{{data.role}}</td>
+                    <td>
+                      <span class="badge badge-pill badge-soft-success font-size-11" [ngClass]=" { 'badge-soft-danger': data.status === 'Inactive',
+                                    'badge-soft-warning': data.status === 'Pending' }">{{data.status}}</span>
+                    </td>
+                    <td>
+                      <button type="button" class="btn btn-primary btn-sm btn-rounded" (click)="openViewModal(ViewContent)">View
+                        Details</button>
+                    </td>
+                    <td>
+                      <div class="d-flex gap-3">
+                        <a href="javascript:void(0);" class="text-success" (click)="editModal($index)"><i class="mdi mdi-pencil font-size-18"></i></a>
+                        <a href="javascript:void(0);" class="text-danger" (click)="confirm(data.id)"><i class="mdi mdi-delete font-size-18"></i></a>
+                      </div>
+                    </td>
+                  </tr>}
+                </tbody>
+              </table>
+            </div>
+            <!-- end table -->
+            <ul class="pagination pagination-rounded justify-content-end mb-2">
+              <pagination [totalItems]="orderlist?.length" [itemsPerPage]="8" (pagechanged)="pagechanged($event)"></pagination>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- View Details Modal -->
+  <ng-template #ViewContent role="document" let-modal>
+    <div class="modal-header">
+      <h5 class="modal-title mt-0" id="userdetailsModalLabel">User Details</h5>
+      <button type="button" class="btn-close" aria-hidden="true" (click)="modalRef?.hide()"></button>
+    </div>
+    <div class="modal-body">
+      <div class="table-responsive">
+        <table class="table table-centered table-nowrap">
+          <tbody>
+            <tr>
+              <td><strong>Employee ID:</strong></td>
+              <td>#EMP001</td>
+            </tr>
+            <tr>
+              <td><strong>Full Name:</strong></td>
+              <td>John Doe</td>
+            </tr>
+            <tr>
+              <td><strong>Email:</strong></td>
+              <td>john.doe&#64;example.com</td>
+            </tr>
+            <tr>
+              <td><strong>Department:</strong></td>
+              <td>IT</td>
+            </tr>
+            <tr>
+              <td><strong>Role:</strong></td>
+              <td>Developer</td>
+            </tr>
+            <tr>
+              <td><strong>Status:</strong></td>
+              <td><span class="badge badge-pill badge-soft-success">Active</span></td>
+            </tr>
+            <tr>
+              <td><strong>Join Date:</strong></td>
+              <td>01/01/2023</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" (click)="modalRef?.hide()">Close</button>
+    </div>
+  </ng-template>
+  
+  <!-- Add/Edit User Modal -->
+  <div bsModal #showModal="bs-modal" class="modal fade" id="showModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Add New User</h5>
+          <button type="button" class="btn-close" id="close-modal" (click)="showModal.hide()"></button>
+        </div>
+        <div class="modal-body">
+          <form (ngSubmit)="saveUser()" [formGroup]="ordersForm" class="needs-validation" id="createuser-form" novalidate>
+            <div class="row">
+              <div class="col-lg-12">
+                <input type="hidden" class="form-control" id="userid-input">
+                <div class="mb-3">
+                  <label for="fullname-field" class="form-label">Full Name</label>
+                  <input type="text" id="fullname-field" class="form-control" placeholder="Enter full name" required formControlName="name" [ngClass]="{ 'is-invalid': submitted && form['name'].errors }" />
+                  @if(submitted && form['name'].errors){
+                  <div class="invalid-feedback" align="left">
+                    @if(form['name'].errors['required']){
+                    <div>Please enter a name.</div>}
+                  </div>}
+                </div>
+                <div class="mb-3">
+                  <label for="email-field" class="form-label">Email</label>
+                  <input type="email" id="email-field" class="form-control" placeholder="Enter email" required formControlName="email" [ngClass]="{ 'is-invalid': submitted && form['email'].errors }" />
+                  @if(submitted && form['email'].errors){
+                  <div class="invalid-feedback" align="left">
+                    @if(form['email'].errors['required']){
+                    <div>Please enter an email.</div>}
+                    @if(form['email'].errors['email']){
+                    <div>Please enter a valid email address.</div>}
+                  </div>}
+                </div>
+                <div class="mb-3">
+                  <label for="department-field" class="form-label">Department</label>
+                  <select class="form-select" id="department-field" formControlName="department" required>
+                    <option value="">Select Department</option>
+                    <option value="IT">IT</option>
+                    <option value="HR">HR</option>
+                    <option value="Finance">Finance</option>
+                    <option value="Marketing">Marketing</option>
+                  </select>
+                </div>
+                <div class="mb-3">
+                  <label for="role-field" class="form-label">Role</label>
+                  <select class="form-select" id="role-field" formControlName="role" required>
+                    <option value="">Select Role</option>
+                    <option value="Admin">Admin</option>
+                    <option value="Manager">Manager</option>
+                    <option value="Developer">Developer</option>
+                    <option value="User">User</option>
+                  </select>
+                </div>
+                <div class="mb-3">
+                  <label for="status-field" class="form-label">Status</label>
+                  <select class="form-select" id="status-field" formControlName="status" required>
+                    <option value="">Select Status</option>
+                    <option value="Active">Active</option>
+                    <option value="Inactive">Inactive</option>
+                    <option value="Pending">Pending</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-light" (click)="showModal.hide()">Close</button>
+              <button type="submit" class="btn btn-primary" id="addNewUser-btn">Save</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Modal -->
+  <div bsModal #removeItemModal="bs-modal" class="modal fade" id="removeItemModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-md">
+      <div class="modal-content">
+        <div class="modal-body px-4 py-5 text-center">
+          <button type="button" class="btn-close position-absolute end-0 top-0 m-3" (click)="removeItemModal.hide()"></button>
+          <div class="avatar-sm mb-4 mx-auto">
+            <div class="avatar-title bg-primary text-primary bg-opacity-10 font-size-20 rounded-3">
+              <i class="mdi mdi-trash-can-outline"></i>
+            </div>
+          </div>
+          <p class="text-muted font-size-16 mb-4">Are you sure you want to remove this user?</p>
+  
+          <div class="hstack gap-2 justify-content-center mb-0">
+            <button type="button" class="btn btn-danger" id="remove-item" (click)="deleteOrder()">Remove Now</button>
+            <button type="button" class="btn btn-secondary" id="close-removeOrderModal" (click)="removeItemModal.hide()">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- end removeItemModal -->

@@ -2,11 +2,6 @@ import { MenuItem } from './menu.model';
 
 export const MENU: MenuItem[] = [
     {
-        id: 1,
-        label: 'MENUITEMS.MENU.TEXT',
-        isTitle: true
-    },
-    {
         id: 2,
         label: 'MENUITEMS.DASHBOARDS.LIST.DEFAULT',
         icon: 'bx-home-circle',
@@ -31,20 +26,60 @@ export const MENU: MenuItem[] = [
     // },
     {
         id: 4,
-        label: 'Access management',
-        icon: 'bx-chat',
-        link: '/chat',
+        label: 'Access Management',
+        icon: 'bx-user-circle',
         subItems: [
             {
                 id: 6,
-                label: 'Employees',
+                label: 'Users',
+                link: '/users',
+                parentId: 4
             },
             {
                 id: 7,
-                label: 'Employers',
+                label: 'Permissions',
+                parentId: 4
             },
+            {
+                id: 8,
+                label: 'Groups',
+                parentId: 4
+            }
         ]
     },
+    {
+        id: 5,
+        label: 'Deductions Management',
+        icon: 'bx-cog',
+        link: '/deductions'
+    },
+    {
+        id: 6,
+        label: 'Employee Management',
+        icon: 'bx-cog',
+        link: '/employees',    
+        // subItems: [
+        //     {
+        //         id: 9,
+        //         label: 'Deductions Management',
+        //         link: '/deductions',
+        //         parentId: 5
+        //     }
+        // ]
+    },
+    {
+        id: 7,
+        label: 'Allowance & Benefits',
+        icon: 'bx-cog',
+        link: '/allowance-benefits'
+    },
+    {
+        id: 8,
+        label: 'Departments',
+        icon: 'bx-cog',
+        link: '/departments'
+    }
+
 
     /* Commented out menu items
     {

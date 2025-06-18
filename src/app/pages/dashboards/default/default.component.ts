@@ -3,7 +3,6 @@ import { emailSentBarChart, monthlyEarningChart } from './data';
 import { ChartType } from './dashboard.model';
 import { BsModalService, BsModalRef, ModalDirective, ModalModule } from 'ngx-bootstrap/modal';
 import { EventService } from '../../../core/services/event.service';
-
 import { ConfigService } from '../../../core/services/config.service';
 import { CommonModule } from '@angular/common';
 import { NgApexchartsModule } from 'ng-apexcharts';
@@ -16,36 +15,94 @@ import { LoaderComponent } from 'src/app/shared/ui/loader/loader.component';
   selector: 'app-default',
   templateUrl: './default.component.html',
   styleUrls: ['./default.component.scss'],
-  standalone:true,
-  imports:[PagetitleComponent,LoaderComponent,CommonModule,NgApexchartsModule,BsDropdownModule,ModalModule,TransactionComponent]
+  standalone: true,
+  imports: [PagetitleComponent, LoaderComponent, CommonModule, NgApexchartsModule, BsDropdownModule, ModalModule, TransactionComponent]
 })
 export class DefaultComponent implements OnInit {
   modalRef?: BsModalRef;
   isVisible: string;
-
   emailSentBarChart: ChartType;
   monthlyEarningChart: ChartType;
   transactions: any;
   statData: any;
-  config:any = {
+  config: any = {
     backdrop: true,
     ignoreBackdropClick: true
   };
-
   isActive: string;
 
   @ViewChild('content') content;
   @ViewChild('center', { static: false }) center?: ModalDirective;
-  constructor(private modalService: BsModalService, private configService: ConfigService, private eventService: EventService) {
+
+  constructor(
+    private modalService: BsModalService,
+    private configService: ConfigService,
+    private eventService: EventService
+  ) {
+    this.statData = [
+      {
+        title: 'Total Employees',
+        value: '150',
+        icon: 'mdi mdi-account-group'
+      },
+      {
+        title: 'Active Projects',
+        value: '12',
+        icon: 'mdi mdi-briefcase'
+      },
+      {
+        title: 'Leave Requests',
+        value: '8',
+        icon: 'mdi mdi-calendar'
+      }
+    ];
+
+    this.transactions = [
+      {
+        id: 'EMP001',
+        name: 'John Smith',
+        date: '2024-03-15',
+        total: '$4,500',
+        status: 'Paid',
+        payment: ['mdi mdi-bank', 'Bank Transfer']
+      },
+      {
+        id: 'EMP002',
+        name: 'Sarah Johnson',
+        date: '2024-03-15',
+        total: '$3,800',
+        status: 'Pending',
+        payment: ['mdi mdi-credit-card', 'Credit Card']
+      },
+      {
+        id: 'EMP003',
+        name: 'Michael Brown',
+        date: '2024-03-15',
+        total: '$5,200',
+        status: 'Paid',
+        payment: ['mdi mdi-bank', 'Bank Transfer']
+      },
+      {
+        id: 'EMP004',
+        name: 'Emily Davis',
+        date: '2024-03-15',
+        total: '$4,100',
+        status: 'Failed',
+        payment: ['mdi mdi-credit-card', 'Credit Card']
+      },
+      {
+        id: 'EMP005',
+        name: 'Robert Wilson',
+        date: '2024-03-15',
+        total: '$4,800',
+        status: 'Paid',
+        payment: ['mdi mdi-bank', 'Bank Transfer']
+      }
+    ];
   }
 
   ngOnInit() {
-
-    /**
-     * horizontal-vertical layput set
-     */
     const attribute = document.body.getAttribute('data-layout');
-
     this.isVisible = attribute;
     const vertical = document.getElementById('layout-vertical');
     if (vertical != null) {
@@ -57,85 +114,67 @@ export class DefaultComponent implements OnInit {
         horizontal.setAttribute('checked', 'true');
       }
     }
-
-    /**
-     * Fetches the data
-     */
     this.fetchData();
   }
 
   ngAfterViewInit() {
     setTimeout(() => {
-     this.center?.show()
+      this.center?.show()
     }, 2000);
   }
 
-  /**
-   * Fetches the data
-   */
   private fetchData() {
     this.emailSentBarChart = emailSentBarChart;
     this.monthlyEarningChart = monthlyEarningChart;
-
     this.isActive = 'year';
-    this.configService.getConfig().subscribe(data => {
-      this.transactions = data.transactions;
-      this.statData = data.statData;
-    });
   }
+
   opencenterModal(template: TemplateRef<any>) {
     this.modalRef = this.modalService.show(template);
   }
+
   weeklyreport() {
     this.isActive = 'week';
-    this.emailSentBarChart.series =
-      [{
-        name: 'Series A',
-        data: [44, 55, 41, 67, 22, 43, 36, 52, 24, 18, 36, 48]
-      }, {
-        name: 'Series B',
-        data: [11, 17, 15, 15, 21, 14, 11, 18, 17, 12, 20, 18]
-      }, {
-        name: 'Series C',
-        data: [13, 23, 20, 8, 13, 27, 18, 22, 10, 16, 24, 22]
-      }];
+    this.emailSentBarChart.series = [{
+      name: 'Annual Leave',
+      data: [12, 15, 8, 10, 7, 9, 11]
+    }, {
+      name: 'Sick Leave',
+      data: [5, 7, 4, 6, 3, 5, 4]
+    }, {
+      name: 'Emergency',
+      data: [2, 3, 1, 2, 1, 2, 1]
+    }];
   }
 
   monthlyreport() {
     this.isActive = 'month';
-    this.emailSentBarChart.series =
-      [{
-        name: 'Series A',
-        data: [44, 55, 41, 67, 22, 43, 36, 52, 24, 18, 36, 48]
-      }, {
-        name: 'Series B',
-        data: [13, 23, 20, 8, 13, 27, 18, 22, 10, 16, 24, 22]
-      }, {
-        name: 'Series C',
-        data: [11, 17, 15, 15, 21, 14, 11, 18, 17, 12, 20, 18]
-      }];
+    this.emailSentBarChart.series = [{
+      name: 'Annual Leave',
+      data: [45, 52, 38, 45, 42, 48, 50]
+    }, {
+      name: 'Sick Leave',
+      data: [15, 18, 12, 14, 10, 16, 13]
+    }, {
+      name: 'Emergency',
+      data: [8, 10, 6, 7, 5, 8, 6]
+    }];
   }
 
   yearlyreport() {
     this.isActive = 'year';
-    this.emailSentBarChart.series =
-      [{
-        name: 'Series A',
-        data: [13, 23, 20, 8, 13, 27, 18, 22, 10, 16, 24, 22]
-      }, {
-        name: 'Series B',
-        data: [11, 17, 15, 15, 21, 14, 11, 18, 17, 12, 20, 18]
-      }, {
-        name: 'Series C',
-        data: [44, 55, 41, 67, 22, 43, 36, 52, 24, 18, 36, 48]
-      }];
+    this.emailSentBarChart.series = [{
+      name: 'Annual Leave',
+      data: [120, 135, 110, 125, 115, 130, 140]
+    }, {
+      name: 'Sick Leave',
+      data: [45, 50, 40, 42, 38, 45, 48]
+    }, {
+      name: 'Emergency',
+      data: [25, 30, 20, 22, 18, 25, 28]
+    }];
   }
 
-
-  /**
-   * Change the layout onclick
-   * @param layout Change the layout
-   */
   changeLayout(layout: string) {
     this.eventService.broadcast('changeLayout', layout);
   }

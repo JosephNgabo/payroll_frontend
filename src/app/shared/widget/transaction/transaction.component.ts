@@ -1,34 +1,20 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, Input } from '@angular/core';
 
 import { BsModalService, BsModalRef, ModalModule } from 'ngx-bootstrap/modal';
 
 @Component({
   selector: 'app-transaction',
+  standalone: true,
+  imports: [CommonModule, ModalModule],
   templateUrl: './transaction.component.html',
-  styleUrls: ['./transaction.component.scss'],
-  standalone:true,
-  imports:[CommonModule,ModalModule]
-
+  styleUrls: ['./transaction.component.scss']
 })
-export class TransactionComponent implements OnInit {
-
+export class TransactionComponent {
+  @Input() transactions: any[] = [];
   modalRef?: BsModalRef;
 
-  @Input() transactions: Array<{
-    id?: string;
-    index?: number,
-    name?: string,
-    date?: string,
-    total?: string,
-    status?: string,
-    payment?: string[],
-  }>;
-
-  constructor(private modalService: BsModalService) { }
-
-  ngOnInit() {
-  }
+  constructor(private modalService: BsModalService) {}
 
   /**
    * Open modal
@@ -37,5 +23,4 @@ export class TransactionComponent implements OnInit {
   openModal(content: any) {
     this.modalRef = this.modalService.show(content);
   }
-
 }

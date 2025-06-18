@@ -4,14 +4,12 @@
     <div class="row">
         <div class="col-12">
             <div class="page-title-box d-flex align-items-center justify-content-between">
-                <h4 class="mb-0 font-size-18">Dashboard</h4>
+                <h4 class="mb-0 font-size-18">HR Dashboard</h4>
                 <div class="page-title-right">
                     <ol class="breadcrumb m-0">
                         <ng-container>
-                            <li class="breadcrumb-item"><a href="javascript: void(0);">Dashboards</a>
-                            </li>
-                            <li class="breadcrumb-item active">Dashboard
-                            </li>
+                            <li class="breadcrumb-item"><a href="javascript: void(0);">Dashboards</a></li>
+                            <li class="breadcrumb-item active">HR Dashboard</li>
                         </ng-container>
                     </ol>
                 </div>
@@ -27,8 +25,8 @@
                     <div class="row">
                         <div class="col-7">
                             <div class="text-primary p-3">
-                                <h5 class="text-primary">Welcome Back !</h5>
-                                <p>Kuranga</p>
+                                <h5 class="text-primary">Welcome Back!</h5>
+                                <p>HR Department</p>
                             </div>
                         </div>
                         <div class="col-5 align-self-end">
@@ -42,21 +40,20 @@
                             <div class="avatar-md profile-user-wid mb-4">
                                 <img src="assets/images/users/avatar-1.jpg" alt="" class="img-thumbnail rounded-circle">
                             </div>
-                            <h5 class="font-size-15 text-truncate">KURANGA</h5>
-                            <p class="text-muted mb-0 text-truncate">Developer</p>
+                            <h5 class="font-size-15 text-truncate">HR Manager</h5>
+                            <p class="text-muted mb-0 text-truncate">Administrator</p>
                         </div>
 
                         <div class="col-sm-8">
                             <div class="pt-4">
-
                                 <div class="row">
                                     <div class="col-6">
-                                        <h5 class="font-size-15">125</h5>
-                                        <p class="text-muted mb-0">Projects</p>
+                                        <h5 class="font-size-15">150</h5>
+                                        <p class="text-muted mb-0">Total Employees</p>
                                     </div>
                                     <div class="col-6">
-                                        <h5 class="font-size-15">$1245</h5>
-                                        <p class="text-muted mb-0">Revenue</p>
+                                        <h5 class="font-size-15">12</h5>
+                                        <p class="text-muted mb-0">Departments</p>
                                     </div>
                                 </div>
                                 <div class="mt-4">
@@ -69,26 +66,23 @@
             </div>
             <div class="card">
                 <div class="card-body">
-                    <h4 class="card-title mb-4">Monthly Earning</h4>
+                    <h4 class="card-title mb-4">Monthly Payroll Overview</h4>
                     <div class="row">
                         <div class="col-sm-6">
                             <p class="text-muted">This month</p>
-                            <h3>$34,252</h3>
-                            <p class="text-muted"><span class="text-success me-2"> 12% <i class="mdi mdi-arrow-up"></i>
-                                </span> From
-                                previous period</p>
+                            <h3>$245,000</h3>
+                            <p class="text-muted"><span class="text-success me-2"> 8% <i class="mdi mdi-arrow-up"></i></span> From previous month</p>
 
                             <div class="mt-4">
-                                <a href="" class="btn btn-primary btn-sm">View More <i class="mdi mdi-arrow-right ms-1"></i></a>
+                                <a href="" class="btn btn-primary btn-sm">View Details <i class="mdi mdi-arrow-right ms-1"></i></a>
                             </div>
                         </div>
                         <div class="col-sm-6">
-
                             <apx-chart dir="ltr" class="apex-charts" [series]="monthlyEarningChart.series" [chart]="monthlyEarningChart.chart" [legend]="monthlyEarningChart.legend" [colors]="monthlyEarningChart.colors" [labels]="monthlyEarningChart.labels" [stroke]="monthlyEarningChart.stroke" [plotOptions]="monthlyEarningChart.plotOptions">
                             </apx-chart>
                         </div>
                     </div>
-                    <p class="text-muted mb-0">We craft digital, graphic and dimensional thinking.</p>
+                    <p class="text-muted mb-0">Monthly payroll distribution across departments.</p>
                 </div>
             </div>
         </div>
@@ -104,7 +98,7 @@
             <div class="card">
                 <div class="card-body">
                     <div class="d-sm-flex flex-wrap">
-                        <h4 class="card-title mb-4">Recent</h4>
+                        <h4 class="card-title mb-4">Leave Requests</h4>
                         <div class="ms-auto">
                             <ul class="nav nav-pills">
                                 <li class="nav-item">
@@ -131,64 +125,59 @@
         <div class="col-xl-4">
             <div class="card">
                 <div class="card-body">
-                    <h4 class="card-title mb-4">Social Source</h4>
+                    <h4 class="card-title mb-4">Department Overview</h4>
                     <div class="text-center">
                         <div class="avatar-sm mx-auto mb-4">
                             <span class="avatar-title rounded-circle bg-primary-subtle font-size-24">
-                                <i class="mdi mdi-facebook text-primary"></i>
+                                <i class="mdi mdi-account-group text-primary"></i>
                             </span>
                         </div>
-                        <p class="font-16 text-muted mb-2"></p>
-                        <h5><a href="javascript: void(0);" class="text-dark">Facebook - <span class="text-muted font-16">125
-                                    sales</span> </a></h5>
-                        <p class="text-muted">Maecenas nec odio et ante tincidunt tempus. Donec vitae sapien ut libero
-                            venenatis
-                            faucibus tincidunt.</p>
-                        <a href="javascript: void(0);" class="text-primary font-16">Learn more <i class="mdi mdi-chevron-right"></i></a>
+                        <h5><a href="javascript: void(0);" class="text-dark">IT Department - <span class="text-muted font-16">45 employees</span></a></h5>
+                        <p class="text-muted">Leading department with highest number of employees and active projects.</p>
+                        <a href="javascript: void(0);" class="text-primary font-16">View Details <i class="mdi mdi-chevron-right"></i></a>
                     </div>
                     <div class="row mt-4">
                         <div class="col-4">
                             <div class="social-source text-center mt-3">
                                 <div class="avatar-xs mx-auto mb-3">
                                     <span class="avatar-title rounded-circle bg-primary font-size-16">
-                                        <i class="mdi mdi-facebook text-white"></i>
+                                        <i class="mdi mdi-account-group text-white"></i>
                                     </span>
                                 </div>
-                                <h5 class="font-size-15">Facebook</h5>
-                                <p class="text-muted mb-0">125 sales</p>
+                                <h5 class="font-size-15">IT</h5>
+                                <p class="text-muted mb-0">45 employees</p>
                             </div>
                         </div>
                         <div class="col-4">
                             <div class="social-source text-center mt-3">
                                 <div class="avatar-xs mx-auto mb-3">
                                     <span class="avatar-title rounded-circle bg-info font-size-16">
-                                        <i class="mdi mdi-twitter text-white"></i>
+                                        <i class="mdi mdi-account-group text-white"></i>
                                     </span>
                                 </div>
-                                <h5 class="font-size-15">Twitter</h5>
-                                <p class="text-muted mb-0">112 sales</p>
+                                <h5 class="font-size-15">HR</h5>
+                                <p class="text-muted mb-0">25 employees</p>
                             </div>
                         </div>
                         <div class="col-4">
                             <div class="social-source text-center mt-3">
                                 <div class="avatar-xs mx-auto mb-3">
                                     <span class="avatar-title rounded-circle bg-pink font-size-16">
-                                        <i class="mdi mdi-instagram text-white"></i>
+                                        <i class="mdi mdi-account-group text-white"></i>
                                     </span>
                                 </div>
-                                <h5 class="font-size-15">Instagram</h5>
-                                <p class="text-muted mb-0">104 sales</p>
+                                <h5 class="font-size-15">Finance</h5>
+                                <p class="text-muted mb-0">30 employees</p>
                             </div>
                         </div>
                     </div>
-
                 </div>
             </div>
         </div>
         <div class="col-xl-4">
             <div class="card">
                 <div class="card-body">
-                    <h4 class="card-title mb-5">Activity</h4>
+                    <h4 class="card-title mb-5">Recent Activities</h4>
                     <ul class="verti-timeline list-unstyled">
                         <li class="event-list">
                             <div class="event-timeline-dot">
@@ -196,13 +185,10 @@
                             </div>
                             <div class="d-flex">
                                 <div class="flex-shrink-0 me-3">
-                                    <h5 class="font-size-14">22 Nov <i class="bx bx-right-arrow-alt font-size-16 text-primary align-middle ms-2"></i>
-                                    </h5>
+                                    <h5 class="font-size-14">22 Nov <i class="bx bx-right-arrow-alt font-size-16 text-primary align-middle ms-2"></i></h5>
                                 </div>
                                 <div class="flex-grow-1">
-                                    <div>
-                                        Responded to need “Volunteer Activities
-                                    </div>
+                                    <div>New employee onboarding: John Doe (IT Department)</div>
                                 </div>
                             </div>
                         </li>
@@ -212,13 +198,10 @@
                             </div>
                             <div class="d-flex">
                                 <div class="flex-shrink-0 me-3">
-                                    <h5 class="font-size-14">17 Nov <i class="bx bx-right-arrow-alt font-size-16 text-primary align-middle ms-2"></i>
-                                    </h5>
+                                    <h5 class="font-size-14">20 Nov <i class="bx bx-right-arrow-alt font-size-16 text-primary align-middle ms-2"></i></h5>
                                 </div>
                                 <div class="flex-grow-1">
-                                    <div>
-                                        Everyone realizes why a new common language would be desirable... <a href="javascript: void(0);">Read more</a>
-                                    </div>
+                                    <div>Monthly payroll processed for 150 employees</div>
                                 </div>
                             </div>
                         </li>
@@ -228,13 +211,10 @@
                             </div>
                             <div class="d-flex">
                                 <div class="flex-shrink-0 me-3">
-                                    <h5 class="font-size-14">15 Nov <i class="bx bx-right-arrow-alt font-size-16 text-primary align-middle ms-2"></i>
-                                    </h5>
+                                    <h5 class="font-size-14">18 Nov <i class="bx bx-right-arrow-alt font-size-16 text-primary align-middle ms-2"></i></h5>
                                 </div>
                                 <div class="flex-grow-1">
-                                    <div>
-                                        Joined the group “Boardsmanship Forum”
-                                    </div>
+                                    <div>Department meeting: Q4 Planning</div>
                                 </div>
                             </div>
                         </li>
@@ -244,77 +224,50 @@
                             </div>
                             <div class="d-flex">
                                 <div class="flex-shrink-0 me-3">
-                                    <h5 class="font-size-14">12 Nov <i class="bx bx-right-arrow-alt font-size-16 text-primary align-middle ms-2"></i>
-                                    </h5>
+                                    <h5 class="font-size-14">15 Nov <i class="bx bx-right-arrow-alt font-size-16 text-primary align-middle ms-2"></i></h5>
                                 </div>
                                 <div class="flex-grow-1">
-                                    <div>
-                                        Responded to need “In-Kind Opportunity”
-                                    </div>
+                                    <div>Annual performance reviews completed</div>
                                 </div>
                             </div>
                         </li>
                     </ul>
-                    <div class="text-center mt-4"><a href="javascript: void(0);" class="btn btn-primary btn-sm">View
-                            More <i class="mdi mdi-arrow-right ms-1"></i></a></div>
                 </div>
             </div>
         </div>
-
         <div class="col-xl-4">
             <div class="card">
                 <div class="card-body">
-                    <h4 class="card-title mb-4">Top Cities Selling Product</h4>
-
-                    <div class="text-center">
-                        <div class="mb-4">
-                            <i class="bx bx-map-pin text-primary display-4"></i>
-                        </div>
-                        <h3>1,456</h3>
-                        <p>San Francisco</p>
-                    </div>
-
-                    <div class="table-responsive mt-4">
-                        <table class="table table-centered align-middle table-nowrap">
+                    <h4 class="card-title mb-4">Leave Requests</h4>
+                    <div class="table-responsive">
+                        <table class="table table-nowrap mb-0">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Employee</th>
+                                    <th scope="col">Type</th>
+                                    <th scope="col">Status</th>
+                                </tr>
+                            </thead>
                             <tbody>
                                 <tr>
-                                    <td style="width: 30%">
-                                        <p class="mb-0">San Francisco</p>
-                                    </td>
-                                    <td style="width: 25%">
-                                        <h5 class="mb-0">1,456</h5>
-                                    </td>
-                                    <td>
-                                        <div class="progress bg-transparent progress-sm">
-                                            <div class="progress-bar bg-primary rounded" role="progressbar" style="width: 94%" aria-valuenow="94" aria-valuemin="0" aria-valuemax="100"></div>
-                                        </div>
-                                    </td>
+                                    <td>John Doe</td>
+                                    <td>Annual Leave</td>
+                                    <td><span class="badge bg-success">Approved</span></td>
                                 </tr>
                                 <tr>
-                                    <td>
-                                        <p class="mb-0">Los Angeles</p>
-                                    </td>
-                                    <td>
-                                        <h5 class="mb-0">1,123</h5>
-                                    </td>
-                                    <td>
-                                        <div class="progress bg-transparent progress-sm">
-                                            <div class="progress-bar bg-success rounded" role="progressbar" style="width: 82%" aria-valuenow="82" aria-valuemin="0" aria-valuemax="100"></div>
-                                        </div>
-                                    </td>
+                                    <td>Jane Smith</td>
+                                    <td>Sick Leave</td>
+                                    <td><span class="badge bg-warning">Pending</span></td>
                                 </tr>
                                 <tr>
-                                    <td>
-                                        <p class="mb-0">San Diego</p>
-                                    </td>
-                                    <td>
-                                        <h5 class="mb-0">1,026</h5>
-                                    </td>
-                                    <td>
-                                        <div class="progress bg-transparent progress-sm">
-                                            <div class="progress-bar bg-warning rounded" role="progressbar" style="width: 70%" aria-valuenow="70" aria-valuemin="0" aria-valuemax="100"></div>
-                                        </div>
-                                    </td>
+                                    <td>Mike Johnson</td>
+                                    <td>Emergency</td>
+                                    <td><span class="badge bg-danger">Rejected</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Sarah Wilson</td>
+                                    <td>Annual Leave</td>
+                                    <td><span class="badge bg-success">Approved</span></td>
                                 </tr>
                             </tbody>
                         </table>
@@ -325,12 +278,13 @@
     </div>
 
     <div class="row">
-        <div class="col-lg-12">
+        <div class="col-xl-12">
             <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title mb-0">Latest Payroll Transactions</h4>
+                </div>
                 <div class="card-body">
-                    <h4 class="card-title mb-4">Latest Transaction</h4>
                     <app-transaction [transactions]="transactions"></app-transaction>
-                    <!-- end table -->
                 </div>
             </div>
         </div>
