@@ -8,8 +8,6 @@ export interface Deduction {
   id?: number;
   name: string;
   description: string;
-  fixedValue: number;
-  percentageValue: number;
   isTaxApplied: boolean;
   taxPercentage: number;
 }
@@ -28,8 +26,6 @@ export class DeductionsService {
       id: 1,
       name: 'Health Insurance',
       description: 'Monthly health insurance premium',
-      fixedValue: 50.00,
-      percentageValue: 0,
       isTaxApplied: false,
       taxPercentage: 0
     },
@@ -37,8 +33,6 @@ export class DeductionsService {
       id: 2,
       name: '401K Contribution',
       description: 'Pre-tax retirement savings',
-      fixedValue: 0,
-      percentageValue: 5,
       isTaxApplied: true,
       taxPercentage: 10
     },
@@ -46,8 +40,6 @@ export class DeductionsService {
       id: 3,
       name: 'Student Loan',
       description: 'Repayment for student loans',
-      fixedValue: 120.00,
-      percentageValue: 0,
       isTaxApplied: false,
       taxPercentage: 0
     }

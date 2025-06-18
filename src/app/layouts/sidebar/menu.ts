@@ -49,13 +49,13 @@ export const MENU: MenuItem[] = [
     },
     {
         id: 5,
-        label: 'Deductions Management',
+        label: 'Deductions',
         icon: 'bx-cog',
         link: '/deductions'
     },
     {
         id: 6,
-        label: 'Employee Management',
+        label: 'Employees',
         icon: 'bx-cog',
         link: '/employees',    
         // subItems: [
