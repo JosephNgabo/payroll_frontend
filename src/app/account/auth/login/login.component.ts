@@ -7,13 +7,14 @@ import { Store } from '@ngrx/store';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { login } from 'src/app/store/Authentication/authentication.actions';
 import { CommonModule } from '@angular/common';
+import { SlickCarouselModule } from 'ngx-slick-carousel';
 
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
   standalone:true,
-  imports:[CommonModule,FormsModule,ReactiveFormsModule,RouterModule]
+  imports:[CommonModule,FormsModule,ReactiveFormsModule,RouterModule, SlickCarouselModule]
 })
 
 /**
@@ -25,10 +26,19 @@ export class LoginComponent implements OnInit {
   submitted: any = false;
   error: any = '';
   returnUrl: string;
-  fieldTextType!: boolean;
 
   // set the currenr year
   year: number = new Date().getFullYear();
+
+  // slideConfig for ngx-slick-carousel
+  slideConfig = {
+    slidesToShow: 1,
+    slidesToScroll: 1,
+    arrows: false,
+    dots: true,
+    autoplay: true,
+    autoplaySpeed: 2000,
+  };
 
   // tslint:disable-next-line: max-line-length
   constructor(private formBuilder: UntypedFormBuilder, private route: ActivatedRoute, private router: Router, private authenticationService: AuthenticationService, private store: Store,
@@ -53,18 +63,8 @@ export class LoginComponent implements OnInit {
    */
   onSubmit() {
     this.submitted = true;
-
-    const email = this.f['email'].value; // Get the username from the form
-    const password = this.f['password'].value; // Get the password from the form
-
-    // Login Api
+    const email = this.f['email'].value;
+    const password = this.f['password'].value;
     this.store.dispatch(login({ email: email, password: password }));
-  }
-
-  /**
- * Password Hide/Show
- */
-  toggleFieldTextType() {
-    this.fieldTextType = !this.fieldTextType;
   }
 }

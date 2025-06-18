@@ -9,15 +9,15 @@ import { DatePipe } from '@angular/common';
 import { Store } from '@ngrx/store';
 
 @Component({
-  selector: 'app-users',
-  templateUrl: './users.component.html',
-  styleUrls: ['./users.component.scss']
+  selector: 'app-employees',
+  templateUrl: './employees.component.html',
+  styleUrl: './employees.component.scss'
 })
 
 /**
  *  users component
  */
-export class UsersComponent {
+export class EmployeesComponent {
   enditem: any;
   modalRef?: BsModalRef;
   masterSelected!: boolean;
@@ -47,50 +47,42 @@ export class UsersComponent {
     this.breadCrumbItems = [{ label: 'Access Management' }, { label: 'Users', active: true }];
 
     /**
-     * Form Validation - Updated to match backend requirements
+     * Form Validation
      */
     this.ordersForm = this.formBuilder.group({
       id: [''],
-      firstname: ['', [Validators.required]],
-      lastname: ['', [Validators.required]],
-      username: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(20)]],
-      phone: ['', [Validators.required]],
-      title: ['', [Validators.required]],
-      language: ['', [Validators.required, Validators.pattern('^(en|fr)$')]],
-      email: ['', [Validators.required, Validators.email]]
+      name: ['', [Validators.required]],
+      email: ['', [Validators.required, Validators.email]],
+      department: ['', [Validators.required]],
+      role: ['', [Validators.required]],
+      status: ['', [Validators.required]]
     });
 
-    // Mock data for testing - Updated to match new structure
+    // Mock data for testing
     this.orderlist = [
       {
         id: 'EMP001',
-        firstname: 'Mugisha',
-        lastname: 'Benjamin',
-        username: 'mugisha_ben',
-        phone: '+250789123456',
-        title: 'Software Developer',
-        language: 'en',
-        email: 'benjamin@gmail.com'
+        name: 'Mugisha Benjamin',
+        email: 'benjamin@gmail.com',
+        department: 'IT',
+        role: 'Developer',
+        status: 'Active'
       },
       {
         id: 'EMP002',
-        firstname: 'Ishimwe',
-        lastname: 'Nadia',
-        username: 'ishimwe_nadia',
-        phone: '+250789123457',
-        title: 'HR Manager',
-        language: 'en',
-        email: 'nadia@gmail.com'
+        name: 'Ishimwe Nadia',
+        email: 'nadia@gmail.com',
+        department: 'HR',
+        role: 'Manager',
+        status: 'Active'
       },
       {
         id: 'EMP003',
-        firstname: 'Muneza',
-        lastname: 'Jackson',
-        username: 'muneza_jack',
-        phone: '+250789123458',
-        title: 'Finance Analyst',
-        language: 'fr',
-        email: 'jackson@gmail.com'
+        name: 'Muneza Jackson',
+        email: 'jackson@gmail.com',
+        department: 'Finance',
+        role: 'User',
+        status: 'Inactive'
       }
     ];
     this.Allorderlist = this.orderlist;
@@ -133,15 +125,13 @@ export class UsersComponent {
     this.removeItemModal?.hide();
   }
 
-  // fiter job - Updated to search in new fields
+  // fiter job
   searchOrder() {
     if (this.term) {
       this.orderlist = this.Allorderlist.filter((data: any) => {
-        return data.firstname.toLowerCase().includes(this.term.toLowerCase()) ||
-               data.lastname.toLowerCase().includes(this.term.toLowerCase()) ||
-               data.username.toLowerCase().includes(this.term.toLowerCase()) ||
+        return data.name.toLowerCase().includes(this.term.toLowerCase()) ||
                data.email.toLowerCase().includes(this.term.toLowerCase()) ||
-               data.title.toLowerCase().includes(this.term.toLowerCase());
+               data.department.toLowerCase().includes(this.term.toLowerCase());
       });
     } else {
       this.orderlist = this.Allorderlist;
@@ -164,10 +154,9 @@ export class UsersComponent {
   }
 
   /**
-  * Save user - Updated to handle new fields
+  * Save user
   */
   saveUser() {
-    this.submitted = true;
     if (this.ordersForm.valid) {
       if (this.ordersForm.get('id')?.value) {
         // Update existing user
@@ -185,7 +174,7 @@ export class UsersComponent {
       }
       this.showModal?.hide();
       this.ordersForm.reset();
-      this.submitted = false;
+      this.submitted = true;
     }
   }
   /**

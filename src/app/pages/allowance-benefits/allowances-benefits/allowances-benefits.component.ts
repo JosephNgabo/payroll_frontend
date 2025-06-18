@@ -1,3 +1,4 @@
+
 import { Component, ViewChild } from '@angular/core';
 import { Observable } from 'rxjs';
 import { CommonModule } from '@angular/common';
@@ -9,15 +10,15 @@ import { DatePipe } from '@angular/common';
 import { Store } from '@ngrx/store';
 
 @Component({
-  selector: 'app-users',
-  templateUrl: './users.component.html',
-  styleUrls: ['./users.component.scss']
+  selector: 'app-allowances-benefits',
+  templateUrl: './allowances-benefits.component.html',
+  styleUrl: './allowances-benefits.component.scss'
 })
 
 /**
- *  users component
+ *  Allowance benefit component
  */
-export class UsersComponent {
+export class AllowancesBenefitsComponent {
   enditem: any;
   modalRef?: BsModalRef;
   masterSelected!: boolean;
@@ -44,53 +45,43 @@ export class UsersComponent {
   ) { }
 
   ngOnInit() {
-    this.breadCrumbItems = [{ label: 'Access Management' }, { label: 'Users', active: true }];
+    this.breadCrumbItems = [{ label: 'Payroll Management' }, { label: 'Allowances & Benefits', active: true }];
 
     /**
-     * Form Validation - Updated to match backend requirements
+     * Form Validation - Updated for Allowances/Benefits
      */
     this.ordersForm = this.formBuilder.group({
       id: [''],
-      firstname: ['', [Validators.required]],
-      lastname: ['', [Validators.required]],
-      username: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(20)]],
-      phone: ['', [Validators.required]],
-      title: ['', [Validators.required]],
-      language: ['', [Validators.required, Validators.pattern('^(en|fr)$')]],
-      email: ['', [Validators.required, Validators.email]]
+      name: ['', [Validators.required]],
+      description: ['', [Validators.required]],
+      taxValue: ['', [Validators.min(0), Validators.max(100)]]
     });
 
-    // Mock data for testing - Updated to match new structure
+    // Mock data for testing - Updated for Allowances/Benefits
     this.orderlist = [
       {
-        id: 'EMP001',
-        firstname: 'Mugisha',
-        lastname: 'Benjamin',
-        username: 'mugisha_ben',
-        phone: '+250789123456',
-        title: 'Software Developer',
-        language: 'en',
-        email: 'benjamin@gmail.com'
+        id: 'BEN001',
+        name: 'Housing Allowance',
+        description: 'Monthly housing allowance for employees',
+        taxValue: 15
       },
       {
-        id: 'EMP002',
-        firstname: 'Ishimwe',
-        lastname: 'Nadia',
-        username: 'ishimwe_nadia',
-        phone: '+250789123457',
-        title: 'HR Manager',
-        language: 'en',
-        email: 'nadia@gmail.com'
+        id: 'BEN002',
+        name: 'Transport Allowance',
+        description: 'Transportation allowance for commuting',
+        taxValue: 10
       },
       {
-        id: 'EMP003',
-        firstname: 'Muneza',
-        lastname: 'Jackson',
-        username: 'muneza_jack',
-        phone: '+250789123458',
-        title: 'Finance Analyst',
-        language: 'fr',
-        email: 'jackson@gmail.com'
+        id: 'BEN003',
+        name: 'Medical Insurance',
+        description: 'Comprehensive medical insurance coverage',
+        taxValue: 0
+      },
+      {
+        id: 'BEN004',
+        name: 'Meal Allowance',
+        description: 'Daily meal allowance for employees',
+        taxValue: 5
       }
     ];
     this.Allorderlist = this.orderlist;
@@ -128,20 +119,17 @@ export class UsersComponent {
   }
   // delete order
   deleteOrder() {
-    // Here you would typically call your API to delete the user
+    // Here you would typically call your API to delete the allowance/benefit
     this.orderlist = this.orderlist.filter((item: any) => item.id !== this.deletId);
     this.removeItemModal?.hide();
   }
 
-  // fiter job - Updated to search in new fields
+  // fiter job - Updated to search in allowance/benefit fields
   searchOrder() {
     if (this.term) {
       this.orderlist = this.Allorderlist.filter((data: any) => {
-        return data.firstname.toLowerCase().includes(this.term.toLowerCase()) ||
-               data.lastname.toLowerCase().includes(this.term.toLowerCase()) ||
-               data.username.toLowerCase().includes(this.term.toLowerCase()) ||
-               data.email.toLowerCase().includes(this.term.toLowerCase()) ||
-               data.title.toLowerCase().includes(this.term.toLowerCase());
+        return data.name.toLowerCase().includes(this.term.toLowerCase()) ||
+               data.description.toLowerCase().includes(this.term.toLowerCase());
       });
     } else {
       this.orderlist = this.Allorderlist;
@@ -164,21 +152,21 @@ export class UsersComponent {
   }
 
   /**
-  * Save user - Updated to handle new fields
+  * Save allowance/benefit
   */
   saveUser() {
     this.submitted = true;
     if (this.ordersForm.valid) {
       if (this.ordersForm.get('id')?.value) {
-        // Update existing user
+        // Update existing allowance/benefit
         const updatedData = this.ordersForm.value;
         const index = this.orderlist.findIndex((item: any) => item.id === updatedData.id);
         if (index !== -1) {
           this.orderlist[index] = updatedData;
         }
       } else {
-        // Add new user
-        const newId = 'EMP' + (this.orderlist.length + 1).toString().padStart(3, '0');
+        // Add new allowance/benefit
+        const newId = 'BEN' + (this.orderlist.length + 1).toString().padStart(3, '0');
         this.ordersForm.controls['id'].setValue(newId);
         const newData = this.ordersForm.value;
         this.orderlist.push(newData);
@@ -196,7 +184,7 @@ export class UsersComponent {
     this.submitted = false;
     this.showModal?.show();
     const modelTitle = document.querySelector('.modal-title') as HTMLAreaElement;
-    modelTitle.innerHTML = 'Edit User';
+    modelTitle.innerHTML = 'Edit Allowance/Benefit';
     const updateBtn = document.getElementById('addNewUser-btn') as HTMLAreaElement;
     updateBtn.innerHTML = "Update";
     this.ordersForm.patchValue(this.orderlist[id]);

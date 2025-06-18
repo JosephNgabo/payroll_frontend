@@ -1,5 +1,5 @@
 <div class="container-fluid">
-  <app-page-title title="Users Management" [breadcrumbItems]="breadCrumbItems"></app-page-title>
+  <app-page-title title="User Management" [breadcrumbItems]="breadCrumbItems"></app-page-title>
 
   <div class="row">
     <div class="col-12">
@@ -17,7 +17,7 @@
             <div class="col-sm-8">
               <div class="text-sm-end">
                 <button type="button" class="btn btn-success btn-rounded mb-2 me-2" (click)="showModal.show()"><i class="mdi mdi-plus mr-1"></i>
-                  Add New User</button>
+                  Add new user</button>
               </div>
             </div>
           </div>
@@ -32,12 +32,14 @@
                       <label class="form-check-label" for="transactionCheck01"></label>
                     </div>
                   </th>
-                  <th class="align-middle">Employee ID</th>
-                  <th class="align-middle">Full Name</th>
+                  <th class="align-middle">User ID</th>
+                  <th class="align-middle">First Name</th>
+                  <th class="align-middle">Last Name</th>
+                  <th class="align-middle">Username</th>
+                  <th class="align-middle">Phone</th>
+                  <th class="align-middle">Title</th>
+                  <th class="align-middle">Language</th>
                   <th class="align-middle">Email</th>
-                  <th class="align-middle">Department</th>
-                  <th class="align-middle">Role</th>
-                  <th class="align-middle">Status</th>
                   <th class="align-middle">View Details</th>
                   <th class="align-middle">Action</th>
                 </tr>
@@ -54,14 +56,15 @@
                   <td>
                     <a href="javascript: void(0);" class="text-body fw-bold">{{data.id}}</a>
                   </td>
-                  <td>{{data.name}}</td>
-                  <td>{{data.email}}</td>
-                  <td>{{data.department}}</td>
-                  <td>{{data.role}}</td>
+                  <td>{{data.firstname}}</td>
+                  <td>{{data.lastname}}</td>
+                  <td>{{data.username}}</td>
+                  <td>{{data.phone}}</td>
+                  <td>{{data.title}}</td>
                   <td>
-                    <span class="badge badge-pill badge-soft-success font-size-11" [ngClass]=" { 'badge-soft-danger': data.status === 'Inactive',
-                                  'badge-soft-warning': data.status === 'Pending' }">{{data.status}}</span>
+                    <span class="badge badge-pill badge-soft-info font-size-11">{{data.language === 'en' ? 'English' : 'French'}}</span>
                   </td>
+                  <td>{{data.email}}</td>
                   <td>
                     <button type="button" class="btn btn-primary btn-sm btn-rounded" (click)="openViewModal(ViewContent)">View
                       Details</button>
@@ -97,32 +100,36 @@
       <table class="table table-centered table-nowrap">
         <tbody>
           <tr>
-            <td><strong>Employee ID:</strong></td>
+            <td><strong>User ID:</strong></td>
             <td>#EMP001</td>
           </tr>
           <tr>
-            <td><strong>Full Name:</strong></td>
-            <td>John Doe</td>
+            <td><strong>First Name:</strong></td>
+            <td>Mugisha</td>
+          </tr>
+          <tr>
+            <td><strong>Last Name:</strong></td>
+            <td>Benjamin</td>
+          </tr>
+          <tr>
+            <td><strong>Username:</strong></td>
+            <td>mugisha_ben</td>
+          </tr>
+          <tr>
+            <td><strong>Phone:</strong></td>
+            <td>+250789123456</td>
+          </tr>
+          <tr>
+            <td><strong>Title:</strong></td>
+            <td>Software Developer</td>
+          </tr>
+          <tr>
+            <td><strong>Language:</strong></td>
+            <td><span class="badge badge-pill badge-soft-info">English</span></td>
           </tr>
           <tr>
             <td><strong>Email:</strong></td>
-            <td>john.doe&#64;example.com</td>
-          </tr>
-          <tr>
-            <td><strong>Department:</strong></td>
-            <td>IT</td>
-          </tr>
-          <tr>
-            <td><strong>Role:</strong></td>
-            <td>Developer</td>
-          </tr>
-          <tr>
-            <td><strong>Status:</strong></td>
-            <td><span class="badge badge-pill badge-soft-success">Active</span></td>
-          </tr>
-          <tr>
-            <td><strong>Join Date:</strong></td>
-            <td>01/01/2023</td>
+            <td>benjamin&#64;gmail.com</td>
           </tr>
         </tbody>
       </table>
@@ -145,14 +152,69 @@
         <form (ngSubmit)="saveUser()" [formGroup]="ordersForm" class="needs-validation" id="createuser-form" novalidate>
           <div class="row">
             <div class="col-lg-12">
-              <input type="hidden" class="form-control" id="userid-input">
+              <input type="hidden" class="form-control" id="userid-input" formControlName="id">
               <div class="mb-3">
-                <label for="fullname-field" class="form-label">Full Name</label>
-                <input type="text" id="fullname-field" class="form-control" placeholder="Enter full name" required formControlName="name" [ngClass]="{ 'is-invalid': submitted && form['name'].errors }" />
-                @if(submitted && form['name'].errors){
+                <label for="firstname-field" class="form-label">First Name</label>
+                <input type="text" id="firstname-field" class="form-control" placeholder="Enter first name" required formControlName="firstname" [ngClass]="{ 'is-invalid': submitted && form['firstname'].errors }" />
+                @if(submitted && form['firstname'].errors){
                 <div class="invalid-feedback" align="left">
-                  @if(form['name'].errors['required']){
-                  <div>Please enter a name.</div>}
+                  @if(form['firstname'].errors['required']){
+                  <div>First name is required.</div>}
+                </div>}
+              </div>
+              <div class="mb-3">
+                <label for="lastname-field" class="form-label">Last Name</label>
+                <input type="text" id="lastname-field" class="form-control" placeholder="Enter last name" required formControlName="lastname" [ngClass]="{ 'is-invalid': submitted && form['lastname'].errors }" />
+                @if(submitted && form['lastname'].errors){
+                <div class="invalid-feedback" align="left">
+                  @if(form['lastname'].errors['required']){
+                  <div>Last name is required.</div>}
+                </div>}
+              </div>
+              <div class="mb-3">
+                <label for="username-field" class="form-label">Username</label>
+                <input type="text" id="username-field" class="form-control" placeholder="Enter username" required formControlName="username" [ngClass]="{ 'is-invalid': submitted && form['username'].errors }" />
+                @if(submitted && form['username'].errors){
+                <div class="invalid-feedback" align="left">
+                  @if(form['username'].errors['required']){
+                  <div>Username is required.</div>}
+                  @if(form['username'].errors['minlength']){
+                  <div>Username must be at least 3 characters.</div>}
+                  @if(form['username'].errors['maxlength']){
+                  <div>Username must not exceed 20 characters.</div>}
+                </div>}
+              </div>
+              <div class="mb-3">
+                <label for="phone-field" class="form-label">Phone</label>
+                <input type="text" id="phone-field" class="form-control" placeholder="Enter phone number" required formControlName="phone" [ngClass]="{ 'is-invalid': submitted && form['phone'].errors }" />
+                @if(submitted && form['phone'].errors){
+                <div class="invalid-feedback" align="left">
+                  @if(form['phone'].errors['required']){
+                  <div>Phone number is required.</div>}
+                </div>}
+              </div>
+              <div class="mb-3">
+                <label for="title-field" class="form-label">Title</label>
+                <input type="text" id="title-field" class="form-control" placeholder="Enter job title" required formControlName="title" [ngClass]="{ 'is-invalid': submitted && form['title'].errors }" />
+                @if(submitted && form['title'].errors){
+                <div class="invalid-feedback" align="left">
+                  @if(form['title'].errors['required']){
+                  <div>Title is required.</div>}
+                </div>}
+              </div>
+              <div class="mb-3">
+                <label for="language-field" class="form-label">Language</label>
+                <select id="language-field" class="form-select" formControlName="language" required [ngClass]="{ 'is-invalid': submitted && form['language'].errors }">
+                  <option value="">Select Language</option>
+                  <option value="en">English</option>
+                  <option value="fr">French</option>
+                </select>
+                @if(submitted && form['language'].errors){
+                <div class="invalid-feedback" align="left">
+                  @if(form['language'].errors['required']){
+                  <div>Language is required.</div>}
+                  @if(form['language'].errors['pattern']){
+                  <div>Please select a valid language.</div>}
                 </div>}
               </div>
               <div class="mb-3">
@@ -161,39 +223,10 @@
                 @if(submitted && form['email'].errors){
                 <div class="invalid-feedback" align="left">
                   @if(form['email'].errors['required']){
-                  <div>Please enter an email.</div>}
+                  <div>Email is required.</div>}
                   @if(form['email'].errors['email']){
                   <div>Please enter a valid email address.</div>}
                 </div>}
-              </div>
-              <div class="mb-3">
-                <label for="department-field" class="form-label">Department</label>
-                <select class="form-select" id="department-field" formControlName="department" required>
-                  <option value="">Select Department</option>
-                  <option value="IT">IT</option>
-                  <option value="HR">HR</option>
-                  <option value="Finance">Finance</option>
-                  <option value="Marketing">Marketing</option>
-                </select>
-              </div>
-              <div class="mb-3">
-                <label for="role-field" class="form-label">Role</label>
-                <select class="form-select" id="role-field" formControlName="role" required>
-                  <option value="">Select Role</option>
-                  <option value="Admin">Admin</option>
-                  <option value="Manager">Manager</option>
-                  <option value="Developer">Developer</option>
-                  <option value="User">User</option>
-                </select>
-              </div>
-              <div class="mb-3">
-                <label for="status-field" class="form-label">Status</label>
-                <select class="form-select" id="status-field" formControlName="status" required>
-                  <option value="">Select Status</option>
-                  <option value="Active">Active</option>
-                  <option value="Inactive">Inactive</option>
-                  <option value="Pending">Pending</option>
-                </select>
               </div>
             </div>
           </div>

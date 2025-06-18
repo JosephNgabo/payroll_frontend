@@ -1,0 +1,36 @@
+.form-check-input:checked {
+  background-color: #405189;
+  border-color: #405189;
+}
+
+.table {
+  th {
+    background-color: #f8f9fa;
+  }
+  
+  td {
+    vertical-align: middle;
+  }
+}
+
+.btn-sm {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.875rem;
+}
+
+.modal-body {
+  padding: 1.5rem;
+}
+
+.form-label {
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+.alert {
+  margin-bottom: 1rem;
+}
+
+.invalid-feedback {
+  display: block;
+} 

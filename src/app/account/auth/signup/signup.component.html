@@ -1,78 +1,176 @@
-<div class="min-vh-100">
+<div class="container-fluid p-0">
   <div class="row g-0">
-    <!-- Left Column - Image -->
-    <div class="col-lg-6 bg-primary-subtle min-vh-100 position-relative">
-      <img src="assets/images/login-illustration.jpg" alt="Signup" class="w-100 h-100" style="object-fit: cover;">
-    </div>
 
-    <!-- Right Column - Signup Form -->
-    <div class="col-lg-6 min-vh-100 d-flex align-items-center justify-content-center">
-      <div class="p-4 p-lg-5" style="max-width: 450px; width: 100%;">
-        <div class="text-center mb-4">
-          <a routerLink="/">
-            <div class="avatar-md profile-user-wid mx-auto">
-              <span class="avatar-title rounded-circle bg-light">
-                <img src="assets/images/logo.svg" alt="" class="rounded-circle" height="34">
-              </span>
-            </div>
-          </a>
-          <h2 class="text-primary fw-bold mt-4 mb-2">Join Kuranga HR</h2>
-          <p class="text-muted mb-4">Create your account and start managing your HR processes</p>
-        </div>
+      <div class="col-xl-6">
+          <div class="auth-full-bg pt-lg-5 p-4">
+              <div class="w-100">
+                  <div class="bg-overlay"></div>
+                  <div class="d-flex h-100 flex-column">
 
-        <form class="needs-validation" name="signupForm" [formGroup]="signupForm" (ngSubmit)="onSubmit()" novalidate>
-          @if(successmsg){
-          <alert type="success" [dismissible]="false">Registration successful.</alert>
-          }
-          @if(error){
-          <alert type="danger" [dismissible]="false">{{ error }}</alert>
-          }
-
-          <div class="mb-3">
-            <label for="username" class="form-label">Username</label>
-            <input type="text" formControlName="username" class="form-control" [ngClass]="{ 'is-invalid': submitted && f.username.errors }" id="username" placeholder="Enter username" />
-            @if(submitted && f.username.errors){
-            <div class="invalid-feedback">
-              @if(f.username.errors.required){
-              <div>Username is required</div>}
-            </div>}
+                      <div class="p-4 mt-auto">
+                          <div class="row justify-content-center">
+                              <div class="col-lg-7">
+                                  <div class="text-center">
+                                      <h4 class="mb-3"><i class="bx bxs-quote-alt-left text-primary h1 align-middle me-3"></i><span class="text-primary">Join</span> Kuranga Payroll & HR!</h4>
+                                      <p class="font-size-16 mb-4">" Simplify your payroll and human resources management with our comprehensive and easy-to-use application. Efficient, accurate, and designed for your success. "
+                                      </p>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
           </div>
-
-          <div class="mb-3">
-            <label for="email" class="form-label">Email</label>
-            <input type="email" formControlName="email" class="form-control" [ngClass]="{ 'is-invalid': submitted && f.email.errors }" id="email" placeholder="Enter your email" />
-            @if(submitted && f.email.errors){
-            <div class="invalid-feedback">
-              @if(f.email.errors.required){
-              <div>Email is required</div>}
-              @if(f.email.errors.email){
-              <div>Email must be a valid email address</div>}
-            </div>}
-          </div>
-
-          <div class="mb-3">
-            <label for="password" class="form-label">Password</label>
-            <input type="password" formControlName="password" class="form-control" [ngClass]="{ 'is-invalid': submitted && f.password.errors }" id="password" placeholder="Enter password" />
-            @if(submitted && f.password.errors){
-            <div class="invalid-feedback">
-              @if(f.password.errors.required){
-              <div>Password is required</div>}
-            </div>}
-          </div>
-
-          <div class="mt-4 d-grid">
-            <button class="btn btn-primary" type="submit">Create Account</button>
-          </div>
-
-          <div class="mt-4 text-center">
-            <p class="mb-0">By registering you agree to the Kuranga's <a href="javascript: void(0);" class="text-primary">Terms of Use</a></p>
-          </div>
-        </form>
-
-        <div class="mt-4 text-center">
-          <p>Already have an account? <a routerLink="/auth/login" class="fw-medium text-primary">Login</a></p>
-        </div>
       </div>
-    </div>
+      <!-- end col -->
+
+      <div class="col-xl-6">
+          <div class="auth-full-page-content p-md-5 p-4">
+              <div class="w-100">
+
+                  <div class="d-flex flex-column h-100">
+                      <div class="mb-4 mb-md-5">
+                          <a routerLink="/" class="d-block auth-logo">
+                              <img src="assets/images/logo-dark.png" alt="" height="18" class="auth-logo-dark">
+                              <img src="assets/images/logo-light.png" alt="" height="18" class="auth-logo-light">
+                          </a>
+                      </div>
+                      <div class="my-auto">
+
+                          <div>
+                              <h5 class="text-primary">Register User</h5>
+                              <p class="text-muted">Create an account to get started with Kuranga</p>
+                          </div>
+
+                          <div class="mt-4">
+                              <form [formGroup]="signupForm" (ngSubmit)="onSubmit()">
+
+                                  <div class="mb-3">
+                                      <label for="firstname" class="form-label">First Name</label>
+                                      <input type="text" formControlName="firstname" class="form-control" [ngClass]="{ 'is-invalid': submitted && f.firstname.errors }" id="firstname" placeholder="Enter first name" />
+                                      @if(submitted && f.firstname.errors){
+                                      <div class="invalid-feedback">
+                                          @if(f.firstname.errors.required){
+                                          <div>First Name is required</div>}
+                                      </div>}
+                                  </div>
+
+                                  <div class="mb-3">
+                                      <label for="lastname" class="form-label">Last Name</label>
+                                      <input type="text" formControlName="lastname" class="form-control" [ngClass]="{ 'is-invalid': submitted && f.lastname.errors }" id="lastname" placeholder="Enter last name" />
+                                      @if(submitted && f.lastname.errors){
+                                      <div class="invalid-feedback">
+                                          @if(f.lastname.errors.required){
+                                          <div>Last Name is required</div>}
+                                      </div>}
+                                  </div>
+
+                                  <div class="mb-3">
+                                      <label for="username" class="form-label">Username</label>
+                                      <input type="text" formControlName="username" class="form-control" [ngClass]="{ 'is-invalid': submitted && f.username.errors }" id="username" placeholder="Enter username" />
+                                      @if(submitted && f.username.errors){
+                                      <div class="invalid-feedback">
+                                          @if(f.username.errors.required){
+                                          <div>Username is required</div>}
+                                          @if(f.username.errors.minlength){
+                                          <div>Username must be at least 3 characters</div>}
+                                          @if(f.username.errors.maxlength){
+                                          <div>Username cannot exceed 20 characters</div>}
+                                      </div>}
+                                  </div>
+
+                                  <div class="mb-3">
+                                      <label for="phone" class="form-label">Phone</label>
+                                      <input type="text" formControlName="phone" class="form-control" [ngClass]="{ 'is-invalid': submitted && f.phone.errors }" id="phone" placeholder="Enter phone number" />
+                                      @if(submitted && f.phone.errors){
+                                      <div class="invalid-feedback">
+                                          @if(f.phone.errors.required){
+                                          <div>Phone number is required</div>}
+                                      </div>}
+                                  </div>
+
+                                  <div class="mb-3">
+                                      <label for="title" class="form-label">Title</label>
+                                      <input type="text" formControlName="title" class="form-control" [ngClass]="{ 'is-invalid': submitted && f.title.errors }" id="title" placeholder="Enter your title (e.g., Manager, Employee)" />
+                                      @if(submitted && f.title.errors){
+                                      <div class="invalid-feedback">
+                                          @if(f.title.errors.required){
+                                          <div>Title is required</div>}
+                                      </div>}
+                                  </div>
+
+                                  <div class="mb-3">
+                                      <label for="language" class="form-label">Language</label>
+                                      <select formControlName="language" class="form-select" [ngClass]="{ 'is-invalid': submitted && f.language.errors }" id="language">
+                                          <option value="en">English</option>
+                                          <option value="fr">French</option>
+                                      </select>
+                                      @if(submitted && f.language.errors){
+                                      <div class="invalid-feedback">
+                                          @if(f.language.errors.required){
+                                          <div>Language is required</div>}
+                                          @if(f.language.errors.pattern){
+                                          <div>Invalid language selected</div>}
+                                      </div>}
+                                  </div>
+
+                                  <div class="mb-3">
+                                      <label for="email" class="form-label">Email</label>
+                                      <input type="email" formControlName="email" class="form-control" [ngClass]="{ 'is-invalid': submitted && f.email.errors }" id="email" placeholder="Enter your email" />
+                                      @if(submitted && f.email.errors){
+                                      <div class="invalid-feedback">
+                                          @if(f.email.errors.required){
+                                          <div>Email is required</div>}
+                                          @if(f.email.errors.email){
+                                          <div>Email must be a valid email address</div>}
+                                      </div>}
+                                  </div>
+
+                                  <div class="mb-3">
+                                      <label for="password" class="form-label">Password</label>
+                                      <div class="input-group auth-pass-inputgroup">
+                                          <input [type]="fieldTextType ? 'text' : 'password'" class="form-control" formControlName="password" placeholder="Enter password" [ngClass]="{ 'is-invalid': submitted && f.password.errors }">
+                                          <button class="btn btn-light ms-0" type="button" id="password-addon">
+                                              <i class="mdi mdi-eye-outline" [ngClass]="{'mdi-eye-off-outline': !fieldTextType, 'mdi-eye-outline': fieldTextType}" (click)="toggleFieldTextType()"></i>
+                                          </button>
+                                          @if(submitted && f.password.errors){
+                                          <div class="invalid-feedback">
+                                              @if(f.password.errors.required){
+                                              <span>Password is required</span>
+                                              }
+                                          </div>}
+                                      </div>
+                                  </div>
+
+                                  <div class="form-check">
+                                      <input class="form-check-input" type="checkbox" id="terms-check">
+                                      <label class="form-check-label" for="terms-check">
+                                          I agree to the <a href="javascript: void(0);" class="text-primary">Terms of Use</a>
+                                      </label>
+                                  </div>
+
+                                  <div class="mt-4 d-grid">
+                                      <button class="btn btn-primary" type="submit">Register User</button>
+                                  </div>
+                              </form>
+
+                              <div class="mt-4 text-center">
+                                  <p>Already have an account? <a routerLink="/auth/login" class="fw-medium text-primary">Login</a></p>
+                              </div>
+                          </div>
+                      </div>
+
+                      <div class="mt-4 mt-md-5 text-center">
+                          <p class="mb-0">©
+                              {{year}} Kuranga. Crafted with <i class="mdi mdi-heart text-danger"></i> by
+                              Themesbrand</p>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+      <!-- end col -->
   </div>
+  <!-- end row -->
 </div>
+<!-- end container-fluid -->

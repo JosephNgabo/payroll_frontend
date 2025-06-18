@@ -7,17 +7,18 @@ import { ModalDirective } from 'ngx-bootstrap/modal';
 import { UntypedFormBuilder, UntypedFormGroup, FormArray, Validators } from '@angular/forms';
 import { DatePipe } from '@angular/common';
 import { Store } from '@ngrx/store';
+import { SkeletonComponent } from 'src/app/shared/ui/skeleton/skeleton.component';
+import { TableSkeletonComponent } from 'src/app/shared/ui/skeleton/table-skeleton.component';
 
 @Component({
-  selector: 'app-users',
-  templateUrl: './users.component.html',
-  styleUrls: ['./users.component.scss']
+  selector: 'app-department',
+  templateUrl: './department.component.html',
+  styleUrl: './department.component.scss'
 })
-
 /**
- *  users component
+ *  Department component
  */
-export class UsersComponent {
+export class DepartmentComponent {
   enditem: any;
   modalRef?: BsModalRef;
   masterSelected!: boolean;
@@ -33,6 +34,7 @@ export class UsersComponent {
   page: any = 1;
   deletId: any;
   Allorderlist: any;
+  isLoading: boolean = true; // Loading state
   @ViewChild('showModal', { static: false }) showModal?: ModalDirective;
   @ViewChild('removeItemModal', { static: false }) removeItemModal?: ModalDirective;
 
@@ -44,56 +46,60 @@ export class UsersComponent {
   ) { }
 
   ngOnInit() {
-    this.breadCrumbItems = [{ label: 'Access Management' }, { label: 'Users', active: true }];
+    this.breadCrumbItems = [{ label: 'Organization Management' }, { label: 'Departments', active: true }];
 
     /**
-     * Form Validation - Updated to match backend requirements
+     * Form Validation - Updated for Department Management
      */
     this.ordersForm = this.formBuilder.group({
       id: [''],
-      firstname: ['', [Validators.required]],
-      lastname: ['', [Validators.required]],
-      username: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(20)]],
-      phone: ['', [Validators.required]],
-      title: ['', [Validators.required]],
-      language: ['', [Validators.required, Validators.pattern('^(en|fr)$')]],
-      email: ['', [Validators.required, Validators.email]]
+      name: ['', [Validators.required]],
+      description: ['', [Validators.required]]
     });
 
-    // Mock data for testing - Updated to match new structure
-    this.orderlist = [
-      {
-        id: 'EMP001',
-        firstname: 'Mugisha',
-        lastname: 'Benjamin',
-        username: 'mugisha_ben',
-        phone: '+250789123456',
-        title: 'Software Developer',
-        language: 'en',
-        email: 'benjamin@gmail.com'
-      },
-      {
-        id: 'EMP002',
-        firstname: 'Ishimwe',
-        lastname: 'Nadia',
-        username: 'ishimwe_nadia',
-        phone: '+250789123457',
-        title: 'HR Manager',
-        language: 'en',
-        email: 'nadia@gmail.com'
-      },
-      {
-        id: 'EMP003',
-        firstname: 'Muneza',
-        lastname: 'Jackson',
-        username: 'muneza_jack',
-        phone: '+250789123458',
-        title: 'Finance Analyst',
-        language: 'fr',
-        email: 'jackson@gmail.com'
-      }
-    ];
-    this.Allorderlist = this.orderlist;
+    // Simulate loading delay
+    this.loadData();
+  }
+
+  /**
+   * Load data with loading state
+   */
+  loadData() {
+    this.isLoading = true;
+    
+    // Simulate API call delay
+    setTimeout(() => {
+      // Mock data for testing - Updated for Department Management
+      this.orderlist = [
+        {
+          id: 'DEPT001',
+          name: 'Information Technology',
+          description: 'Handles all IT infrastructure, software development, and technical support'
+        },
+        {
+          id: 'DEPT002',
+          name: 'Human Resources',
+          description: 'Manages employee relations, recruitment, training, and HR policies'
+        },
+        {
+          id: 'DEPT003',
+          name: 'Finance',
+          description: 'Handles financial planning, accounting, budgeting, and financial reporting'
+        },
+        {
+          id: 'DEPT004',
+          name: 'Marketing',
+          description: 'Manages brand promotion, advertising, market research, and customer engagement'
+        },
+        {
+          id: 'DEPT005',
+          name: 'Operations',
+          description: 'Oversees daily business operations, process improvement, and quality management'
+        }
+      ];
+      this.Allorderlist = this.orderlist;
+      this.isLoading = false;
+    }, 1500); // 1.5 second delay to show skeleton
   }
 
   /**
@@ -128,20 +134,17 @@ export class UsersComponent {
   }
   // delete order
   deleteOrder() {
-    // Here you would typically call your API to delete the user
+    // Here you would typically call your API to delete the department
     this.orderlist = this.orderlist.filter((item: any) => item.id !== this.deletId);
     this.removeItemModal?.hide();
   }
 
-  // fiter job - Updated to search in new fields
+  // fiter job - Updated to search in department fields
   searchOrder() {
     if (this.term) {
       this.orderlist = this.Allorderlist.filter((data: any) => {
-        return data.firstname.toLowerCase().includes(this.term.toLowerCase()) ||
-               data.lastname.toLowerCase().includes(this.term.toLowerCase()) ||
-               data.username.toLowerCase().includes(this.term.toLowerCase()) ||
-               data.email.toLowerCase().includes(this.term.toLowerCase()) ||
-               data.title.toLowerCase().includes(this.term.toLowerCase());
+        return data.name.toLowerCase().includes(this.term.toLowerCase()) ||
+               data.description.toLowerCase().includes(this.term.toLowerCase());
       });
     } else {
       this.orderlist = this.Allorderlist;
@@ -164,21 +167,21 @@ export class UsersComponent {
   }
 
   /**
-  * Save user - Updated to handle new fields
+  * Save department
   */
   saveUser() {
     this.submitted = true;
     if (this.ordersForm.valid) {
       if (this.ordersForm.get('id')?.value) {
-        // Update existing user
+        // Update existing department
         const updatedData = this.ordersForm.value;
         const index = this.orderlist.findIndex((item: any) => item.id === updatedData.id);
         if (index !== -1) {
           this.orderlist[index] = updatedData;
         }
       } else {
-        // Add new user
-        const newId = 'EMP' + (this.orderlist.length + 1).toString().padStart(3, '0');
+        // Add new department
+        const newId = 'DEPT' + (this.orderlist.length + 1).toString().padStart(3, '0');
         this.ordersForm.controls['id'].setValue(newId);
         const newData = this.ordersForm.value;
         this.orderlist.push(newData);
@@ -196,7 +199,7 @@ export class UsersComponent {
     this.submitted = false;
     this.showModal?.show();
     const modelTitle = document.querySelector('.modal-title') as HTMLAreaElement;
-    modelTitle.innerHTML = 'Edit User';
+    modelTitle.innerHTML = 'Edit Department';
     const updateBtn = document.getElementById('addNewUser-btn') as HTMLAreaElement;
     updateBtn.innerHTML = "Update";
     this.ordersForm.patchValue(this.orderlist[id]);
