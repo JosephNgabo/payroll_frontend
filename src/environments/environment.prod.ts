@@ -1,7 +1,7 @@
 export const environment = {
   production: true,
-  defaultauth: 'fakebackend',
-  apiUrl: 'https://your-api-url.com/api',
+  defaultauth: 'laravel',
+  apiUrl: 'http://38.242.240.201:8000/api',
   firebaseConfig: {
     apiKey: '',
     authDomain: '',
