@@ -5,7 +5,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { AuthenticationService } from '../../../core/services/auth.service';
 import { environment } from '../../../../environments/environment';
 import { first } from 'rxjs/operators';
-import { UserProfileService } from '../../../core/services/user.service';
+import { UserProfileService } from '../../../core/services/user-profile.service';
 import { Store } from '@ngrx/store';
 import { Register } from 'src/app/store/Authentication/authentication.actions';
 import { CommonModule } from '@angular/common';

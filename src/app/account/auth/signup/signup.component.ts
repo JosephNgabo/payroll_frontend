@@ -5,7 +5,7 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { AuthenticationService } from '../../../core/services/auth.service';
 import { environment } from '../../../../environments/environment';
 import { first } from 'rxjs/operators';
-import { UserProfileService } from '../../../core/services/user.service';
+// import { UserProfileService } from '../../../core/services/user.service';
 import { Store } from '@ngrx/store';
 import { Register } from 'src/app/store/Authentication/authentication.actions';
 import { CommonModule } from '@angular/common';
@@ -30,7 +30,7 @@ export class SignupComponent implements OnInit {
 
   // tslint:disable-next-line: max-line-length
   constructor(private formBuilder: UntypedFormBuilder, private route: ActivatedRoute, private router: Router, private authenticationService: AuthenticationService,
-    private userService: UserProfileService, public store: Store) { }
+     public store: Store) { }
 
   ngOnInit() {
     this.signupForm = this.formBuilder.group({

@@ -21,23 +21,33 @@ import { FakeBackendInterceptor } from './app/core/helpers/fake-backend';
 import { HTTP_INTERCEPTORS, provideHttpClient } from '@angular/common/http';
 import { JwtInterceptor } from './app/core/helpers/jwt.interceptor';
 import { ErrorInterceptor } from './app/core/helpers/error.interceptor';
+import { AuthInterceptor } from './app/core/interceptors/auth.interceptor';
+
 // Enable production mode if in production environment
 if (environment.production) {
   enableProdMode();
 }
 
+// Configure interceptors based on authentication type
+const interceptors = [];
+
 if (environment.defaultauth === 'firebase') {
   initFirebaseBackend(environment.firebaseConfig);
+} else if (environment.defaultauth === 'laravel') {
+  // Use Laravel authentication interceptor
+  interceptors.push({ provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true });
 } else {
-  FakeBackendInterceptor;
+  // Use fake backend for development/testing
+  interceptors.push({ provide: HTTP_INTERCEPTORS, useClass: FakeBackendInterceptor, multi: true });
 }
+
+// Always include error interceptor
+interceptors.push({ provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true });
 
 bootstrapApplication(AppComponent, {
   providers: [
     provideHttpClient(),
-    { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
-    { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
-    { provide: HTTP_INTERCEPTORS, useClass: FakeBackendInterceptor, multi: true },
+    ...interceptors,
     ...appConfig.providers
   ]
 })

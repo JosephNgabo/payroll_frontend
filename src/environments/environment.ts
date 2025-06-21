@@ -4,8 +4,8 @@
 
 export const environment = {
   production: false,
-  defaultauth: 'fakebackend',
-  apiUrl: 'http://localhost:3000/api', // Add your API URL here
+  defaultauth: 'laravel',
+  apiUrl: 'http://38.242.240.201:8000/api', // Updated to your Laravel backend URL
   firebaseConfig: {
     apiKey: "",
     authDomain: "",
