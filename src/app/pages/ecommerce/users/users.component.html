@@ -62,7 +62,7 @@
                   </td>
                   <td>
                     <div class="d-flex gap-3">
-                      <a href="javascript:void(0);" (click)="editModal(user)" class="text-success"><i class="mdi mdi-pencil font-size-18"></i></a>
+                      <a href="javascript:void(0);" (click)="editModal(user, showModal)" class="text-success"><i class="mdi mdi-pencil font-size-18"></i></a>
                       <a href="javascript:void(0);" (click)="confirmDelete(user.id)" class="text-danger"><i class="mdi mdi-delete font-size-18"></i></a>
                     </div>
                   </td>
@@ -102,6 +102,9 @@
   </div>
   <div class="modal-body">
     <form (ngSubmit)="saveUser()" [formGroup]="ordersForm">
+      <!-- Hidden field for user ID -->
+      <input type="hidden" formControlName="id">
+      
       <div class="mb-3">
         <label for="firstname-field" class="form-label">First Name</label>
         <input type="text" id="firstname-field" class="form-control" formControlName="firstname" required>
@@ -120,7 +123,7 @@
       </div>
       <div class="mb-3">
         <label for="email-field" class="form-label">Email</label>
-        <input type="email" id="email-field" class="form-control" formControlName="email" required>
+        <input type="email" id="email-field" class="form-control" formControlName="email" [readonly]="isEditMode" required>
         <div *ngIf="(form['email'].touched || submitted) && form['email'].errors" class="text-danger mt-1">
           <small *ngIf="form['email'].errors['required']">Email is required</small>
           <small *ngIf="form['email'].errors['email']">Please enter a valid email address</small>
@@ -138,7 +141,7 @@
       </div>
       <div class="mb-3">
         <label for="username-field" class="form-label">Username</label>
-        <input type="text" id="username-field" class="form-control" formControlName="username" required>
+        <input type="text" id="username-field" class="form-control" formControlName="username" [readonly]="isEditMode" required>
         <div *ngIf="(form['username'].touched || submitted) && form['username'].errors" class="text-danger mt-1">
           <small *ngIf="form['username'].errors['required']">Username is required</small>
           <small *ngIf="form['username'].errors['minlength']">Username must be at least 3 characters</small>

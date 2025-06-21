@@ -6,6 +6,7 @@ import { AuthenticationService } from '../../../core/services/auth.service';
 import { environment } from '../../../../environments/environment';
 import { CommonModule } from '@angular/common';
 import { SlickCarouselModule } from 'ngx-slick-carousel';
+import { UserService } from 'src/app/core/services/user.service';
 
 @Component({
   selector: 'app-recoverpwd2',
@@ -25,7 +26,7 @@ export class Recoverpwd2Component implements OnInit {
   success: any = '';
   loading: any = false;
 
-  constructor(private formBuilder: UntypedFormBuilder, private route: ActivatedRoute, private router: Router, private authenticationService: AuthenticationService) { }
+  constructor(private formBuilder: UntypedFormBuilder, private route: ActivatedRoute, private router: Router, private authenticationService: AuthenticationService, private userService: UserService) { }
 
   ngOnInit(): void {
     this.resetForm = this.formBuilder.group({
@@ -41,18 +42,31 @@ export class Recoverpwd2Component implements OnInit {
    */
   onSubmit() {
     this.success = '';
+    this.error = '';
     this.submitted = true;
 
-    // stop here if form is invalid
     if (this.resetForm.invalid) {
       return;
     }
-    if (environment.defaultauth === 'firebase') {
-      this.authenticationService.resetPassword(this.f.email.value)
-        .catch(error => {
-          this.error = error ? error : '';
-        });
-    }
+
+    // Debug log
+    console.log('Submitting forgot password for:', this.f.email.value);
+
+    this.loading = true;
+    this.userService.forgotPassword(this.f.email.value).subscribe({
+      next: (res) => {
+        this.success = 'Check your email for reset instructions.';
+        this.loading = false;
+        this.resetForm.reset();
+        this.submitted = false;
+        console.log('Forgot password success:', res);
+      },
+      error: (err) => {
+        this.error = err.error?.message || 'Failed to send reset instructions. Please try again.';
+        this.loading = false;
+        console.log('Forgot password error:', err);
+      }
+    });
   }
   // swiper config
   slideConfig = {

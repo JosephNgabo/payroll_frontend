@@ -9,6 +9,9 @@ import { LaravelAuthService } from './laravel-auth.service';
 // Define a type for the create user payload
 export type CreateUserPayload = Omit<UserDetail, 'id' | 'id_util' | 'verified_at' | 'created_at' | 'updated_at' | 'deleted_at' | 'login_attempts' | 'avatar'> & { password?: string };
 
+// Define a type for the update user payload (similar to create but with optional password)
+export type UpdateUserPayload = Partial<Omit<UserDetail, 'id' | 'id_util' | 'verified_at' | 'created_at' | 'updated_at' | 'deleted_at' | 'login_attempts' | 'avatar'>> & { password?: string };
+
 @Injectable({
   providedIn: 'root'
 })
@@ -36,5 +39,30 @@ export class UserService {
   createUser(userData: CreateUserPayload): Observable<UserDetail> {
     const headers = this.authService.getAuthHeaders();
     return this.http.post<UserDetail>(`${this.API_URL}/user`, userData, { headers });
+  }
+
+  /**
+   * Update an existing user
+   * @param id The user ID to update
+   * @param userData The updated user data
+   */
+  updateUser(id: number, userData: UpdateUserPayload): Observable<UserDetail> {
+    const headers = this.authService.getAuthHeaders();
+    return this.http.put<UserDetail>(`${this.API_URL}/user/${id}`, userData, { headers });
+  }
+
+  /**
+   * Delete a user by ID
+   */
+  deleteUser(id: number | string): Observable<any> {
+    const headers = this.authService.getAuthHeaders();
+    return this.http.delete(`${this.API_URL}/user/${id}`, { headers });
+  }
+
+  /**
+   * Trigger password reset email
+   */
+  forgotPassword(email: string): Observable<any> {
+    return this.http.post(`${this.API_URL}/user/forgot-password`, { email });
   }
 }

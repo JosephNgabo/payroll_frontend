@@ -1,12 +1,13 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, TemplateRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BsModalService, BsModalRef, ModalModule } from 'ngx-bootstrap/modal';
 import { ModalDirective } from 'ngx-bootstrap/modal';
 import { FormBuilder, FormGroup, Validators, FormControl } from '@angular/forms';
 import { Store } from '@ngrx/store';
-import { UserService, CreateUserPayload } from 'src/app/core/services/user.service';
+import { UserService, CreateUserPayload, UpdateUserPayload } from 'src/app/core/services/user.service';
 import { UserDetail, PaginatedUsersResponse } from 'src/app/core/models/user.model';
+import { Observable } from 'rxjs';
 
 // Define a type for the user form for strong typing
 interface UserForm {
@@ -50,6 +51,7 @@ export class UsersComponent implements OnInit {
   submitted = false;
   deletId: any;
   isEditMode = false;
+  originalUserData: UserDetail | null = null; // Track original user data for comparison
 
   // UI
   breadCrumbItems: Array<{}>;
@@ -57,7 +59,7 @@ export class UsersComponent implements OnInit {
   masterSelected!: boolean;
   
   @ViewChild('showModal', { static: false }) showModal?: ModalDirective;
-  @ViewChild('removeItemModal', { static: false }) removeItemModal?: ModalDirective;
+  @ViewChild('removeItemModal') removeItemModal!: TemplateRef<any>;
 
   constructor(
     private modalService: BsModalService,
@@ -124,13 +126,21 @@ export class UsersComponent implements OnInit {
   // Delete Data
   confirmDelete(id: any) {
     this.deletId = id;
-    this.removeItemModal?.show();
+    this.modalRef = this.modalService.show(this.removeItemModal, { class: 'modal-md' });
   }
   // delete order
   deleteUser() {
-    // Here you would call userService.deleteUser(this.deletId)
-    this.userList = this.userList.filter((item: any) => item.id !== this.deletId);
-    this.removeItemModal?.hide();
+    if (!this.deletId) return;
+    this.userService.deleteUser(this.deletId).subscribe({
+      next: () => {
+        this.fetchUsers(); // Refresh the list
+        this.modalRef?.hide();
+      },
+      error: (err) => {
+        console.error('Delete user error:', err);
+        // Optionally show an error message to the user
+      }
+    });
   }
 
   // fiter job - Updated to search in new fields
@@ -157,6 +167,8 @@ export class UsersComponent implements OnInit {
     this.submitted = false;
     this.error = null; // Clear any previous errors
     this.ordersForm.reset();
+    this.originalUserData = null; // Clear original user data for new user creation
+    
     // Clear any server errors
     Object.keys(this.ordersForm.controls).forEach(key => {
       this.ordersForm.get(key)?.setErrors(null);
@@ -176,21 +188,91 @@ export class UsersComponent implements OnInit {
   * Save user - Updated to handle new fields
   */
   saveUser() {
+    console.log('saveUser called. userId:', this.ordersForm.get('id')?.value, 'isEditMode:', this.isEditMode);
+    console.log('=== SAVE USER DEBUG ===');
     this.submitted = true;
     if (this.ordersForm.invalid) {
       this.ordersForm.markAllAsTouched();
+      console.log('Form is invalid, returning early');
       return;
     }
-    if (this.ordersForm.get('id')?.value) {
-      // Here you would call userService.updateUser(this.ordersForm.value)
-      const updatedData = this.ordersForm.value;
-      const index = this.userList.findIndex((item: any) => item.id === updatedData.id);
-      if (index !== -1) {
-        this.userList[index] = { ...this.userList[index], ...updatedData };
+    
+    const formValue = this.ordersForm.value;
+    const userId = this.ordersForm.get('id')?.value;
+    
+    console.log('Full form value:', formValue); // Debug log
+    console.log('User ID from form:', userId, 'Type:', typeof userId); // Debug log
+    console.log('User ID as number:', Number(userId)); // Debug log
+    console.log('Is user ID truthy?', !!userId); // Debug log
+    console.log('Is user ID NaN?', isNaN(Number(userId))); // Debug log
+    
+    if (userId && !isNaN(Number(userId))) {
+      // Update existing user - exclude email and username
+      const updatePayload: Partial<UpdateUserPayload> = {
+        firstname: formValue.firstname,
+        lastname: formValue.lastname,
+        phone: formValue.phone,
+        title: formValue.title,
+        language: formValue.language,
+        is_active: 1,
+        user_profile: 'user'
+      };
+      if (formValue.password) {
+        updatePayload.password = formValue.password;
       }
+      this.userService.updateUser(Number(userId), updatePayload as UpdateUserPayload).subscribe({
+        next: (updatedUser) => {
+          this.fetchUsers();
+          this.modalRef?.hide();
+          this.ordersForm.reset();
+          this.submitted = false;
+        },
+        error: (err) => {
+          console.log('=== UPDATE ERROR DEBUG ===');
+          console.log('Error response:', err); // Debug log
+          console.log('Error status:', err.status); // Debug log
+          console.log('Error message:', err.message); // Debug log
+          console.log('Error URL:', err.url); // Debug log
+          
+          if (err.status === 422 && err.error && err.error.errors) {
+            const errors = err.error.errors;
+            console.log('Validation errors:', errors); // Debug log
+            
+            // Clear any existing server errors first
+            Object.keys(this.ordersForm.controls).forEach(key => {
+              const control = this.ordersForm.get(key);
+              if (control) {
+                const currentErrors = control.errors;
+                if (currentErrors && currentErrors['serverError']) {
+                  delete currentErrors['serverError'];
+                  control.setErrors(Object.keys(currentErrors).length > 0 ? currentErrors : null);
+                }
+              }
+            });
+            
+            // Set new server errors
+            Object.keys(errors).forEach(field => {
+              const control = this.ordersForm.get(field);
+              if (control) {
+                const currentErrors = control.errors || {};
+                const errorMessage = errors[field][0];
+                control.setErrors({ ...currentErrors, serverError: errorMessage });
+                console.log(`Set error on ${field}:`, errorMessage); // Debug log
+              }
+            });
+            
+            // Set a generic error message
+            this.error = err.error.message || 'Please correct the validation errors below.';
+          } else {
+            this.error = err.error?.message || err.message || 'Failed to update user.';
+          }
+          console.log('=== END UPDATE ERROR DEBUG ===');
+        }
+      });
     } else {
-      const formValue = this.ordersForm.value;
-      const payload: CreateUserPayload = {
+      console.log('Creating new user - include email and username');
+      // Create new user - include email and username
+      const createPayload: CreateUserPayload = {
         firstname: formValue.firstname,
         lastname: formValue.lastname,
         username: formValue.username,
@@ -202,7 +284,10 @@ export class UsersComponent implements OnInit {
         is_active: 1,
         user_profile: 'user'
       };
-      this.userService.createUser(payload).subscribe({
+      
+      console.log('Create payload:', createPayload); // Debug log
+      
+      this.userService.createUser(createPayload).subscribe({
         next: (newUser) => {
           this.fetchUsers();
           this.modalRef?.hide();
@@ -210,7 +295,12 @@ export class UsersComponent implements OnInit {
           this.submitted = false;
         },
         error: (err) => {
+          console.log('=== UPDATE ERROR DEBUG ===');
           console.log('Error response:', err); // Debug log
+          console.log('Error status:', err.status); // Debug log
+          console.log('Error message:', err.message); // Debug log
+          console.log('Error URL:', err.url); // Debug log
+          
           if (err.status === 422 && err.error && err.error.errors) {
             const errors = err.error.errors;
             console.log('Validation errors:', errors); // Debug log
@@ -243,6 +333,7 @@ export class UsersComponent implements OnInit {
           } else {
             this.error = err.error?.message || err.message || 'Failed to create user.';
           }
+          console.log('=== END UPDATE ERROR DEBUG ===');
         }
       });
     }
@@ -251,14 +342,53 @@ export class UsersComponent implements OnInit {
    * Open Edit modal
    * @param content modal content
    */
-  editModal(user: UserDetail) {
+  editModal(user: UserDetail, content: any) {
+    console.log('=== EDIT MODAL DEBUG ===');
+    console.log('Editing user:', user); // Debug log
+    console.log('User ID type:', typeof user.id, 'Value:', user.id); // Debug log
+    console.log('User ID as number:', Number(user.id)); // Debug log
+    
     this.isEditMode = true;
     this.submitted = false;
+    this.error = null; // Clear any previous errors
     this.ordersForm.reset();
+    
+    // Store original user data for comparison
+    this.originalUserData = { ...user };
+    console.log('Original user data stored:', this.originalUserData);
+    
+    // Clear any server errors
+    Object.keys(this.ordersForm.controls).forEach(key => {
+      this.ordersForm.get(key)?.setErrors(null);
+    });
+    
+    // Remove password requirement for edit mode
     this.ordersForm.get('password')?.clearValidators();
     this.ordersForm.get('password')?.updateValueAndValidity();
-    this.showModal?.show();
-    this.ordersForm.patchValue(user as any);
+    
+    // Set form values - ensure ID is properly set
+    const formData = {
+      id: user.id ? user.id.toString() : null,
+      firstname: user.firstname,
+      lastname: user.lastname,
+      username: user.username,
+      phone: user.phone,
+      title: user.title,
+      language: user.language as 'en' | 'fr' | '',
+      email: user.email,
+      password: null // Don't populate password in edit mode
+    };
+    console.log('Form data to patch:', formData); // Debug log
+    this.ordersForm.patchValue(formData);
+    
+    // Verify ID was set correctly
+    console.log('Form ID value after patch:', this.ordersForm.get('id')?.value); // Debug log
+    console.log('Form ID type after patch:', typeof this.ordersForm.get('id')?.value); // Debug log
+    console.log('Form ID as number after patch:', Number(this.ordersForm.get('id')?.value)); // Debug log
+    console.log('=== END EDIT MODAL DEBUG ===');
+    
+    // Show modal
+    this.modalRef = this.modalService.show(content, { class: 'modal-md' });
   }
 
   // pagination
