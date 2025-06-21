@@ -1,4 +1,3 @@
-
 import { Component, ViewChild } from '@angular/core';
 import { Observable } from 'rxjs';
 import { CommonModule } from '@angular/common';
@@ -8,6 +7,8 @@ import { ModalDirective } from 'ngx-bootstrap/modal';
 import { UntypedFormBuilder, UntypedFormGroup, FormArray, Validators } from '@angular/forms';
 import { DatePipe } from '@angular/common';
 import { Store } from '@ngrx/store';
+import { SkeletonComponent } from 'src/app/shared/ui/skeleton/skeleton.component';
+import { TableSkeletonComponent } from 'src/app/shared/ui/skeleton/table-skeleton.component';
 
 @Component({
   selector: 'app-allowances-benefits',
@@ -34,6 +35,7 @@ export class AllowancesBenefitsComponent {
   page: any = 1;
   deletId: any;
   Allorderlist: any;
+  isLoading: boolean = true; // Loading state
   @ViewChild('showModal', { static: false }) showModal?: ModalDirective;
   @ViewChild('removeItemModal', { static: false }) removeItemModal?: ModalDirective;
 
@@ -57,34 +59,41 @@ export class AllowancesBenefitsComponent {
       taxValue: ['', [Validators.min(0), Validators.max(100)]]
     });
 
-    // Mock data for testing - Updated for Allowances/Benefits
-    this.orderlist = [
-      {
-        id: 'BEN001',
-        name: 'Housing Allowance',
-        description: 'Monthly housing allowance for employees',
-        taxValue: 15
-      },
-      {
-        id: 'BEN002',
-        name: 'Transport Allowance',
-        description: 'Transportation allowance for commuting',
-        taxValue: 10
-      },
-      {
-        id: 'BEN003',
-        name: 'Medical Insurance',
-        description: 'Comprehensive medical insurance coverage',
-        taxValue: 0
-      },
-      {
-        id: 'BEN004',
-        name: 'Meal Allowance',
-        description: 'Daily meal allowance for employees',
-        taxValue: 5
-      }
-    ];
-    this.Allorderlist = this.orderlist;
+    this.loadData();
+  }
+
+  loadData() {
+    this.isLoading = true;
+    setTimeout(() => {
+      this.orderlist = [
+        {
+          id: 'BEN001',
+          name: 'Housing Allowance',
+          description: 'Monthly housing allowance for employees',
+          taxValue: 15
+        },
+        {
+          id: 'BEN002',
+          name: 'Transport Allowance',
+          description: 'Transportation allowance for commuting',
+          taxValue: 10
+        },
+        {
+          id: 'BEN003',
+          name: 'Medical Insurance',
+          description: 'Comprehensive medical insurance coverage',
+          taxValue: 0
+        },
+        {
+          id: 'BEN004',
+          name: 'Meal Allowance',
+          description: 'Daily meal allowance for employees',
+          taxValue: 5
+        }
+      ];
+      this.Allorderlist = this.orderlist;
+      this.isLoading = false;
+    }, 1500);
   }
 
   /**

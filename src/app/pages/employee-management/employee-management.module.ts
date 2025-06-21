@@ -23,6 +23,8 @@ import { DropzoneModule } from 'ngx-dropzone-wrapper';
 import { DROPZONE_CONFIG } from 'ngx-dropzone-wrapper';
 import { DropzoneConfigInterface } from 'ngx-dropzone-wrapper';
 import { PagetitleComponent } from 'src/app/shared/ui/pagetitle/pagetitle.component';
+import { TableSkeletonComponent } from 'src/app/shared/ui/skeleton/table-skeleton.component';
+
 
 const DEFAULT_DROPZONE_CONFIG: DropzoneConfigInterface = {
   // Change this to your upload POST address:
@@ -47,6 +49,7 @@ const DEFAULT_DROPZONE_CONFIG: DropzoneConfigInterface = {
     PaginationModule.forRoot(),
     BsDatepickerModule.forRoot(),
     DropzoneModule,
+    TableSkeletonComponent,
     PagetitleComponent
   ],
   providers: [

@@ -5,81 +5,91 @@
       <div class="col-12">
         <div class="card">
           <div class="card-body">
-            <div class="row mb-2">
-              <div class="col-sm-4">
-                <div class="search-box me-2 mb-2 d-inline-block">
-                  <div class="position-relative">
-                    <input type="text" class="form-control" autocomplete="off" id="searchTableList" placeholder="Search users..." [(ngModel)]="term" (ngModelChange)="searchOrder()">
-                    <i class="bx bx-search-alt search-icon"></i>
+            <!-- Loading State -->
+            <div *ngIf="isLoading">
+              <app-table-skeleton 
+                [columns]="['Employee ID', 'Full Name', 'Email', 'Department', 'Role', 'Status', 'View Details', 'Action']" 
+                [rowCount]="5">
+              </app-table-skeleton>
+            </div>
+            <!-- Actual Content -->
+            <div *ngIf="!isLoading">
+              <div class="row mb-2">
+                <div class="col-sm-4">
+                  <div class="search-box me-2 mb-2 d-inline-block">
+                    <div class="position-relative">
+                      <input type="text" class="form-control" autocomplete="off" id="searchTableList" placeholder="Search users..." [(ngModel)]="term" (ngModelChange)="searchOrder()">
+                      <i class="bx bx-search-alt search-icon"></i>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-sm-8">
+                  <div class="text-sm-end">
+                    <button type="button" class="btn btn-success btn-rounded mb-2 me-2" (click)="showModal.show()"><i class="mdi mdi-plus mr-1"></i>
+                      Add new employee</button>
                   </div>
                 </div>
               </div>
-              <div class="col-sm-8">
-                <div class="text-sm-end">
-                  <button type="button" class="btn btn-success btn-rounded mb-2 me-2" (click)="showModal.show()"><i class="mdi mdi-plus mr-1"></i>
-                    Add new employee</button>
-                </div>
+              <!-- Table data -->
+              <div class="table-responsive mb-0">
+                <table class="table align-middle table-nowrap dt-responsive nowrap w-100 table-check" id="user-list">
+                  <thead class="table-light">
+                    <tr>
+                      <th style="width: 20px;">
+                        <div class="form-check font-size-16 align-middle">
+                          <input class="form-check-input" type="checkbox" id="transactionCheck01" [(ngModel)]="masterSelected" (change)="checkUncheckAll($event)">
+                          <label class="form-check-label" for="transactionCheck01"></label>
+                        </div>
+                      </th>
+                      <th class="align-middle">Employee ID</th>
+                      <th class="align-middle">Full Name</th>
+                      <th class="align-middle">Email</th>
+                      <th class="align-middle">Department</th>
+                      <th class="align-middle">Role</th>
+                      <th class="align-middle">Status</th>
+                      <th class="align-middle">View Details</th>
+                      <th class="align-middle">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (data of orderlist; track $index) {
+                    <tr id="u_{{data.id}}">
+                      <td>
+                        <div class="form-check font-size-16">
+                          <input class="form-check-input" type="checkbox" id="transactionCheck{{data.index}}" value="{{data.id}}" [(ngModel)]="data.state">
+                          <label class="form-check-label" for="transactionCheck{{data.index}}"></label>
+                        </div>
+                      </td>
+                      <td>
+                        <a href="javascript: void(0);" class="text-body fw-bold">{{data.id}}</a>
+                      </td>
+                      <td>{{data.name}}</td>
+                      <td>{{data.email}}</td>
+                      <td>{{data.department}}</td>
+                      <td>{{data.role}}</td>
+                      <td>
+                        <span class="badge badge-pill badge-soft-success font-size-11" [ngClass]=" { 'badge-soft-danger': data.status === 'Inactive',
+                                      'badge-soft-warning': data.status === 'Pending' }">{{data.status}}</span>
+                      </td>
+                      <td>
+                        <button type="button" class="btn btn-primary btn-sm btn-rounded" (click)="openViewModal(ViewContent)">View
+                          Details</button>
+                      </td>
+                      <td>
+                        <div class="d-flex gap-3">
+                          <a href="javascript:void(0);" class="text-success" (click)="editModal($index)"><i class="mdi mdi-pencil font-size-18"></i></a>
+                          <a href="javascript:void(0);" class="text-danger" (click)="confirm(data.id)"><i class="mdi mdi-delete font-size-18"></i></a>
+                        </div>
+                      </td>
+                    </tr>}
+                  </tbody>
+                </table>
               </div>
+              <!-- end table -->
+              <ul class="pagination pagination-rounded justify-content-end mb-2">
+                <pagination [totalItems]="orderlist?.length" [itemsPerPage]="8" (pagechanged)="pagechanged($event)"></pagination>
+              </ul>
             </div>
-            <!-- Table data -->
-            <div class="table-responsive mb-0">
-              <table class="table align-middle table-nowrap dt-responsive nowrap w-100 table-check" id="user-list">
-                <thead class="table-light">
-                  <tr>
-                    <th style="width: 20px;">
-                      <div class="form-check font-size-16 align-middle">
-                        <input class="form-check-input" type="checkbox" id="transactionCheck01" [(ngModel)]="masterSelected" (change)="checkUncheckAll($event)">
-                        <label class="form-check-label" for="transactionCheck01"></label>
-                      </div>
-                    </th>
-                    <th class="align-middle">Employee ID</th>
-                    <th class="align-middle">Full Name</th>
-                    <th class="align-middle">Email</th>
-                    <th class="align-middle">Department</th>
-                    <th class="align-middle">Role</th>
-                    <th class="align-middle">Status</th>
-                    <th class="align-middle">View Details</th>
-                    <th class="align-middle">Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  @for (data of orderlist; track $index) {
-                  <tr id="u_{{data.id}}">
-                    <td>
-                      <div class="form-check font-size-16">
-                        <input class="form-check-input" type="checkbox" id="transactionCheck{{data.index}}" value="{{data.id}}" [(ngModel)]="data.state">
-                        <label class="form-check-label" for="transactionCheck{{data.index}}"></label>
-                      </div>
-                    </td>
-                    <td>
-                      <a href="javascript: void(0);" class="text-body fw-bold">{{data.id}}</a>
-                    </td>
-                    <td>{{data.name}}</td>
-                    <td>{{data.email}}</td>
-                    <td>{{data.department}}</td>
-                    <td>{{data.role}}</td>
-                    <td>
-                      <span class="badge badge-pill badge-soft-success font-size-11" [ngClass]=" { 'badge-soft-danger': data.status === 'Inactive',
-                                    'badge-soft-warning': data.status === 'Pending' }">{{data.status}}</span>
-                    </td>
-                    <td>
-                      <button type="button" class="btn btn-primary btn-sm btn-rounded" (click)="openViewModal(ViewContent)">View
-                        Details</button>
-                    </td>
-                    <td>
-                      <div class="d-flex gap-3">
-                        <a href="javascript:void(0);" class="text-success" (click)="editModal($index)"><i class="mdi mdi-pencil font-size-18"></i></a>
-                        <a href="javascript:void(0);" class="text-danger" (click)="confirm(data.id)"><i class="mdi mdi-delete font-size-18"></i></a>
-                      </div>
-                    </td>
-                  </tr>}
-                </tbody>
-              </table>
-            </div>
-            <!-- end table -->
-            <ul class="pagination pagination-rounded justify-content-end mb-2">
-              <pagination [totalItems]="orderlist?.length" [itemsPerPage]="8" (pagechanged)="pagechanged($event)"></pagination>
-            </ul>
           </div>
         </div>
       </div>
