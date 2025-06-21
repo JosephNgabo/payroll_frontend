@@ -7,6 +7,7 @@ import { ModalDirective } from 'ngx-bootstrap/modal';
 import { UntypedFormBuilder, UntypedFormGroup, FormArray, Validators } from '@angular/forms';
 import { DatePipe } from '@angular/common';
 import { Store } from '@ngrx/store';
+import { TableSkeletonComponent } from 'src/app/shared/ui/skeleton/table-skeleton.component';
 
 @Component({
   selector: 'app-employees',
@@ -35,6 +36,7 @@ export class EmployeesComponent {
   Allorderlist: any;
   @ViewChild('showModal', { static: false }) showModal?: ModalDirective;
   @ViewChild('removeItemModal', { static: false }) removeItemModal?: ModalDirective;
+  isLoading: boolean = true; // Loading state
 
   constructor(
     private modalService: BsModalService,
@@ -58,34 +60,38 @@ export class EmployeesComponent {
       status: ['', [Validators.required]]
     });
 
-    // Mock data for testing
-    this.orderlist = [
-      {
-        id: 'EMP001',
-        name: 'Mugisha Benjamin',
-        email: 'benjamin@gmail.com',
-        department: 'IT',
-        role: 'Developer',
-        status: 'Active'
-      },
-      {
-        id: 'EMP002',
-        name: 'Ishimwe Nadia',
-        email: 'nadia@gmail.com',
-        department: 'HR',
-        role: 'Manager',
-        status: 'Active'
-      },
-      {
-        id: 'EMP003',
-        name: 'Muneza Jackson',
-        email: 'jackson@gmail.com',
-        department: 'Finance',
-        role: 'User',
-        status: 'Inactive'
-      }
-    ];
-    this.Allorderlist = this.orderlist;
+    // Simulate loading delay
+    setTimeout(() => {
+      // Mock data for testing
+      this.orderlist = [
+        {
+          id: 'EMP001',
+          name: 'Mugisha Benjamin',
+          email: 'benjamin@gmail.com',
+          department: 'IT',
+          role: 'Developer',
+          status: 'Active'
+        },
+        {
+          id: 'EMP002',
+          name: 'Ishimwe Nadia',
+          email: 'nadia@gmail.com',
+          department: 'HR',
+          role: 'Manager',
+          status: 'Active'
+        },
+        {
+          id: 'EMP003',
+          name: 'Muneza Jackson',
+          email: 'jackson@gmail.com',
+          department: 'Finance',
+          role: 'User',
+          status: 'Inactive'
+        }
+      ];
+      this.Allorderlist = this.orderlist;
+      this.isLoading = false;
+    }, 1500); // 1.5 second delay to show skeleton
   }
 
   /**

@@ -15,6 +15,7 @@ interface DeductionWithState extends Deduction {
 })
 export class DeductionsComponent implements OnInit {
   deductions: DeductionWithState[] = [];
+  allDeductions: DeductionWithState[] = [];
   deductionForm: FormGroup;
   submitted = false;
   isEdit = false;
@@ -56,10 +57,11 @@ export class DeductionsComponent implements OnInit {
     
     this.deductionsService.getDeductions().subscribe({
       next: (data) => {
-        this.deductions = data.map(deduction => ({
+        this.allDeductions = data.map(deduction => ({
           ...deduction,
           state: false
         }));
+        this.deductions = [...this.allDeductions];
         this.isLoading = false;
       },
       error: (error) => {
@@ -155,13 +157,13 @@ export class DeductionsComponent implements OnInit {
 
   searchDeductions() {
     if (!this.term) {
-      this.loadDeductions();
+      this.deductions = [...this.allDeductions];
       return;
     }
-    
-    this.deductions = this.deductions.filter(deduction => 
-      deduction.name.toLowerCase().includes(this.term.toLowerCase()) ||
-      deduction.description.toLowerCase().includes(this.term.toLowerCase())
+    const lowerTerm = this.term.toLowerCase();
+    this.deductions = this.allDeductions.filter(deduction => 
+      deduction.name.toLowerCase().includes(lowerTerm) ||
+      deduction.description.toLowerCase().includes(lowerTerm)
     );
   }
 

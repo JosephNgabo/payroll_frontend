@@ -25,7 +25,6 @@ import { DropzoneModule } from 'ngx-dropzone-wrapper';
 import { DROPZONE_CONFIG } from 'ngx-dropzone-wrapper';
 import { DropzoneConfigInterface } from 'ngx-dropzone-wrapper';
 import { PagetitleComponent } from 'src/app/shared/ui/pagetitle/pagetitle.component';
-import { SkeletonComponent } from 'src/app/shared/ui/skeleton/skeleton.component';
 import { TableSkeletonComponent } from 'src/app/shared/ui/skeleton/table-skeleton.component';
 
 const DEFAULT_DROPZONE_CONFIG: DropzoneConfigInterface = {
@@ -52,7 +51,6 @@ const DEFAULT_DROPZONE_CONFIG: DropzoneConfigInterface = {
     BsDatepickerModule.forRoot(),
     DropzoneModule,
     PagetitleComponent,
-    SkeletonComponent,
     TableSkeletonComponent
   ],
   providers: [

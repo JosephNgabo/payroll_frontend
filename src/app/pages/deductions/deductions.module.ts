@@ -6,8 +6,8 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrModule } from 'ngx-toastr';
 import { DeductionsComponent } from './deductions.component';
 import { DeductionsRoutingModule } from './deductions-routing.module';
-// import { PageTitleComponent } from '../../shared/ui/page-title/page-title.module';
-// import { PaginationModule } from '../../shared/pagination/pagination.module';
+import { PagetitleComponent } from 'src/app/shared/ui/pagetitle/pagetitle.component';
+import { TableSkeletonComponent } from 'src/app/shared/ui/skeleton/table-skeleton.component';
 
 @NgModule({
   declarations: [
@@ -21,8 +21,8 @@ import { DeductionsRoutingModule } from './deductions-routing.module';
     NgbModule,
     ToastrModule,
     DeductionsRoutingModule,
-    // PageTitleComponent,
-    // PaginationModule
+    PagetitleComponent,
+    TableSkeletonComponent
   ],
   exports: [
     DeductionsComponent
