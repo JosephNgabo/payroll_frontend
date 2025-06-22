@@ -65,4 +65,12 @@ export class UserService {
   forgotPassword(email: string): Observable<any> {
     return this.http.post(`${this.API_URL}/user/forgot-password`, { email });
   }
+
+  /**
+   * Update user status
+   */
+  updateUserStatus(userId: number | string, status: boolean): Observable<any> {
+    const headers = this.authService.getAuthHeaders();
+    return this.http.post(`${this.API_URL}/user/update-status/${userId}`, { status: status ? 1 : 0 }, { headers });
+  }
 }

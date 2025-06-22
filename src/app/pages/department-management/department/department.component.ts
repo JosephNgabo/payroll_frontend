@@ -9,6 +9,9 @@ import { DatePipe } from '@angular/common';
 import { Store } from '@ngrx/store';
 import { SkeletonComponent } from 'src/app/shared/ui/skeleton/skeleton.component';
 import { TableSkeletonComponent } from 'src/app/shared/ui/skeleton/table-skeleton.component';
+import { DepartmentService } from 'src/app/core/services/department.service';
+import { Department } from 'src/app/core/models/department.model';
+import { map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-department',
@@ -25,7 +28,7 @@ export class DepartmentComponent {
   // bread crumb items
   breadCrumbItems: Array<{}>;
   term: any;
-  orderlist: any;
+  orderlist: Department[] = [];
   ordersForm!: UntypedFormGroup;
   submitted = false;
   content?: any;
@@ -33,16 +36,18 @@ export class DepartmentComponent {
   total: Observable<number>;
   page: any = 1;
   deletId: any;
-  Allorderlist: any;
+  Allorderlist: Department[] = [];
   isLoading: boolean = true; // Loading state
   @ViewChild('showModal', { static: false }) showModal?: ModalDirective;
   @ViewChild('removeItemModal', { static: false }) removeItemModal?: ModalDirective;
+  selectedDepartment: Department | null = null;
 
   constructor(
     private modalService: BsModalService,
     private formBuilder: UntypedFormBuilder,
     private datePipe: DatePipe,
-    private store: Store
+    private store: Store,
+    private departmentService: DepartmentService
   ) { }
 
   ngOnInit() {
@@ -57,7 +62,6 @@ export class DepartmentComponent {
       description: ['', [Validators.required]]
     });
 
-    // Simulate loading delay
     this.loadData();
   }
 
@@ -66,47 +70,24 @@ export class DepartmentComponent {
    */
   loadData() {
     this.isLoading = true;
-    
-    // Simulate API call delay
-    setTimeout(() => {
-      // Mock data for testing - Updated for Department Management
-      this.orderlist = [
-        {
-          id: 'DEPT001',
-          name: 'Information Technology',
-          description: 'Handles all IT infrastructure, software development, and technical support'
-        },
-        {
-          id: 'DEPT002',
-          name: 'Human Resources',
-          description: 'Manages employee relations, recruitment, training, and HR policies'
-        },
-        {
-          id: 'DEPT003',
-          name: 'Finance',
-          description: 'Handles financial planning, accounting, budgeting, and financial reporting'
-        },
-        {
-          id: 'DEPT004',
-          name: 'Marketing',
-          description: 'Manages brand promotion, advertising, market research, and customer engagement'
-        },
-        {
-          id: 'DEPT005',
-          name: 'Operations',
-          description: 'Oversees daily business operations, process improvement, and quality management'
-        }
-      ];
-      this.Allorderlist = this.orderlist;
-      this.isLoading = false;
-    }, 1500); // 1.5 second delay to show skeleton
+    this.departmentService.getDepartments().subscribe({
+      next: (departments) => {
+        this.orderlist = departments;
+        this.Allorderlist = departments;
+        this.isLoading = false;
+      },
+      error: () => {
+        this.isLoading = false;
+      }
+    });
   }
 
   /**
    * Open modal
    * @param content modal content
    */
-  openViewModal(content: any) {
+  openViewModal(content: any, department: Department) {
+    this.selectedDepartment = department;
     this.modalRef = this.modalService.show(content);
   }
 
@@ -134,9 +115,17 @@ export class DepartmentComponent {
   }
   // delete order
   deleteOrder() {
-    // Here you would typically call your API to delete the department
-    this.orderlist = this.orderlist.filter((item: any) => item.id !== this.deletId);
-    this.removeItemModal?.hide();
+    console.log('Delete order called for ID:', this.deletId);
+    if (!this.deletId) return;
+    this.departmentService.deleteDepartment(this.deletId).subscribe({
+      next: () => {
+        this.loadData();
+        this.removeItemModal?.hide();
+      },
+      error: () => {
+        // Optionally handle error
+      }
+    });
   }
 
   // fiter job - Updated to search in department fields
@@ -153,12 +142,37 @@ export class DepartmentComponent {
 
   /**
    * Open modal
-   * @param content modal content
+   * @param isEdit boolean indicating if it's an edit operation
+   * @param department department to be edited or null for a new department
    */
-  openModal(content: any) {
+  openModal(isEdit: boolean = false, department?: Department) {
     this.submitted = false;
-    this.modalRef = this.modalService.show(content, { class: 'modal-md' });
+    if (isEdit && department) {
+      this.selectedDepartment = department;
+      this.ordersForm.patchValue({
+        id: department.id,
+        name: department.name,
+        description: department.description
+      });
+      setTimeout(() => {
+        const modelTitle = document.querySelector('.modal-title') as HTMLAreaElement;
+        if (modelTitle) modelTitle.innerHTML = 'Edit Department';
+        const updateBtn = document.getElementById('addNewUser-btn') as HTMLAreaElement;
+        if (updateBtn) updateBtn.innerHTML = 'Update';
+      });
+    } else {
+      this.selectedDepartment = null;
+      this.ordersForm.reset();
+      setTimeout(() => {
+        const modelTitle = document.querySelector('.modal-title') as HTMLAreaElement;
+        if (modelTitle) modelTitle.innerHTML = 'Add New Department';
+        const updateBtn = document.getElementById('addNewUser-btn') as HTMLAreaElement;
+        if (updateBtn) updateBtn.innerHTML = 'Save';
+      });
+    }
+    this.showModal?.show();
   }
+
   /**
    * Form data get
    */
@@ -171,38 +185,50 @@ export class DepartmentComponent {
   */
   saveUser() {
     this.submitted = true;
-    if (this.ordersForm.valid) {
-      if (this.ordersForm.get('id')?.value) {
-        // Update existing department
-        const updatedData = this.ordersForm.value;
-        const index = this.orderlist.findIndex((item: any) => item.id === updatedData.id);
-        if (index !== -1) {
-          this.orderlist[index] = updatedData;
+    if (this.ordersForm.invalid) return;
+    const formValue = this.ordersForm.value;
+    if (formValue.id) {
+      this.departmentService.updateDepartment(formValue.id, {
+        name: formValue.name,
+        description: formValue.description
+      }).subscribe({
+        next: () => {
+          this.loadData();
+          this.showModal?.hide();
+          this.ordersForm.reset();
+          this.submitted = false;
+        },
+        error: () => {
+          // Optionally handle error
         }
-      } else {
-        // Add new department
-        const newId = 'DEPT' + (this.orderlist.length + 1).toString().padStart(3, '0');
-        this.ordersForm.controls['id'].setValue(newId);
-        const newData = this.ordersForm.value;
-        this.orderlist.push(newData);
-      }
-      this.showModal?.hide();
-      this.ordersForm.reset();
-      this.submitted = false;
+      });
+    } else {
+      // Add new department
+      const payload = {
+        departement_name: formValue.name,
+        departement_description: formValue.description
+      };
+      console.log('Payload sent to createDepartment:', payload);
+      this.departmentService.createDepartment(payload).subscribe({
+        next: () => {
+          this.loadData();
+          this.showModal?.hide();
+          this.ordersForm.reset();
+          this.submitted = false;
+        },
+        error: () => {
+          // Optionally handle error
+        }
+      });
     }
   }
+
   /**
    * Open Edit modal
-   * @param content modal content
+   * @param department department to be edited
    */
-  editModal(id: any) {
-    this.submitted = false;
-    this.showModal?.show();
-    const modelTitle = document.querySelector('.modal-title') as HTMLAreaElement;
-    modelTitle.innerHTML = 'Edit Department';
-    const updateBtn = document.getElementById('addNewUser-btn') as HTMLAreaElement;
-    updateBtn.innerHTML = "Update";
-    this.ordersForm.patchValue(this.orderlist[id]);
+  editModal(department: Department) {
+    this.openModal(true, department);
   }
 
   // pagination

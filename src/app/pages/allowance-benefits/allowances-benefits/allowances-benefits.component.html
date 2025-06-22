@@ -43,7 +43,6 @@
                       </th>
                       <th class="align-middle">Name</th>
                       <th class="align-middle">Description</th>
-                      <th class="align-middle">Tax Value (%)</th>
                       <th class="align-middle">View Details</th>
                       <th class="align-middle">Action</th>
                     </tr>
@@ -60,11 +59,7 @@
                       <td>{{data.name}}</td>
                       <td>{{data.description}}</td>
                       <td>
-                        <span class="badge badge-pill badge-soft-info font-size-11">{{data.taxValue}}%</span>
-                      </td>
-                      <td>
-                        <button type="button" class="btn btn-primary btn-sm btn-rounded" (click)="openViewModal(ViewContent)">View
-                          Details</button>
+                        <button type="button" class="btn btn-primary btn-sm btn-rounded" (click)="openViewModal(ViewContent, data)">View Details</button>
                       </td>
                       <td>
                         <div class="d-flex gap-3">
@@ -97,20 +92,12 @@
         <table class="table table-centered table-nowrap">
           <tbody>
             <tr>
-              <td><strong>ID:</strong></td>
-              <td>#BEN001</td>
-            </tr>
-            <tr>
               <td><strong>Name:</strong></td>
-              <td>Housing Allowance</td>
+              <td>{{selectedAllowance?.name}}</td>
             </tr>
             <tr>
               <td><strong>Description:</strong></td>
-              <td>Monthly housing allowance for employees</td>
-            </tr>
-            <tr>
-              <td><strong>Tax Value:</strong></td>
-              <td><span class="badge badge-pill badge-soft-info">15%</span></td>
+              <td>{{selectedAllowance?.description}}</td>
             </tr>
           </tbody>
         </table>
@@ -150,18 +137,6 @@
                   <div class="invalid-feedback" align="left">
                     @if(form['description'].errors['required']){
                     <div>Description is required.</div>}
-                  </div>}
-                </div>
-                <div class="mb-3">
-                  <label for="taxValue-field" class="form-label">Tax Value (%)</label>
-                  <input type="number" id="taxValue-field" class="form-control" placeholder="Enter tax value percentage" formControlName="taxValue" min="0" max="100" [ngClass]="{ 'is-invalid': submitted && form['taxValue'].errors }" />
-                  <small class="form-text text-muted">Optional: Enter tax value percentage (0-100)</small>
-                  @if(submitted && form['taxValue'].errors){
-                  <div class="invalid-feedback" align="left">
-                    @if(form['taxValue'].errors['min']){
-                    <div>Tax value must be at least 0%.</div>}
-                    @if(form['taxValue'].errors['max']){
-                    <div>Tax value cannot exceed 100%.</div>}
                   </div>}
                 </div>
               </div>

@@ -41,6 +41,7 @@ export class AllowancesBenefitsComponent {
   deleteError: string | null = null; // To hold deletion error messages
   @ViewChild('showModal') showModal!: ModalDirective;
   @ViewChild('removeItemModal', { static: false }) removeItemModal?: ModalDirective;
+  selectedAllowance: Allowance | null = null;
 
   constructor(
     private modalService: BsModalService,
@@ -59,8 +60,7 @@ export class AllowancesBenefitsComponent {
     this.ordersForm = this.formBuilder.group({
       id: [''],
       name: ['', [Validators.required]],
-      description: ['', [Validators.required]],
-      taxValue: ['', [Validators.min(0), Validators.max(100)]]
+      description: ['', [Validators.required]]
     });
 
     this.loadData();
@@ -84,7 +84,8 @@ export class AllowancesBenefitsComponent {
    * Open modal
    * @param content modal content
    */
-  openViewModal(content: any) {
+  openViewModal(content: any, allowance: Allowance) {
+    this.selectedAllowance = allowance;
     this.modalRef = this.modalService.show(content);
   }
 
@@ -185,8 +186,7 @@ export class AllowancesBenefitsComponent {
       // Add new allowance/benefit
       this.allowanceService.createAllowance({
         name: formValue.name,
-        description: formValue.description,
-        taxValue: formValue.taxValue,
+        description: formValue.description
       }).subscribe({
         next: (created) => {
           this.loadData(); // Refresh list

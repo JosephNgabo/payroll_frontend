@@ -8,10 +8,12 @@ import { DeductionsComponent } from './deductions.component';
 import { DeductionsRoutingModule } from './deductions-routing.module';
 import { PagetitleComponent } from 'src/app/shared/ui/pagetitle/pagetitle.component';
 import { TableSkeletonComponent } from 'src/app/shared/ui/skeleton/table-skeleton.component';
+import { OtherDeductionsComponent } from './other-deductions/other-deductions.component';
 
 @NgModule({
   declarations: [
-    DeductionsComponent
+    DeductionsComponent,
+    OtherDeductionsComponent
   ],
   imports: [
     CommonModule,
@@ -25,7 +27,8 @@ import { TableSkeletonComponent } from 'src/app/shared/ui/skeleton/table-skeleto
     TableSkeletonComponent
   ],
   exports: [
-    DeductionsComponent
+    DeductionsComponent,
+    OtherDeductionsComponent
   ]
 })
 export class DeductionsModule { } 

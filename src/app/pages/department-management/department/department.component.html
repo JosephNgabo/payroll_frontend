@@ -42,7 +42,6 @@
                           <label class="form-check-label" for="transactionCheck01"></label>
                         </div>
                       </th>
-                      <th class="align-middle">ID</th>
                       <th class="align-middle">Name</th>
                       <th class="align-middle">Description</th>
                       <th class="align-middle">View Details</th>
@@ -58,18 +57,14 @@
                           <label class="form-check-label" for="transactionCheck{{data.index}}"></label>
                         </div>
                       </td>
-                      <td>
-                        <a href="javascript: void(0);" class="text-body fw-bold">{{data.id}}</a>
-                      </td>
                       <td>{{data.name}}</td>
                       <td>{{data.description}}</td>
                       <td>
-                        <button type="button" class="btn btn-primary btn-sm btn-rounded" (click)="openViewModal(ViewContent)">View
-                          Details</button>
+                        <button type="button" class="btn btn-primary btn-sm btn-rounded" (click)="openViewModal(ViewContent, data)">View Details</button>
                       </td>
                       <td>
                         <div class="d-flex gap-3">
-                          <a href="javascript:void(0);" class="text-success" (click)="editModal($index)"><i class="mdi mdi-pencil font-size-18"></i></a>
+                          <a href="javascript:void(0);" class="text-success" (click)="editModal(data)"><i class="mdi mdi-pencil font-size-18"></i></a>
                           <a href="javascript:void(0);" class="text-danger" (click)="confirm(data.id)"><i class="mdi mdi-delete font-size-18"></i></a>
                         </div>
                       </td>
@@ -99,16 +94,12 @@
         <table class="table table-centered table-nowrap">
           <tbody>
             <tr>
-              <td><strong>ID:</strong></td>
-              <td>#DEPT001</td>
-            </tr>
-            <tr>
               <td><strong>Name:</strong></td>
-              <td>Information Technology</td>
+              <td>{{selectedDepartment?.name}}</td>
             </tr>
             <tr>
               <td><strong>Description:</strong></td>
-              <td>Handles all IT infrastructure, software development, and technical support</td>
+              <td>{{selectedDepartment?.description}}</td>
             </tr>
           </tbody>
         </table>
