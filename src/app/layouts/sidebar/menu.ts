@@ -51,7 +51,20 @@ export const MENU: MenuItem[] = [
         id: 5,
         label: 'Deductions',
         icon: 'bx-cog',
-        link: '/deductions'
+        subItems: [
+            {
+                id: 51,
+                label: 'RSSB Deductions',
+                link: '/deductions',
+                parentId: 5
+            },
+            {
+                id: 52,
+                label: 'Other Deductions',
+                link: '/deductions/other-deductions',
+                parentId: 5
+            }
+        ]
     },
     {
         id: 6,

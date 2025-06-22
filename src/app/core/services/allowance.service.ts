@@ -27,4 +27,8 @@ export class AllowanceService {
   deleteAllowance(id: number): Observable<any> {
     return this.http.delete<any>(`${this.API_URL}/allowance/${id}`);
   }
+
+  getAllowance(id: number): Observable<Allowance> {
+    return this.http.get<Allowance>(`${this.API_URL}/allowance/${id}`);
+  }
 }

@@ -1,0 +1,227 @@
+<div class="container-fluid">
+  <!-- Page title -->
+  <div class="row">
+    <div class="col-12">
+      <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+        <h4 class="mb-sm-0">Deductions Management</h4>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-body">
+          <!-- Skeleton Loader -->
+          <div *ngIf="isLoading">
+            <app-table-skeleton 
+              [columns]="['Name', 'Description', 'Tax Applied', 'Tax Percentage', 'View Details', 'Action']" 
+              [rowCount]="5">
+            </app-table-skeleton>
+          </div>
+          <!-- Main Content: Only show when not loading -->
+          <ng-container *ngIf="!isLoading">
+            <div class="row mb-2">
+              <div class="col-sm-4">
+                <div class="search-box me-2 mb-2 d-inline-block">
+                  <div class="position-relative">
+                    <input type="text" class="form-control" autocomplete="off" id="searchTableList" placeholder="Search deductions..." [(ngModel)]="term" (ngModelChange)="searchDeductions()">
+                    <i class="bx bx-search-alt search-icon"></i>
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-8">
+                <div class="text-sm-end">
+                  <button type="button" class="btn btn-success btn-rounded mb-2 me-2" (click)="openModal(deductionModal)"><i class="mdi mdi-plus mr-1"></i>
+                    Add New Deduction</button>
+                </div>
+              </div>
+            </div>
+            <!-- Table data -->
+            <div class="table-responsive mb-0">
+              @if(error) {
+                <div class="alert alert-danger" role="alert">
+                  {{ error }}
+                  <button type="button" class="btn btn-primary mt-2" (click)="loadDeductions()">Try Again</button>
+                </div>
+              } @else if(deductions.length === 0) {
+                <div class="text-center py-4">
+                  <p>No deductions found.</p>
+                  <button type="button" class="btn btn-success" (click)="openModal(deductionModal)">
+                    <i class="mdi mdi-plus mr-1"></i> Add New Deduction
+                  </button>
+                </div>
+              } @else {
+                <table class="table align-middle table-nowrap dt-responsive nowrap w-100 table-check" id="deduction-list">
+                  <thead class="table-light">
+                    <tr>
+                      <th style="width: 20px;">
+                        <div class="form-check font-size-16 align-middle">
+                          <input class="form-check-input" type="checkbox" id="transactionCheck01" [(ngModel)]="masterSelected" (change)="checkUncheckAll($event)">
+                          <label class="form-check-label" for="transactionCheck01"></label>
+                        </div>
+                      </th>
+                      <th class="align-middle">Name</th>
+                      <th class="align-middle">Description</th>
+                      <th class="align-middle">Tax Applied</th>
+                      <th class="align-middle">Tax Percentage</th>
+                      <th class="align-middle">View Details</th>
+                      <th class="align-middle">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (deduction of deductions; track $index) {
+                    <tr id="d_{{deduction.id}}">
+                      <td>
+                        <div class="form-check font-size-16">
+                          <input class="form-check-input" type="checkbox" id="transactionCheck{{deduction.index}}" value="{{deduction.id}}" [(ngModel)]="deduction.state">
+                          <label class="form-check-label" for="transactionCheck{{deduction.index}}"></label>
+                        </div>
+                      </td>
+                      <td>
+                        <a href="javascript: void(0);" class="text-body fw-bold">{{deduction.name}}</a>
+                      </td>
+                      <td>{{deduction.description}}</td>
+                      <td>
+                        <span class="badge badge-pill badge-soft-success font-size-11" [ngClass]="{'badge-soft-danger': !deduction.isTaxApplied}">
+                          {{deduction.isTaxApplied ? 'Yes' : 'No'}}
+                        </span>
+                      </td>
+                      <td>{{deduction.taxPercentage}}%</td>
+                      <td>
+                        <button type="button" class="btn btn-primary btn-sm btn-rounded" (click)="openViewModal(ViewContent, deduction)">View
+                          Details</button>
+                      </td>
+                      <td>
+                        <div class="d-flex gap-3">
+                          <a href="javascript:void(0);" class="text-success" (click)="openModal(deductionModal, deduction)"><i class="mdi mdi-pencil font-size-18"></i></a>
+                          <a href="javascript:void(0);" class="text-danger" (click)="confirm(deduction.id)"><i class="mdi mdi-delete font-size-18"></i></a>
+                        </div>
+                      </td>
+                    </tr>}
+                  </tbody>
+                </table>
+              }
+            </div>
+          </ng-container>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- View Details Modal -->
+<ng-template #ViewContent role="document" let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title mt-0" id="deductiondetailsModalLabel">Deduction Details</h5>
+    <button type="button" class="btn-close" aria-hidden="true" (click)="modalRef?.hide()"></button>
+  </div>
+  <div class="modal-body">
+    <div class="table-responsive">
+      <table class="table table-centered table-nowrap">
+        <tbody>
+          <tr>
+            <td><strong>Name:</strong></td>
+            <td>{{selectedDeduction?.name}}</td>
+          </tr>
+          <tr>
+            <td><strong>Description:</strong></td>
+            <td>{{selectedDeduction?.description}}</td>
+          </tr>
+          <tr>
+            <td><strong>Tax Applied:</strong></td>
+            <td>
+              <span class="badge badge-pill badge-soft-success" [ngClass]="{'badge-soft-danger': !selectedDeduction?.isTaxApplied}">
+                {{selectedDeduction?.isTaxApplied ? 'Yes' : 'No'}}
+              </span>
+            </td>
+          </tr>
+          <tr>
+            <td><strong>Tax Percentage:</strong></td>
+            <td>{{selectedDeduction?.taxPercentage}}%</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-secondary" (click)="modalRef?.hide()">Close</button>
+  </div>
+</ng-template>
+
+<!-- Add/Edit Deduction Modal -->
+<ng-template #deductionModal>
+  <div class="modal-header">
+    <h5 class="modal-title">{{isEdit ? 'Edit' : 'Add'}} Deduction</h5>
+    <button type="button" class="btn-close" aria-label="Close" (click)="modalService.dismissAll()"></button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="deductionForm" (ngSubmit)="onSubmit()" class="needs-validation" novalidate>
+      <div class="row">
+        <div class="col-lg-12">
+          <div class="mb-3">
+            <label for="name-field" class="form-label">Name <span class="text-danger">*</span></label>
+            <input type="text" id="name-field" class="form-control" placeholder="Enter deduction name" required formControlName="name" [ngClass]="{ 'is-invalid': submitted && f['name'].errors }" />
+            @if(submitted && f['name'].errors){
+            <div class="invalid-feedback" align="left">
+              @if(f['name'].errors['required']){
+              <div>Please enter a name.</div>}
+            </div>}
+          </div>
+          <div class="mb-3">
+            <label for="description-field" class="form-label">Description <span class="text-danger">*</span></label>
+            <input type="text" id="description-field" class="form-control" placeholder="Enter description" required formControlName="description" [ngClass]="{ 'is-invalid': submitted && f['description'].errors }" />
+            @if(submitted && f['description'].errors){
+            <div class="invalid-feedback" align="left">
+              @if(f['description'].errors['required']){
+              <div>Please enter a description.</div>}
+            </div>}
+          </div>
+          <div class="mb-3">
+            <div class="form-check form-switch">
+              <input class="form-check-input" type="checkbox" id="tax-applied-field" formControlName="isTaxApplied">
+              <label class="form-check-label" for="tax-applied-field">Tax Applied</label>
+            </div>
+          </div>
+          <div class="mb-3" *ngIf="f['isTaxApplied'].value">
+            <label for="tax-percentage-field" class="form-label">Tax Percentage (%)</label>
+            <input type="number" id="tax-percentage-field" class="form-control" placeholder="Enter tax percentage" formControlName="taxPercentage" [ngClass]="{ 'is-invalid': submitted && f['taxPercentage'].errors }" />
+            @if(submitted && f['taxPercentage'].errors){
+            <div class="invalid-feedback" align="left">
+              @if(f['taxPercentage'].errors['min']){
+              <div>Value must be greater than or equal to 0.</div>}
+              @if(f['taxPercentage'].errors['max']){
+              <div>Value must be less than or equal to 100.</div>}
+            </div>}
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-light" (click)="modalService.dismissAll()">Close</button>
+        <button type="submit" class="btn btn-primary">Save</button>
+      </div>
+    </form>
+  </div>
+</ng-template>
+
+<!-- Delete Confirmation Modal -->
+<ng-template #removeItemModal>
+  <div class="modal-dialog modal-dialog-centered modal-md">
+    <div class="modal-content">
+      <div class="modal-body px-4 py-5 text-center">
+        <button type="button" class="btn-close position-absolute end-0 top-0 m-3" (click)="modalService.dismissAll()"></button>
+        <div class="avatar-sm mb-4 mx-auto">
+          <div class="avatar-title bg-primary text-primary bg-opacity-10 font-size-20 rounded-3">
+            <i class="mdi mdi-trash-can-outline"></i>
+          </div>
+        </div>
+        <p class="text-muted font-size-16 mb-4">Are you sure you want to remove this deduction?</p>
+
+        <div class="hstack gap-2 justify-content-center mb-0">
+          <button type="button" class="btn btn-danger" id="remove-item" (click)="deleteDeduction(selectedDeductionId)">Remove Now</button>
+          <button type="button" class="btn btn-secondary" id="close-removeOrderModal" (click)="modalService.dismissAll()">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-template> 

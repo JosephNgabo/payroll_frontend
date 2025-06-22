@@ -61,6 +61,9 @@ export class UsersComponent implements OnInit {
   @ViewChild('showModal', { static: false }) showModal?: ModalDirective;
   @ViewChild('removeItemModal') removeItemModal!: TemplateRef<any>;
 
+  selectedUser: UserDetail | null = null;
+  statusToUpdate: boolean = true;
+
   constructor(
     private modalService: BsModalService,
     private formBuilder: FormBuilder,
@@ -394,5 +397,29 @@ export class UsersComponent implements OnInit {
   // pagination
   pageChanged(event: any): void {
     this.fetchUsers(event.page);
+  }
+
+  openStatusModal(user: UserDetail, modalTemplate: TemplateRef<any>) {
+    this.selectedUser = user;
+    this.statusToUpdate = !!user.is_active;
+    this.modalRef = this.modalService.show(modalTemplate, { class: 'modal-md' });
+  }
+
+  updateUserStatus() {
+    if (!this.selectedUser) return;
+    const userId = this.selectedUser.id;
+    this.userService.updateUserStatus(userId, this.statusToUpdate).subscribe({
+      next: () => {
+        // Update local userList for instant feedback
+        const idx = this.userList.findIndex(u => u.id === this.selectedUser!.id);
+        if (idx !== -1) {
+          this.userList[idx].is_active = this.statusToUpdate ? 1 : 0;
+        }
+        this.fetchUsers(); // Still fetch to ensure data is in sync
+      },
+      error: (err) => {
+        console.error('Failed to update user status', err);
+      }
+    });
   }
 }
