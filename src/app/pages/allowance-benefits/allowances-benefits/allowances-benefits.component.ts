@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, ViewChild, TemplateRef } from '@angular/core';
 import { Observable } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -9,6 +9,8 @@ import { DatePipe } from '@angular/common';
 import { Store } from '@ngrx/store';
 import { SkeletonComponent } from 'src/app/shared/ui/skeleton/skeleton.component';
 import { TableSkeletonComponent } from 'src/app/shared/ui/skeleton/table-skeleton.component';
+import { AllowanceService } from 'src/app/core/services/allowance.service';
+import { Allowance } from 'src/app/core/models/allowance.model';
 
 @Component({
   selector: 'app-allowances-benefits',
@@ -26,7 +28,7 @@ export class AllowancesBenefitsComponent {
   // bread crumb items
   breadCrumbItems: Array<{}>;
   term: any;
-  orderlist: any;
+  orderlist: Allowance[] = [];
   ordersForm!: UntypedFormGroup;
   submitted = false;
   content?: any;
@@ -34,16 +36,18 @@ export class AllowancesBenefitsComponent {
   total: Observable<number>;
   page: any = 1;
   deletId: any;
-  Allorderlist: any;
+  Allorderlist: Allowance[] = [];
   isLoading: boolean = true; // Loading state
-  @ViewChild('showModal', { static: false }) showModal?: ModalDirective;
+  deleteError: string | null = null; // To hold deletion error messages
+  @ViewChild('showModal') showModal!: ModalDirective;
   @ViewChild('removeItemModal', { static: false }) removeItemModal?: ModalDirective;
 
   constructor(
     private modalService: BsModalService,
     private formBuilder: UntypedFormBuilder,
     private datePipe: DatePipe,
-    private store: Store
+    private store: Store,
+    private allowanceService: AllowanceService
   ) { }
 
   ngOnInit() {
@@ -64,36 +68,16 @@ export class AllowancesBenefitsComponent {
 
   loadData() {
     this.isLoading = true;
-    setTimeout(() => {
-      this.orderlist = [
-        {
-          id: 'BEN001',
-          name: 'Housing Allowance',
-          description: 'Monthly housing allowance for employees',
-          taxValue: 15
-        },
-        {
-          id: 'BEN002',
-          name: 'Transport Allowance',
-          description: 'Transportation allowance for commuting',
-          taxValue: 10
-        },
-        {
-          id: 'BEN003',
-          name: 'Medical Insurance',
-          description: 'Comprehensive medical insurance coverage',
-          taxValue: 0
-        },
-        {
-          id: 'BEN004',
-          name: 'Meal Allowance',
-          description: 'Daily meal allowance for employees',
-          taxValue: 5
-        }
-      ];
-      this.Allorderlist = this.orderlist;
-      this.isLoading = false;
-    }, 1500);
+    this.allowanceService.getAllowances().subscribe({
+      next: (response: any) => {
+        this.orderlist = response.data;
+        this.Allorderlist = response.data;
+        this.isLoading = false;
+      },
+      error: (err) => {
+        this.isLoading = false;
+      }
+    });
   }
 
   /**
@@ -124,13 +108,26 @@ export class AllowancesBenefitsComponent {
   // Delete Data
   confirm(id: any) {
     this.deletId = id;
+    this.deleteError = null;
     this.removeItemModal?.show();
   }
   // delete order
   deleteOrder() {
-    // Here you would typically call your API to delete the allowance/benefit
-    this.orderlist = this.orderlist.filter((item: any) => item.id !== this.deletId);
-    this.removeItemModal?.hide();
+    if (!this.deletId) return;
+    this.allowanceService.deleteAllowance(this.deletId).subscribe({
+      next: () => {
+        this.loadData(); // Refresh the list after deletion
+        this.removeItemModal?.hide();
+      },
+      error: (err) => {
+        if (err.status === 404 && err.error && err.error.message) {
+          this.deleteError = err.error.message;
+        } else {
+          this.deleteError = 'An unexpected error occurred while deleting the allowance.';
+        }
+        console.error('Delete allowance error:', err);
+      }
+    });
   }
 
   // fiter job - Updated to search in allowance/benefit fields
@@ -151,7 +148,7 @@ export class AllowancesBenefitsComponent {
    */
   openModal(content: any) {
     this.submitted = false;
-    this.modalRef = this.modalService.show(content, { class: 'modal-md' });
+    this.showModal.show();
   }
   /**
    * Form data get
@@ -165,38 +162,60 @@ export class AllowancesBenefitsComponent {
   */
   saveUser() {
     this.submitted = true;
-    if (this.ordersForm.valid) {
-      if (this.ordersForm.get('id')?.value) {
-        // Update existing allowance/benefit
-        const updatedData = this.ordersForm.value;
-        const index = this.orderlist.findIndex((item: any) => item.id === updatedData.id);
-        if (index !== -1) {
-          this.orderlist[index] = updatedData;
+    if (this.ordersForm.invalid) return;
+
+    const formValue = this.ordersForm.value;
+    if (formValue.id) {
+      // Update existing allowance
+      this.allowanceService.updateAllowance(formValue.id, {
+        name: formValue.name,
+        description: formValue.description
+      }).subscribe({
+        next: (updated) => {
+          this.loadData(); // Refresh list
+          this.showModal.hide();
+          this.ordersForm.reset();
+          this.submitted = false;
+        },
+        error: (err) => {
+          // Handle error, show message if needed
         }
-      } else {
-        // Add new allowance/benefit
-        const newId = 'BEN' + (this.orderlist.length + 1).toString().padStart(3, '0');
-        this.ordersForm.controls['id'].setValue(newId);
-        const newData = this.ordersForm.value;
-        this.orderlist.push(newData);
-      }
-      this.showModal?.hide();
-      this.ordersForm.reset();
-      this.submitted = false;
+      });
+    } else {
+      // Add new allowance/benefit
+      this.allowanceService.createAllowance({
+        name: formValue.name,
+        description: formValue.description,
+        taxValue: formValue.taxValue,
+      }).subscribe({
+        next: (created) => {
+          this.loadData(); // Refresh list
+          this.showModal.hide();
+          this.ordersForm.reset();
+          this.submitted = false;
+        },
+        error: (err) => {
+          // Handle error, e.g., show validation errors
+          console.error('Create allowance error:', err);
+        }
+      });
     }
   }
   /**
    * Open Edit modal
    * @param content modal content
    */
-  editModal(id: any) {
+  editModal(index: number) {
     this.submitted = false;
-    this.showModal?.show();
-    const modelTitle = document.querySelector('.modal-title') as HTMLAreaElement;
-    modelTitle.innerHTML = 'Edit Allowance/Benefit';
-    const updateBtn = document.getElementById('addNewUser-btn') as HTMLAreaElement;
-    updateBtn.innerHTML = "Update";
-    this.ordersForm.patchValue(this.orderlist[id]);
+    const allowance = this.orderlist[index];
+    this.ordersForm.patchValue({
+      id: allowance.id,
+      name: allowance.name,
+      description: allowance.description
+      // taxValue: allowance.taxValue (add later if needed)
+    });
+    this.showModal.show();
+    // Optionally update modal title/button text for edit mode
   }
 
   // pagination
