@@ -1,7 +1,8 @@
 export const environment = {
   production: true,
   defaultauth: 'laravel',
-  apiUrl: 'http://38.242.240.201:8000/api',
+  apiUrl: 'https://5650-52-47-88-109.ngrok-free.app/api',
+  // apiUrl: 'http://localhost:3000',
   firebaseConfig: {
     apiKey: '',
     authDomain: '',

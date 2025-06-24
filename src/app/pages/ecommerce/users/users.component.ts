@@ -64,6 +64,10 @@ export class UsersComponent implements OnInit {
   selectedUser: UserDetail | null = null;
   statusToUpdate: boolean = true;
 
+  passwordForm: FormGroup = this.formBuilder.group({
+    newPassword: ['', [Validators.required, Validators.minLength(6)]]
+  });
+
   constructor(
     private modalService: BsModalService,
     private formBuilder: FormBuilder,
@@ -217,7 +221,7 @@ export class UsersComponent implements OnInit {
         phone: formValue.phone,
         title: formValue.title,
         language: formValue.language,
-        is_active: 1,
+        is_active: true,
         user_profile: 'user'
       };
       if (formValue.password) {
@@ -284,7 +288,7 @@ export class UsersComponent implements OnInit {
         language: formValue.language,
         email: formValue.email,
         password: formValue.password,
-        is_active: 1,
+        is_active: true,
         user_profile: 'user'
       };
       
@@ -401,7 +405,7 @@ export class UsersComponent implements OnInit {
 
   openStatusModal(user: UserDetail, modalTemplate: TemplateRef<any>) {
     this.selectedUser = user;
-    this.statusToUpdate = !!user.is_active;
+    this.statusToUpdate = user.is_active;
     this.modalRef = this.modalService.show(modalTemplate, { class: 'modal-md' });
   }
 
@@ -413,12 +417,35 @@ export class UsersComponent implements OnInit {
         // Update local userList for instant feedback
         const idx = this.userList.findIndex(u => u.id === this.selectedUser!.id);
         if (idx !== -1) {
-          this.userList[idx].is_active = this.statusToUpdate ? 1 : 0;
+          this.userList[idx].is_active = this.statusToUpdate;
         }
         this.fetchUsers(); // Still fetch to ensure data is in sync
       },
       error: (err) => {
         console.error('Failed to update user status', err);
+      }
+    });
+  }
+
+  openPasswordModal(user: UserDetail, modal: any) {
+    this.selectedUser = user;
+    this.passwordForm.reset();
+    this.modalRef = this.modalService.show(modal, { class: 'modal-md' });
+  }
+
+  resetPassword(modal: any) {
+    if (this.passwordForm.invalid || !this.selectedUser) return;
+    const payload = {
+      username: this.selectedUser.username,
+      password: this.passwordForm.value.newPassword
+    };
+    this.userService.resetPassword(payload).subscribe({
+      next: () => {
+        modal.close();
+        // Optionally show a success message
+      },
+      error: (err) => {
+        // Optionally show an error message
       }
     });
   }

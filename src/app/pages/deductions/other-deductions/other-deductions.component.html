@@ -3,7 +3,7 @@
   <div class="row">
     <div class="col-12">
       <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-        <h4 class="mb-sm-0">Deductions Management</h4>
+        <h4 class="mb-sm-0">Other Deductions</h4>
       </div>
     </div>
   </div>
@@ -15,7 +15,7 @@
           <!-- Skeleton Loader -->
           <div *ngIf="isLoading">
             <app-table-skeleton 
-              [columns]="['Name', 'Description', 'Tax Applied', 'Tax Percentage', 'View Details', 'Action']" 
+              [columns]="['Name', 'Description', 'Deduction Code', 'Has Tax', 'Tax Rate', 'Action']" 
               [rowCount]="5">
             </app-table-skeleton>
           </div>
@@ -55,17 +55,11 @@
                 <table class="table align-middle table-nowrap dt-responsive nowrap w-100 table-check" id="deduction-list">
                   <thead class="table-light">
                     <tr>
-                      <th style="width: 20px;">
-                        <div class="form-check font-size-16 align-middle">
-                          <input class="form-check-input" type="checkbox" id="transactionCheck01" [(ngModel)]="masterSelected" (change)="checkUncheckAll($event)">
-                          <label class="form-check-label" for="transactionCheck01"></label>
-                        </div>
-                      </th>
                       <th class="align-middle">Name</th>
                       <th class="align-middle">Description</th>
-                      <th class="align-middle">Tax Applied</th>
-                      <th class="align-middle">Tax Percentage</th>
-                      <th class="align-middle">View Details</th>
+                      <th class="align-middle">Deduction Code</th>
+                      <th class="align-middle">Has Tax</th>
+                      <th class="align-middle">Tax Rate</th>
                       <th class="align-middle">Action</th>
                     </tr>
                   </thead>
@@ -73,30 +67,20 @@
                     @for (deduction of deductions; track $index) {
                     <tr id="d_{{deduction.id}}">
                       <td>
-                        <div class="form-check font-size-16">
-                          <input class="form-check-input" type="checkbox" id="transactionCheck{{deduction.index}}" value="{{deduction.id}}" [(ngModel)]="deduction.state">
-                          <label class="form-check-label" for="transactionCheck{{deduction.index}}"></label>
-                        </div>
+                        <a href="javascript: void(0);" class="text-body fw-bold">{{deduction.deduction_name}}</a>
                       </td>
+                      <td>{{deduction.deduction_description}}</td>
+                      <td>{{deduction.deduction_code}}</td>
                       <td>
-                        <a href="javascript: void(0);" class="text-body fw-bold">{{deduction.name}}</a>
-                      </td>
-                      <td>{{deduction.description}}</td>
-                      <td>
-                        <span class="badge badge-pill badge-soft-success font-size-11" [ngClass]="{'badge-soft-danger': !deduction.isTaxApplied}">
-                          {{deduction.isTaxApplied ? 'Yes' : 'No'}}
+                        <span class="badge badge-pill badge-soft-success font-size-11" [ngClass]="{'badge-soft-danger': !deduction.has_tax}">
+                          {{deduction.has_tax ? 'Yes' : 'No'}}
                         </span>
                       </td>
-                      <td>{{deduction.taxPercentage}}%</td>
+                      <td>{{deduction.tax_rate}}</td>
                       <td>
-                        <button type="button" class="btn btn-primary btn-sm btn-rounded" (click)="openViewModal(ViewContent, deduction)">View
-                          Details</button>
-                      </td>
-                      <td>
-                        <div class="d-flex gap-3">
-                          <a href="javascript:void(0);" class="text-success" (click)="openModal(deductionModal, deduction)"><i class="mdi mdi-pencil font-size-18"></i></a>
-                          <a href="javascript:void(0);" class="text-danger" (click)="confirm(deduction.id)"><i class="mdi mdi-delete font-size-18"></i></a>
-                        </div>
+                        <button type="button" class="btn btn-primary btn-sm btn-rounded" (click)="openViewModal(ViewContent, deduction)">View Details</button>
+                        <button type="button" class="btn btn-success btn-sm btn-rounded ms-1" (click)="openModal(deductionModal, deduction)"><i class="mdi mdi-pencil font-size-16"></i></button>
+                        <button type="button" class="btn btn-danger btn-sm btn-rounded ms-1" (click)="confirm(deduction.id, removeItemModal)"><i class="mdi mdi-delete font-size-16"></i></button>
                       </td>
                     </tr>}
                   </tbody>
@@ -111,10 +95,10 @@
 </div>
 
 <!-- View Details Modal -->
-<ng-template #ViewContent role="document" let-modal>
+<ng-template #ViewContent let-modal>
   <div class="modal-header">
     <h5 class="modal-title mt-0" id="deductiondetailsModalLabel">Deduction Details</h5>
-    <button type="button" class="btn-close" aria-hidden="true" (click)="modalRef?.hide()"></button>
+    <button type="button" class="btn-close" aria-hidden="true" (click)="modalRef?.close()"></button>
   </div>
   <div class="modal-body">
     <div class="table-responsive">
@@ -122,37 +106,49 @@
         <tbody>
           <tr>
             <td><strong>Name:</strong></td>
-            <td>{{selectedDeduction?.name}}</td>
+            <td>{{selectedDeduction?.deduction_name}}</td>
           </tr>
           <tr>
             <td><strong>Description:</strong></td>
-            <td>{{selectedDeduction?.description}}</td>
+            <td>{{selectedDeduction?.deduction_description}}</td>
           </tr>
           <tr>
-            <td><strong>Tax Applied:</strong></td>
+            <td><strong>Deduction Code:</strong></td>
+            <td>{{selectedDeduction?.deduction_code}}</td>
+          </tr>
+          <tr>
+            <td><strong>Has Tax:</strong></td>
             <td>
-              <span class="badge badge-pill badge-soft-success" [ngClass]="{'badge-soft-danger': !selectedDeduction?.isTaxApplied}">
-                {{selectedDeduction?.isTaxApplied ? 'Yes' : 'No'}}
+              <span class="badge badge-pill badge-soft-success" [ngClass]="{'badge-soft-danger': !selectedDeduction?.has_tax}">
+                {{selectedDeduction?.has_tax ? 'Yes' : 'No'}}
               </span>
             </td>
           </tr>
           <tr>
-            <td><strong>Tax Percentage:</strong></td>
-            <td>{{selectedDeduction?.taxPercentage}}%</td>
+            <td><strong>Tax Rate:</strong></td>
+            <td>{{selectedDeduction?.tax_rate}}</td>
+          </tr>
+          <tr>
+            <td><strong>Created At:</strong></td>
+            <td>{{selectedDeduction?.created_at | date:'medium'}}</td>
+          </tr>
+          <tr>
+            <td><strong>Updated At:</strong></td>
+            <td>{{selectedDeduction?.updated_at | date:'medium'}}</td>
           </tr>
         </tbody>
       </table>
     </div>
   </div>
   <div class="modal-footer">
-    <button class="btn btn-secondary" (click)="modalRef?.hide()">Close</button>
+    <button class="btn btn-secondary" (click)="modalRef?.close()">Close</button>
   </div>
 </ng-template>
 
 <!-- Add/Edit Deduction Modal -->
 <ng-template #deductionModal>
   <div class="modal-header">
-    <h5 class="modal-title">{{isEdit ? 'Edit' : 'Add'}} Deduction</h5>
+    <h5 class="modal-title">Add Deduction</h5>
     <button type="button" class="btn-close" aria-label="Close" (click)="modalService.dismissAll()"></button>
   </div>
   <div class="modal-body">
@@ -179,19 +175,19 @@
           </div>
           <div class="mb-3">
             <div class="form-check form-switch">
-              <input class="form-check-input" type="checkbox" id="tax-applied-field" formControlName="isTaxApplied">
-              <label class="form-check-label" for="tax-applied-field">Tax Applied</label>
+              <input class="form-check-input" type="checkbox" id="has-tax-field" formControlName="has_tax">
+              <label class="form-check-label" for="has-tax-field">Has Tax</label>
             </div>
           </div>
-          <div class="mb-3" *ngIf="f['isTaxApplied'].value">
-            <label for="tax-percentage-field" class="form-label">Tax Percentage (%)</label>
-            <input type="number" id="tax-percentage-field" class="form-control" placeholder="Enter tax percentage" formControlName="taxPercentage" [ngClass]="{ 'is-invalid': submitted && f['taxPercentage'].errors }" />
-            @if(submitted && f['taxPercentage'].errors){
+          <div class="mb-3">
+            <label for="rate-field" class="form-label">Tax Rate (%)</label>
+            <input type="number" id="rate-field" class="form-control" placeholder="Enter tax rate" formControlName="rate" [ngClass]="{ 'is-invalid': submitted && f['rate'].errors }" />
+            @if(submitted && f['rate'].errors){
             <div class="invalid-feedback" align="left">
-              @if(f['taxPercentage'].errors['min']){
+              @if(f['rate'].errors['required']){
+              <div>Please enter a tax rate.</div>}
+              @if(f['rate'].errors['min']){
               <div>Value must be greater than or equal to 0.</div>}
-              @if(f['taxPercentage'].errors['max']){
-              <div>Value must be less than or equal to 100.</div>}
             </div>}
           </div>
         </div>

@@ -5,7 +5,7 @@
 export const environment = {
   production: false,
   defaultauth: 'laravel',
-  apiUrl: 'http://38.242.240.201:8000/api', // Updated to your Laravel backend URL
+  apiUrl: 'https://5650-52-47-88-109.ngrok-free.app/api', // Updated to your Laravel backend URL
   firebaseConfig: {
     apiKey: "",
     authDomain: "",

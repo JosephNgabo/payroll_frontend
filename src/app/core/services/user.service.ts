@@ -71,6 +71,14 @@ export class UserService {
    */
   updateUserStatus(userId: number | string, status: boolean): Observable<any> {
     const headers = this.authService.getAuthHeaders();
-    return this.http.post(`${this.API_URL}/user/update-status/${userId}`, { status: status ? 1 : 0 }, { headers });
+    return this.http.post(`${this.API_URL}/user/update-status/${userId}`, { status }, { headers });
+  }
+
+  /**
+   * Reset user password
+   */
+  resetPassword(payload: { username: string, password: string }): Observable<any> {
+    const headers = this.authService.getAuthHeaders();
+    return this.http.patch(`${this.API_URL}/user/reset-password`, payload, { headers });
   }
 }

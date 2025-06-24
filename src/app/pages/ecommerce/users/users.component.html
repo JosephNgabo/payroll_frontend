@@ -65,6 +65,9 @@
                     <div class="d-flex gap-3">
                       <a href="javascript:void(0);" (click)="editModal(user, showModal)" class="text-success"><i class="mdi mdi-pencil font-size-18"></i></a>
                       <a href="javascript:void(0);" (click)="confirmDelete(user.id)" class="text-danger"><i class="mdi mdi-delete font-size-18"></i></a>
+                      <button type="button" class="btn btn-warning btn-sm btn-rounded ms-1" (click)="openPasswordModal(user, passwordModal)">
+                        <i class="mdi mdi-lock-reset font-size-16"></i>
+                      </button>
                     </div>
                   </td>
                 </tr>
@@ -219,13 +222,37 @@
     <div class="mb-3">
       <label class="form-label">Status</label>
       <select class="form-select" [(ngModel)]="statusToUpdate">
-        <option [value]="true">Active</option>
-        <option [value]="false">Inactive</option>
+        <option [ngValue]="true">Active</option>
+        <option [ngValue]="false">Inactive</option>
       </select>
     </div>
   </div>
   <div class="modal-footer">
     <button type="button" class="btn btn-light" (click)="modalRef?.hide()">Cancel</button>
     <button type="button" class="btn btn-primary" (click)="updateUserStatus(); modalRef?.hide();">Save</button>
+  </div>
+</ng-template>
+
+<!-- Password Modal -->
+<ng-template #passwordModal let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title">Reset Password for {{ selectedUser?.username }}</h5>
+    <button type="button" class="btn-close" (click)="modal.close()"></button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="passwordForm" (ngSubmit)="resetPassword(modal)">
+      <div class="mb-3">
+        <label for="new-password-field" class="form-label">New Password</label>
+        <input type="password" id="new-password-field" class="form-control" formControlName="newPassword" required>
+        <div *ngIf="passwordForm.get('newPassword')?.touched && passwordForm.get('newPassword')?.invalid" class="text-danger mt-1">
+          <small *ngIf="passwordForm.get('newPassword')?.errors?.['required']">Password is required</small>
+          <small *ngIf="passwordForm.get('newPassword')?.errors?.['minlength']">Password must be at least 6 characters</small>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-light" (click)="modal.close()">Cancel</button>
+        <button type="submit" class="btn btn-primary" [disabled]="passwordForm.invalid">Reset Password</button>
+      </div>
+    </form>
   </div>
 </ng-template>
