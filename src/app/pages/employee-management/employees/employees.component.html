@@ -1,241 +1,311 @@
 <div class="container-fluid">
-    <app-page-title title="Employee Management" [breadcrumbItems]="breadCrumbItems"></app-page-title>
-  
-    <div class="row">
-      <div class="col-12">
-        <div class="card">
-          <div class="card-body">
-            <!-- Loading State -->
-            <div *ngIf="isLoading">
-              <app-table-skeleton 
-                [columns]="['Employee ID', 'Full Name', 'Email', 'Department', 'Role', 'Status', 'View Details', 'Action']" 
-                [rowCount]="5">
-              </app-table-skeleton>
-            </div>
-            <!-- Actual Content -->
-            <div *ngIf="!isLoading">
-              <div class="row mb-2">
-                <div class="col-sm-4">
-                  <div class="search-box me-2 mb-2 d-inline-block">
-                    <div class="position-relative">
-                      <input type="text" class="form-control" autocomplete="off" id="searchTableList" placeholder="Search users..." [(ngModel)]="term" (ngModelChange)="searchOrder()">
-                      <i class="bx bx-search-alt search-icon"></i>
+  <app-page-title title="Employee Management" [breadcrumbItems]="breadCrumbItems"></app-page-title>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="text-center my-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+    <p class="mt-2">Loading employee form...</p>
+  </div>
+
+  <!-- Start Form Wizard Basic row -->
+  <div class="row" *ngIf="!isLoading">
+    <div class="col-lg-12">
+      <div class="card">
+        <div class="card-body">
+          <h4 class="card-title mb-4">Employee Creation</h4>
+          <div id="basic-example">
+            <ng-stepper #cdkStepper [linear]="true" class="wizard">
+
+              <!-- Step 1: Basic Info -->
+              <cdk-step [optional]="false">
+                <ng-template cdkStepLabel>
+                  <span class="number">1.</span>
+                  <span>Personal Info</span>
+                </ng-template>
+                <section *ngIf="cdkStepper.selectedIndex === 0">
+                  <form [formGroup]="basicInfoForm" (ngSubmit)="onBasicInfoNext()" novalidate>
+                    <div class="row">
+                      <div class="col-lg-4 mb-3">
+                        <label>Salutation</label>
+                        <ng-select [items]="['Mr', 'Ms', 'Mrs', 'Dr']"
+                                   formControlName="salutation"
+                                   placeholder="Select Salutation"
+                                   [ngClass]="{'is-invalid': submittedBasicInfo && basicInfo.salutation.errors, 'is-valid': submittedBasicInfo && basicInfo.salutation.valid}">
+                        </ng-select>
+                        <div class="invalid-feedback d-block" *ngIf="submittedBasicInfo && basicInfo.salutation.errors">
+                          <span *ngIf="basicInfo.salutation.errors.required">Salutation is required.</span>
+                        </div>
+                      </div>
+                      <div class="col-lg-4 mb-3">
+                        <label>First Name</label>
+                        <input type="text" class="form-control" formControlName="firstName" placeholder="Enter First Name"
+                               [ngClass]="{'is-invalid': submittedBasicInfo && basicInfo.firstName.errors, 'is-valid': submittedBasicInfo && basicInfo.firstName.valid}">
+                        <div class="invalid-feedback" *ngIf="submittedBasicInfo && basicInfo.firstName.errors">
+                          <span *ngIf="basicInfo.firstName.errors.required">First name is required.</span>
+                        </div>
+                      </div>
+                      <div class="col-lg-4 mb-3">
+                        <label>Last Name</label>
+                        <input type="text" class="form-control" formControlName="lastName" placeholder="Enter Last Name"
+                               [ngClass]="{'is-invalid': submittedBasicInfo && basicInfo.lastName.errors, 'is-valid': submittedBasicInfo && basicInfo.lastName.valid}">
+                        <div class="invalid-feedback" *ngIf="submittedBasicInfo && basicInfo.lastName.errors">
+                          <span *ngIf="basicInfo.lastName.errors.required">Last name is required.</span>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </div>
-                <div class="col-sm-8">
-                  <div class="text-sm-end">
-                    <button type="button" class="btn btn-success btn-rounded mb-2 me-2" (click)="showModal.show()"><i class="mdi mdi-plus mr-1"></i>
-                      Add new employee</button>
-                  </div>
-                </div>
-              </div>
-              <!-- Table data -->
-              <div class="table-responsive mb-0">
-                <table class="table align-middle table-nowrap dt-responsive nowrap w-100 table-check" id="user-list">
-                  <thead class="table-light">
-                    <tr>
-                      <th style="width: 20px;">
-                        <div class="form-check font-size-16 align-middle">
-                          <input class="form-check-input" type="checkbox" id="transactionCheck01" [(ngModel)]="masterSelected" (change)="checkUncheckAll($event)">
-                          <label class="form-check-label" for="transactionCheck01"></label>
+                    <div class="row">
+                      <div class="col-lg-4 mb-3">
+                        <label>Gender</label>
+                        <ng-select [items]="['Male', 'Female']"
+                                   formControlName="gender"
+                                   placeholder="Select Gender"
+                                   [ngClass]="{'is-invalid': submittedBasicInfo && basicInfo.gender.errors, 'is-valid': submittedBasicInfo && basicInfo.gender.valid}">
+                        </ng-select>
+                        <div class="invalid-feedback d-block" *ngIf="submittedBasicInfo && basicInfo.gender.errors">
+                          <span *ngIf="basicInfo.gender.errors.required">Gender is required.</span>
                         </div>
-                      </th>
-                      <th class="align-middle">Employee ID</th>
-                      <th class="align-middle">Full Name</th>
-                      <th class="align-middle">Email</th>
-                      <th class="align-middle">Department</th>
-                      <th class="align-middle">Role</th>
-                      <th class="align-middle">Status</th>
-                      <th class="align-middle">View Details</th>
-                      <th class="align-middle">Action</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    @for (data of orderlist; track $index) {
-                    <tr id="u_{{data.id}}">
-                      <td>
-                        <div class="form-check font-size-16">
-                          <input class="form-check-input" type="checkbox" id="transactionCheck{{data.index}}" value="{{data.id}}" [(ngModel)]="data.state">
-                          <label class="form-check-label" for="transactionCheck{{data.index}}"></label>
+                      </div>
+                      <div class="col-lg-4 mb-3">
+                        <label>Date of Birth</label>
+                        <input type="date" class="form-control" formControlName="dateOfBirth"
+                               [ngClass]="{'is-invalid': submittedBasicInfo && basicInfo.dateOfBirth.errors, 'is-valid': submittedBasicInfo && basicInfo.dateOfBirth.valid}">
+                        <div class="invalid-feedback" *ngIf="submittedBasicInfo && basicInfo.dateOfBirth.errors">
+                          <span *ngIf="basicInfo.dateOfBirth.errors.required">Date of birth is required.</span>
                         </div>
-                      </td>
-                      <td>
-                        <a href="javascript: void(0);" class="text-body fw-bold">{{data.id}}</a>
-                      </td>
-                      <td>{{data.name}}</td>
-                      <td>{{data.email}}</td>
-                      <td>{{data.department}}</td>
-                      <td>{{data.role}}</td>
-                      <td>
-                        <span class="badge badge-pill badge-soft-success font-size-11" [ngClass]=" { 'badge-soft-danger': data.status === 'Inactive',
-                                      'badge-soft-warning': data.status === 'Pending' }">{{data.status}}</span>
-                      </td>
-                      <td>
-                        <button type="button" class="btn btn-primary btn-sm btn-rounded" (click)="openViewModal(ViewContent)">View
-                          Details</button>
-                      </td>
-                      <td>
-                        <div class="d-flex gap-3">
-                          <a href="javascript:void(0);" class="text-success" (click)="editModal($index)"><i class="mdi mdi-pencil font-size-18"></i></a>
-                          <a href="javascript:void(0);" class="text-danger" (click)="confirm(data.id)"><i class="mdi mdi-delete font-size-18"></i></a>
+                      </div>
+                      <div class="col-lg-4 mb-3">
+                        <label>Nationality</label>
+                        <input type="text" class="form-control" formControlName="nationality" placeholder="Enter Nationality"
+                               [ngClass]="{'is-invalid': submittedBasicInfo && basicInfo.nationality.errors, 'is-valid': submittedBasicInfo && basicInfo.nationality.valid}">
+                        <div class="invalid-feedback" *ngIf="submittedBasicInfo && basicInfo.nationality.errors">
+                          <span *ngIf="basicInfo.nationality.errors.required">Nationality is required.</span>
                         </div>
-                      </td>
-                    </tr>}
-                  </tbody>
-                </table>
-              </div>
-              <!-- end table -->
-              <ul class="pagination pagination-rounded justify-content-end mb-2">
-                <pagination [totalItems]="orderlist?.length" [itemsPerPage]="8" (pagechanged)="pagechanged($event)"></pagination>
-              </ul>
-            </div>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-lg-4 mb-3">
+                        <label>Country of Birth</label>
+                        <ng-select [items]="countries"
+                                   formControlName="countryOfBirth"
+                                   placeholder="Select Country of Birth"
+                                   [ngClass]="{'is-invalid': submittedBasicInfo && basicInfo.countryOfBirth.errors, 'is-valid': submittedBasicInfo && basicInfo.countryOfBirth.valid}">
+                        </ng-select>
+                        <div class="invalid-feedback d-block" *ngIf="submittedBasicInfo && basicInfo.countryOfBirth.errors">
+                          <span *ngIf="basicInfo.countryOfBirth.errors.required">Country of birth is required.</span>
+                        </div>
+                      </div>
+                      <div class="col-lg-4 mb-3">
+                        <label>Marital Status</label>
+                        <ng-select [items]="['single', 'married', 'widowed', 'divorced', 'separated']"
+                                   formControlName="maritalStatus"
+                                   placeholder="Select Marital Status"
+                                   [ngClass]="{'is-invalid': submittedBasicInfo && basicInfo.maritalStatus.errors, 'is-valid': submittedBasicInfo && basicInfo.maritalStatus.valid}">
+                        </ng-select>
+                        <div class="invalid-feedback d-block" *ngIf="submittedBasicInfo && basicInfo.maritalStatus.errors">
+                          <span *ngIf="basicInfo.maritalStatus.errors.required">Marital status is required.</span>
+                        </div>
+                      </div>
+                      <div class="col-lg-4 mb-3">
+                        <label>Name of Spouse</label>
+                        <input type="text" class="form-control" formControlName="spouseName" placeholder="Enter Name of Spouse">
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-lg-4 mb-3">
+                        <label>Number of Children</label>
+                        <input type="number" class="form-control" formControlName="numberOfChildren" min="0" placeholder="Enter Number of Children"
+                               [ngClass]="{'is-invalid': submittedBasicInfo && basicInfo.numberOfChildren.errors, 'is-valid': submittedBasicInfo && basicInfo.numberOfChildren.valid}">
+                        <div class="invalid-feedback" *ngIf="submittedBasicInfo && basicInfo.numberOfChildren.errors">
+                          <span *ngIf="basicInfo.numberOfChildren.errors.required">Number of children is required.</span>
+                          <span *ngIf="basicInfo.numberOfChildren.errors.min">Value must be 0 or greater.</span>
+                        </div>
+                      </div>
+                    </div>
+                    <ul class="list-inline wizard d-flex justify-content-end mb-0">
+                      <li class="list-inline-item">
+                        <a class="btn btn-secondary" [routerLink]="['/employees/employees-view']" [class.disabled]="saving" [attr.aria-disabled]="saving ? true : null">
+                          <span *ngIf="saving" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                          <i class="mdi mdi-arrow-left me-1" *ngIf="!saving"></i> Back
+                        </a>
+                      </li>
+                      <li class="next list-inline-item" aria-disabled="false">
+                        <button class="btn btn-primary" type="submit" [disabled]="saving">
+                          <span *ngIf="saving" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                          <i class="mdi mdi-arrow-right me-1" *ngIf="!saving"></i> Next
+                        </button>
+                      </li>
+                    </ul>
+                  </form>
+                </section>
+              </cdk-step>
+
+              <!-- Step 2: Legal Info -->
+              <cdk-step [optional]="true">
+                <ng-template cdkStepLabel>
+                  <span class="number">2.</span>
+                  <span>Legal Info</span>
+                </ng-template>
+                <section *ngIf="cdkStepper.selectedIndex === 1">
+                  <form [formGroup]="legalInfoForm" (ngSubmit)="onLegalInfoNext()" novalidate>
+                    <div class="row">
+                      <div class="col-lg-4 mb-3">
+                        <label>Document Type</label>
+                        <ng-select [items]="['ID Card', 'Passport', 'Driver License']"
+                                   formControlName="documentType"
+                                   placeholder="Select Document Type"
+                                   [ngClass]="{'is-invalid': submittedLegalInfo && legalInfo.documentType.errors, 'is-valid': submittedLegalInfo && legalInfo.documentType.valid}">
+                        </ng-select>
+                        <div class="invalid-feedback d-block" *ngIf="submittedLegalInfo && legalInfo.documentType.errors">
+                          <span *ngIf="legalInfo.documentType.errors.required">Document type is required.</span>
+                        </div>
+                        <div class="valid-feedback d-block" *ngIf="submittedLegalInfo && legalInfo.documentType.valid"></div>
+                      </div>
+                      <div class="col-lg-4 mb-3">
+                        <label>Document Number</label>
+                        <input type="text" class="form-control" formControlName="documentNumber" placeholder="Enter Document Number"
+                               [ngClass]="{'is-invalid': submittedLegalInfo && legalInfo.documentNumber.errors, 'is-valid': submittedLegalInfo && legalInfo.documentNumber.valid}">
+                        <div class="invalid-feedback" *ngIf="submittedLegalInfo && legalInfo.documentNumber.errors">
+                          <span *ngIf="legalInfo.documentNumber.errors.required">Document number is required.</span>
+                        </div>
+                        <div class="valid-feedback" *ngIf="submittedLegalInfo && legalInfo.documentNumber.valid"></div>
+                      </div>
+                      <div class="col-lg-4 mb-3">
+                        <label>Document Issue Date</label>
+                        <input type="date" class="form-control" formControlName="documentIssueDate"
+                               [ngClass]="{'is-invalid': submittedLegalInfo && legalInfo.documentIssueDate.errors, 'is-valid': submittedLegalInfo && legalInfo.documentIssueDate.valid}">
+                        <div class="invalid-feedback" *ngIf="submittedLegalInfo && legalInfo.documentIssueDate.errors">
+                          <span *ngIf="legalInfo.documentIssueDate.errors.required">Issue date is required.</span>
+                        </div>
+                        <div class="valid-feedback" *ngIf="submittedLegalInfo && legalInfo.documentIssueDate.valid"></div>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-lg-4 mb-3">
+                        <label>Document Expiry Date</label>
+                        <input type="date" class="form-control" formControlName="documentExpiryDate"
+                               [ngClass]="{'is-invalid': submittedLegalInfo && legalInfo.documentExpiryDate.errors, 'is-valid': submittedLegalInfo && legalInfo.documentExpiryDate.valid}">
+                        <div class="invalid-feedback" *ngIf="submittedLegalInfo && legalInfo.documentExpiryDate.errors">
+                          <span *ngIf="legalInfo.documentExpiryDate.errors.required">Expiry date is required.</span>
+                        </div>
+                        <div class="valid-feedback" *ngIf="submittedLegalInfo && legalInfo.documentExpiryDate.valid"></div>
+                      </div>
+                      <div class="col-lg-4 mb-3">
+                        <label>Place of Issue</label>
+                        <input type="text" class="form-control" formControlName="placeOfIssue" placeholder="Enter Place of Issue"
+                               [ngClass]="{'is-invalid': submittedLegalInfo && legalInfo.placeOfIssue.errors, 'is-valid': submittedLegalInfo && legalInfo.placeOfIssue.valid}">
+                        <div class="invalid-feedback" *ngIf="submittedLegalInfo && legalInfo.placeOfIssue.errors">
+                          <span *ngIf="legalInfo.placeOfIssue.errors.required">Place of issue is required.</span>
+                        </div>
+                        <div class="valid-feedback" *ngIf="submittedLegalInfo && legalInfo.placeOfIssue.valid"></div>
+                      </div>
+                      <div class="col-lg-4 mb-3">
+                        <label>RSSB Number</label>
+                        <input type="text" class="form-control" formControlName="rssbNumber" placeholder="Enter RSSB Number"
+                               [ngClass]="{'is-invalid': submittedLegalInfo && legalInfo.rssbNumber.errors, 'is-valid': submittedLegalInfo && legalInfo.rssbNumber.valid}">
+                        <div class="invalid-feedback" *ngIf="submittedLegalInfo && legalInfo.rssbNumber.errors">
+                          <span *ngIf="legalInfo.rssbNumber.errors.required">RSSB number is required.</span>
+                        </div>
+                        <div class="valid-feedback" *ngIf="submittedLegalInfo && legalInfo.rssbNumber.valid"></div>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-lg-4 mb-3">
+                        <label>Highest Education</label>
+                        <ng-select [items]="['Secondary', 'Bachelor', 'Master', 'PhD', 'Other']"
+                                   formControlName="highestEducation"
+                                   placeholder="Select Highest Education"
+                                   [ngClass]="{'is-invalid': submittedLegalInfo && legalInfo.highestEducation.errors, 'is-valid': submittedLegalInfo && legalInfo.highestEducation.valid}">
+                        </ng-select>
+                        <div class="invalid-feedback d-block" *ngIf="submittedLegalInfo && legalInfo.highestEducation.errors">
+                          <span *ngIf="legalInfo.highestEducation.errors.required">Highest education is required.</span>
+                        </div>
+                        <div class="valid-feedback d-block" *ngIf="submittedLegalInfo && legalInfo.highestEducation.valid"></div>
+                      </div>
+                    </div>
+                    <ul class="list-inline wizard d-flex justify-content-end mb-0">
+                      <li class="previous list-inline-item" aria-disabled="true">
+                        <button class="btn btn-primary" cdkStepperPrevious [disabled]="saving">
+                          <span *ngIf="saving" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                          <i class="mdi mdi-arrow-left me-1" *ngIf="!saving"></i> Previous
+                        </button>
+                      </li>
+                      <li class="next list-inline-item" aria-disabled="false">
+                        <button class="btn btn-primary" type="submit" [disabled]="saving">
+                          <span *ngIf="saving" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                          <i class="mdi mdi-arrow-right me-1" *ngIf="!saving"></i> Next
+                        </button>
+                      </li>
+                    </ul>
+                  </form>
+                </section>
+              </cdk-step>
+
+              <!-- Step 3: Contact Info -->
+              <cdk-step [optional]="true">
+                <ng-template cdkStepLabel>
+                  <span class="number">3.</span>
+                  <span>Contact Info</span>
+                </ng-template>
+                <section *ngIf="cdkStepper.selectedIndex === 2">
+                  <form [formGroup]="contactInfoForm" (ngSubmit)="onContactInfoSubmit()" novalidate>
+                    <div class="row">
+                      <div class="col-lg-4 mb-3">
+                        <label>Personal Mobile</label>
+                        <input type="text" class="form-control" formControlName="personalMobile" placeholder="Enter Personal Mobile"
+                               [ngClass]="{'is-invalid': submittedContactInfo && contactInfo.personalMobile.errors, 'is-valid': submittedContactInfo && contactInfo.personalMobile.valid}">
+                        <div class="invalid-feedback" *ngIf="submittedContactInfo && contactInfo.personalMobile.errors">
+                          <span *ngIf="contactInfo.personalMobile.errors.required">Personal mobile is required.</span>
+                        </div>
+                      </div>
+                      <div class="col-lg-4 mb-3">
+                        <label>Personal Email</label>
+                        <input type="email" class="form-control" formControlName="personalEmail" placeholder="Enter Personal Email"
+                               [ngClass]="{'is-invalid': submittedContactInfo && contactInfo.personalEmail.errors, 'is-valid': submittedContactInfo && contactInfo.personalEmail.valid}">
+                        <div class="invalid-feedback" *ngIf="submittedContactInfo && contactInfo.personalEmail.errors">
+                          <span *ngIf="contactInfo.personalEmail.errors.required">Personal email is required.</span>
+                          <span *ngIf="contactInfo.personalEmail.errors.email">Please enter a valid email address.</span>
+                        </div>
+                      </div>
+                      <div class="col-lg-4 mb-3">
+                        <label>Home Phone</label>
+                        <input type="text" class="form-control" formControlName="homePhone" placeholder="Enter Home Phone"
+                               [ngClass]="{'is-invalid': submittedContactInfo && contactInfo.homePhone.errors, 'is-valid': submittedContactInfo && contactInfo.homePhone.valid}">
+                        <div class="invalid-feedback" *ngIf="submittedContactInfo && contactInfo.homePhone.errors">
+                          <span *ngIf="contactInfo.homePhone.errors.required">Home phone is required.</span>
+                        </div>
+                      </div>
+                    </div>
+                    <ul class="list-inline wizard d-flex justify-content-end mb-0">
+                      <li class="previous list-inline-item" aria-disabled="true">
+                        <button class="btn btn-primary" cdkStepperPrevious [disabled]="saving">
+                          <span *ngIf="saving" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                          <i class="mdi mdi-arrow-left me-1" *ngIf="!saving"></i> Previous
+                        </button>
+                      </li>
+                      <li class="next list-inline-item" aria-disabled="false">
+                        <button class="btn btn-primary" type="submit" [disabled]="saving">
+                          <span *ngIf="saving" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                          <i class="mdi mdi-content-save me-1" *ngIf="!saving"></i> {{ saving ? 'Saving...' : 'Submit' }}
+                        </button>
+                      </li>
+                    </ul>
+                  </form>
+                </section>
+              </cdk-step>
+
+            </ng-stepper>
           </div>
+
         </div>
+        <!-- end card body -->
       </div>
+      <!-- end card -->
     </div>
+    <!-- end col -->
   </div>
-  
-  <!-- View Details Modal -->
-  <ng-template #ViewContent role="document" let-modal>
-    <div class="modal-header">
-      <h5 class="modal-title mt-0" id="userdetailsModalLabel">User Details</h5>
-      <button type="button" class="btn-close" aria-hidden="true" (click)="modalRef?.hide()"></button>
-    </div>
-    <div class="modal-body">
-      <div class="table-responsive">
-        <table class="table table-centered table-nowrap">
-          <tbody>
-            <tr>
-              <td><strong>Employee ID:</strong></td>
-              <td>#EMP001</td>
-            </tr>
-            <tr>
-              <td><strong>Full Name:</strong></td>
-              <td>John Doe</td>
-            </tr>
-            <tr>
-              <td><strong>Email:</strong></td>
-              <td>john.doe&#64;example.com</td>
-            </tr>
-            <tr>
-              <td><strong>Department:</strong></td>
-              <td>IT</td>
-            </tr>
-            <tr>
-              <td><strong>Role:</strong></td>
-              <td>Developer</td>
-            </tr>
-            <tr>
-              <td><strong>Status:</strong></td>
-              <td><span class="badge badge-pill badge-soft-success">Active</span></td>
-            </tr>
-            <tr>
-              <td><strong>Join Date:</strong></td>
-              <td>01/01/2023</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-secondary" (click)="modalRef?.hide()">Close</button>
-    </div>
-  </ng-template>
-  
-  <!-- Add/Edit User Modal -->
-  <div bsModal #showModal="bs-modal" class="modal fade" id="showModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="exampleModalLabel">Add New User</h5>
-          <button type="button" class="btn-close" id="close-modal" (click)="showModal.hide()"></button>
-        </div>
-        <div class="modal-body">
-          <form (ngSubmit)="saveUser()" [formGroup]="ordersForm" class="needs-validation" id="createuser-form" novalidate>
-            <div class="row">
-              <div class="col-lg-12">
-                <input type="hidden" class="form-control" id="userid-input">
-                <div class="mb-3">
-                  <label for="fullname-field" class="form-label">Full Name</label>
-                  <input type="text" id="fullname-field" class="form-control" placeholder="Enter full name" required formControlName="name" [ngClass]="{ 'is-invalid': submitted && form['name'].errors }" />
-                  @if(submitted && form['name'].errors){
-                  <div class="invalid-feedback" align="left">
-                    @if(form['name'].errors['required']){
-                    <div>Please enter a name.</div>}
-                  </div>}
-                </div>
-                <div class="mb-3">
-                  <label for="email-field" class="form-label">Email</label>
-                  <input type="email" id="email-field" class="form-control" placeholder="Enter email" required formControlName="email" [ngClass]="{ 'is-invalid': submitted && form['email'].errors }" />
-                  @if(submitted && form['email'].errors){
-                  <div class="invalid-feedback" align="left">
-                    @if(form['email'].errors['required']){
-                    <div>Please enter an email.</div>}
-                    @if(form['email'].errors['email']){
-                    <div>Please enter a valid email address.</div>}
-                  </div>}
-                </div>
-                <div class="mb-3">
-                  <label for="department-field" class="form-label">Department</label>
-                  <select class="form-select" id="department-field" formControlName="department" required>
-                    <option value="">Select Department</option>
-                    <option value="IT">IT</option>
-                    <option value="HR">HR</option>
-                    <option value="Finance">Finance</option>
-                    <option value="Marketing">Marketing</option>
-                  </select>
-                </div>
-                <div class="mb-3">
-                  <label for="role-field" class="form-label">Role</label>
-                  <select class="form-select" id="role-field" formControlName="role" required>
-                    <option value="">Select Role</option>
-                    <option value="Admin">Admin</option>
-                    <option value="Manager">Manager</option>
-                    <option value="Developer">Developer</option>
-                    <option value="User">User</option>
-                  </select>
-                </div>
-                <div class="mb-3">
-                  <label for="status-field" class="form-label">Status</label>
-                  <select class="form-select" id="status-field" formControlName="status" required>
-                    <option value="">Select Status</option>
-                    <option value="Active">Active</option>
-                    <option value="Inactive">Inactive</option>
-                    <option value="Pending">Pending</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-light" (click)="showModal.hide()">Close</button>
-              <button type="submit" class="btn btn-primary" id="addNewUser-btn">Save</button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
-  </div>
-  
-  <!-- Modal -->
-  <div bsModal #removeItemModal="bs-modal" class="modal fade" id="removeItemModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-md">
-      <div class="modal-content">
-        <div class="modal-body px-4 py-5 text-center">
-          <button type="button" class="btn-close position-absolute end-0 top-0 m-3" (click)="removeItemModal.hide()"></button>
-          <div class="avatar-sm mb-4 mx-auto">
-            <div class="avatar-title bg-primary text-primary bg-opacity-10 font-size-20 rounded-3">
-              <i class="mdi mdi-trash-can-outline"></i>
-            </div>
-          </div>
-          <p class="text-muted font-size-16 mb-4">Are you sure you want to remove this user?</p>
-  
-          <div class="hstack gap-2 justify-content-center mb-0">
-            <button type="button" class="btn btn-danger" id="remove-item" (click)="deleteOrder()">Remove Now</button>
-            <button type="button" class="btn btn-secondary" id="close-removeOrderModal" (click)="removeItemModal.hide()">Close</button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-  <!-- end removeItemModal -->
+  <!-- end row -->
+  <!-- Start Form Wizard vertical row-->
+  <!-- end row -->
+</div>

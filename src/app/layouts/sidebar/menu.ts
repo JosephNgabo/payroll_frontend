@@ -70,15 +70,21 @@ export const MENU: MenuItem[] = [
         id: 6,
         label: 'Employees',
         icon: 'bx-cog',
-        link: '/employees',    
-        // subItems: [
-        //     {
-        //         id: 9,
-        //         label: 'Deductions Management',
-        //         link: '/deductions',
-        //         parentId: 5
-        //     }
-        // ]
+        // link: '/employees',    
+        subItems: [
+            {
+                id: 7,
+                label: 'Employee creation',
+                link: '/employees',
+                parentId: 4
+            },
+            {
+                id: 8,
+                label: 'View Employees',
+                link: '/employees/employees-view',
+                parentId: 5
+            }
+        ]
     },
     {
         id: 7,

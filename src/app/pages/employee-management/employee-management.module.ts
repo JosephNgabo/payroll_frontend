@@ -24,6 +24,11 @@ import { DROPZONE_CONFIG } from 'ngx-dropzone-wrapper';
 import { DropzoneConfigInterface } from 'ngx-dropzone-wrapper';
 import { PagetitleComponent } from 'src/app/shared/ui/pagetitle/pagetitle.component';
 import { TableSkeletonComponent } from 'src/app/shared/ui/skeleton/table-skeleton.component';
+import { CdkStepperModule } from '@angular/cdk/stepper';
+import { NgStepperModule } from 'angular-ng-stepper';
+import { EmployeesViewComponent } from './employees-view/employees-view.component';
+import { EmployeeModificationComponent } from './employee-modification/employee-modification.component';
+
 
 
 const DEFAULT_DROPZONE_CONFIG: DropzoneConfigInterface = {
@@ -34,7 +39,7 @@ const DEFAULT_DROPZONE_CONFIG: DropzoneConfigInterface = {
 };
 
 @NgModule({
-  declarations: [ EmployeesComponent],
+  declarations: [ EmployeesComponent, EmployeesViewComponent, EmployeeModificationComponent],
   imports: [
     CommonModule,
     EmployeeManagementRoutingModule,
@@ -50,7 +55,9 @@ const DEFAULT_DROPZONE_CONFIG: DropzoneConfigInterface = {
     BsDatepickerModule.forRoot(),
     DropzoneModule,
     TableSkeletonComponent,
-    PagetitleComponent
+    PagetitleComponent,
+    CdkStepperModule,
+    NgStepperModule
   ],
   providers: [
     DatePipe,

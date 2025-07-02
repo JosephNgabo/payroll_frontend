@@ -5,7 +5,7 @@
 export const environment = {
   production: false,
   defaultauth: 'laravel',
-  apiUrl: 'https://5650-52-47-88-109.ngrok-free.app/api', // Updated to your Laravel backend URL
+  apiUrl: 'https://hr-payroll-main-8svwul.laravel.cloud/api', // Updated to your Laravel backend URL
   firebaseConfig: {
     apiKey: "",
     authDomain: "",

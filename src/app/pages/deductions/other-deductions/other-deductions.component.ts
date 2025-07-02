@@ -11,6 +11,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { OtherDeductionsService, CreateOtherDeductionDto } from '../../../core/services/other-deductions.service';
 import { OtherDeduction, PaginatedOtherDeductions } from '../../../core/models/other-deduction.model';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-other-deductions',
@@ -34,6 +35,8 @@ export class OtherDeductionsComponent implements OnInit {
   submitted = false;
   isEdit = false;
   selectedDeductionId: string | null = null;
+  saving = false;
+  deleteLoading = false;
 
   constructor(
     private fb: FormBuilder,
@@ -105,7 +108,11 @@ export class OtherDeductionsComponent implements OnInit {
 
   onSubmit() {
     this.submitted = true;
+    this.saving = true;
     if (this.deductionForm.invalid) {
+      setTimeout(() => {
+        this.saving = false;
+      }, 800);
       return;
     }
     const raw = this.deductionForm.value;
@@ -123,9 +130,18 @@ export class OtherDeductionsComponent implements OnInit {
           this.loadDeductions();
           this.isEdit = false;
           this.selectedDeductionId = null;
+          this.saving = false;
+          Swal.fire({
+            position: 'center',
+            icon: 'success',
+            title: 'Deduction updated successfully',
+            showConfirmButton: false,
+            timer: 1500
+          });
         },
         error: (error) => {
           this.error = 'Failed to update deduction. Please try again.';
+          this.saving = false;
           console.error('Error updating deduction:', error);
         }
       });
@@ -134,9 +150,18 @@ export class OtherDeductionsComponent implements OnInit {
         next: () => {
           this.modalService.dismissAll();
           this.loadDeductions();
+          this.saving = false;
+          Swal.fire({
+            position: 'center',
+            icon: 'success',
+            title: 'Deduction created successfully',
+            showConfirmButton: false,
+            timer: 1500
+          });
         },
         error: (error) => {
           this.error = 'Failed to create deduction. Please try again.';
+          this.saving = false;
           console.error('Error creating deduction:', error);
         }
       });
@@ -150,13 +175,23 @@ export class OtherDeductionsComponent implements OnInit {
 
   deleteDeduction(id: string | null) {
     if (!id) return;
+    this.deleteLoading = true;
     this.deductionsService.deleteOtherDeduction(id).subscribe({
       next: () => {
         this.modalService.dismissAll();
         this.loadDeductions();
+        this.deleteLoading = false;
+        Swal.fire({
+          position: 'center',
+          icon: 'success',
+          title: 'Deduction deleted successfully',
+          showConfirmButton: false,
+          timer: 1500
+        });
       },
       error: (error) => {
         this.error = 'Failed to delete deduction. Please try again.';
+        this.deleteLoading = false;
         console.error('Error deleting deduction:', error);
       }
     });

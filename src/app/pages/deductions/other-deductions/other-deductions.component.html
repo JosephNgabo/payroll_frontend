@@ -32,7 +32,7 @@
               </div>
               <div class="col-sm-8">
                 <div class="text-sm-end">
-                  <button type="button" class="btn btn-success btn-rounded mb-2 me-2" (click)="openModal(deductionModal)"><i class="mdi mdi-plus mr-1"></i>
+                  <button type="button" class="btn btn-primary btn-rounded mb-2 me-2" (click)="openModal(deductionModal)"><i class="mdi mdi-plus mr-1"></i>
                     Add New Deduction</button>
                 </div>
               </div>
@@ -78,9 +78,15 @@
                       </td>
                       <td>{{deduction.tax_rate}}</td>
                       <td>
-                        <button type="button" class="btn btn-primary btn-sm btn-rounded" (click)="openViewModal(ViewContent, deduction)">View Details</button>
-                        <button type="button" class="btn btn-success btn-sm btn-rounded ms-1" (click)="openModal(deductionModal, deduction)"><i class="mdi mdi-pencil font-size-16"></i></button>
-                        <button type="button" class="btn btn-danger btn-sm btn-rounded ms-1" (click)="confirm(deduction.id, removeItemModal)"><i class="mdi mdi-delete font-size-16"></i></button>
+                        <div class="d-flex gap-2">
+                          <button type="button" class="btn btn-primary btn-sm btn-rounded" (click)="openViewModal(ViewContent, deduction)">View Details</button>
+                          <button type="button" class="btn btn-success btn-sm btn-rounded ms-1" (click)="openModal(deductionModal, deduction)">
+                            <i class="mdi mdi-pencil font-size-16"></i>
+                          </button>
+                          <button type="button" class="btn btn-danger btn-sm btn-rounded ms-1" (click)="confirm(deduction.id, removeItemModal)">
+                            <i class="mdi mdi-delete font-size-16"></i>
+                          </button>
+                        </div>
                       </td>
                     </tr>}
                   </tbody>
@@ -179,7 +185,7 @@
               <label class="form-check-label" for="has-tax-field">Has Tax</label>
             </div>
           </div>
-          <div class="mb-3">
+          <div class="mb-3" *ngIf="deductionForm.get('has_tax').value">
             <label for="rate-field" class="form-label">Tax Rate (%)</label>
             <input type="number" id="rate-field" class="form-control" placeholder="Enter tax rate" formControlName="rate" [ngClass]="{ 'is-invalid': submitted && f['rate'].errors }" />
             @if(submitted && f['rate'].errors){
@@ -194,7 +200,10 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-light" (click)="modalService.dismissAll()">Close</button>
-        <button type="submit" class="btn btn-primary">Save</button>
+        <button type="submit" class="btn btn-primary" [disabled]="saving">
+          <span *ngIf="saving" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+          {{ isEdit ? (saving ? 'Updating...' : 'Update') : (saving ? 'Creating...' : 'Create') }}
+        </button>
       </div>
     </form>
   </div>
@@ -214,7 +223,10 @@
         <p class="text-muted font-size-16 mb-4">Are you sure you want to remove this deduction?</p>
 
         <div class="hstack gap-2 justify-content-center mb-0">
-          <button type="button" class="btn btn-danger" id="remove-item" (click)="deleteDeduction(selectedDeductionId)">Remove Now</button>
+          <button type="button" class="btn btn-danger" id="remove-item" (click)="deleteDeduction(selectedDeductionId)" [disabled]="deleteLoading">
+            <span *ngIf="deleteLoading" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+            {{ deleteLoading ? 'Removing...' : 'Remove Now' }}
+          </button>
           <button type="button" class="btn btn-secondary" id="close-removeOrderModal" (click)="modalService.dismissAll()">Close</button>
         </div>
       </div>
