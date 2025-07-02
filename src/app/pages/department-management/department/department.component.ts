@@ -12,6 +12,7 @@ import { TableSkeletonComponent } from 'src/app/shared/ui/skeleton/table-skeleto
 import { DepartmentService } from 'src/app/core/services/department.service';
 import { Department } from 'src/app/core/models/department.model';
 import { map } from 'rxjs/operators';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-department',
@@ -38,6 +39,7 @@ export class DepartmentComponent {
   deletId: any;
   Allorderlist: Department[] = [];
   isLoading: boolean = true; // Loading state
+  saving: boolean = false;
   @ViewChild('showModal', { static: false }) showModal?: ModalDirective;
   @ViewChild('removeItemModal', { static: false }) removeItemModal?: ModalDirective;
   selectedDepartment: Department | null = null;
@@ -185,7 +187,13 @@ export class DepartmentComponent {
   */
   saveUser() {
     this.submitted = true;
-    if (this.ordersForm.invalid) return;
+    this.saving = true;
+    if (this.ordersForm.invalid) {
+      setTimeout(() => {
+        this.saving = false;
+      }, 800); // Show spinner briefly even if invalid
+      return;
+    }
     const formValue = this.ordersForm.value;
     if (formValue.id) {
       this.departmentService.updateDepartment(formValue.id, {
@@ -197,9 +205,17 @@ export class DepartmentComponent {
           this.showModal?.hide();
           this.ordersForm.reset();
           this.submitted = false;
+          this.saving = false;
+          Swal.fire({
+            position: 'center',
+            icon: 'success',
+            title: 'Department updated successfully',
+            showConfirmButton: false,
+            timer: 1500
+          });
         },
         error: () => {
-          // Optionally handle error
+          this.saving = false;
         }
       });
     } else {
@@ -215,9 +231,17 @@ export class DepartmentComponent {
           this.showModal?.hide();
           this.ordersForm.reset();
           this.submitted = false;
+          this.saving = false;
+          Swal.fire({
+            position: 'center',
+            icon: 'success',
+            title: 'Department created successfully',
+            showConfirmButton: false,
+            timer: 1500
+          });
         },
         error: () => {
-          // Optionally handle error
+          this.saving = false;
         }
       });
     }

@@ -25,7 +25,7 @@
                 </div>
                 <div class="col-sm-8">
                   <div class="text-sm-end">
-                    <button type="button" class="btn btn-success btn-rounded mb-2 me-2" (click)="showModal.show()"><i class="mdi mdi-plus mr-1"></i>
+                    <button type="button" class="btn btn-primary btn-rounded mb-2 me-2" (click)="showModal.show()"><i class="mdi mdi-plus mr-1"></i>
                       Add new allowance/benefit</button>
                   </div>
                 </div>
@@ -143,7 +143,10 @@
             </div>
             <div class="modal-footer">
               <button type="button" class="btn btn-light" (click)="showModal.hide()">Close</button>
-              <button type="submit" class="btn btn-primary" id="addNewUser-btn">Save</button>
+              <button type="submit" class="btn btn-primary" id="addNewUser-btn" [disabled]="saving">
+                <span *ngIf="saving" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                <i class="mdi mdi-content-save me-1" *ngIf="!saving"></i> {{ saving ? 'Updating...' : 'Update' }}
+              </button>
             </div>
           </form>
         </div>

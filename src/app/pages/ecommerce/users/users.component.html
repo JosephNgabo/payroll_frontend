@@ -1,6 +1,32 @@
 <div class="container-fluid">
   <app-page-title title="Users" [breadcrumbItems]="breadCrumbItems"></app-page-title>
 
+  <!-- Alert Notifications -->
+  <div class="row mb-3" *ngIf="alertMessage">
+    <div class="col-12">
+      <div class="alert alert-dismissible fade show" 
+           [ngClass]="{
+             'alert-success': alertType === 'success',
+             'alert-danger': alertType === 'error',
+             'alert-warning': alertType === 'warning',
+             'alert-info': alertType === 'info'
+           }" 
+           role="alert">
+        <div class="d-flex align-items-center">
+          <i class="me-2" 
+             [ngClass]="{
+               'mdi mdi-check-circle': alertType === 'success',
+               'mdi mdi-alert-circle': alertType === 'error',
+               'mdi mdi-alert': alertType === 'warning',
+               'mdi mdi-information': alertType === 'info'
+             }"></i>
+          <span>{{ alertMessage }}</span>
+        </div>
+        <button type="button" class="btn-close" (click)="clearAlert()" aria-label="Close"></button>
+      </div>
+    </div>
+  </div>
+
   <div class="row">
     <div class="col-lg-12">
       <div class="card">
@@ -16,8 +42,9 @@
             </div>
             <div class="col-sm-8">
               <div class="text-sm-end">
-                <button type="button" class="btn btn-success btn-rounded mb-2 me-2" (click)="openModal(showModal)">
-                  <i class="mdi mdi-plus me-1"></i> Add New User
+                <button type="button" class="btn btn-primary btn-rounded mb-2 me-2" (click)="openModal(showModal)" [disabled]="isLoading">
+                  <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                  <i class="mdi mdi-plus me-1" *ngIf="!isLoading"></i> {{ isLoading ? 'Loading...' : 'Add New User' }}
                 </button>
               </div>
             </div>
@@ -25,8 +52,10 @@
 
           <!-- Loading State -->
           <div *ngIf="isLoading" class="text-center">
-            <p>Loading users...</p>
-            <!-- You can add a spinner here -->
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="mt-2">Loading users...</p>
           </div>
 
           <!-- Error State -->
@@ -39,13 +68,13 @@
             <table class="table align-middle table-nowrap table-check">
               <thead>
                 <tr>
-                  <th>#</th>
+                  <th>ID</th>
                   <th>Username</th>
                   <th>Full Name</th>
                   <th>Email</th>
                   <th>Title</th>
                   <th>Status</th>
-                  <th>Action</th>
+                  <th>Action<span style="margin-left: 1.5em;"></span>Change password</th>
                 </tr>
               </thead>
               <tbody>
@@ -62,9 +91,16 @@
                     </span>
                   </td>
                   <td>
-                    <div class="d-flex gap-3">
-                      <a href="javascript:void(0);" (click)="editModal(user, showModal)" class="text-success"><i class="mdi mdi-pencil font-size-18"></i></a>
-                      <a href="javascript:void(0);" (click)="confirmDelete(user.id)" class="text-danger"><i class="mdi mdi-delete font-size-18"></i></a>
+                    <div class="d-flex gap-2">
+                      <button type="button" class="btn btn-success btn-sm btn-rounded" (click)="editModal(user, showModal)">
+                        <i class="mdi mdi-pencil font-size-16"></i>
+                      </button>
+                      <button type="button" class="btn btn-danger btn-sm btn-rounded ms-1" (click)="confirmDelete(user.id)">
+                        <i class="mdi mdi-delete font-size-16"></i>
+                      </button>
+                      <button type="button" class="btn btn-warning btn-sm btn-rounded ms-1" (click)="openPasswordModal(user, passwordModal)">
+                        <i class="mdi mdi-lock-reset font-size-16"></i>
+                      </button>
                     </div>
                   </td>
                 </tr>
@@ -124,7 +160,7 @@
       </div>
       <div class="mb-3">
         <label for="email-field" class="form-label">Email</label>
-        <input type="email" id="email-field" class="form-control" formControlName="email" [readonly]="isEditMode" required>
+        <input type="email" id="email-field" class="form-control" formControlName="email" required>
         <div *ngIf="(form['email'].touched || submitted) && form['email'].errors" class="text-danger mt-1">
           <small *ngIf="form['email'].errors['required']">Email is required</small>
           <small *ngIf="form['email'].errors['email']">Please enter a valid email address</small>
@@ -142,7 +178,7 @@
       </div>
       <div class="mb-3">
         <label for="username-field" class="form-label">Username</label>
-        <input type="text" id="username-field" class="form-control" formControlName="username" [readonly]="isEditMode" required>
+        <input type="text" id="username-field" class="form-control" formControlName="username" required>
         <div *ngIf="(form['username'].touched || submitted) && form['username'].errors" class="text-danger mt-1">
           <small *ngIf="form['username'].errors['required']">Username is required</small>
           <small *ngIf="form['username'].errors['minlength']">Username must be at least 3 characters</small>
@@ -182,8 +218,11 @@
     </form>
   </div>
   <div class="modal-footer">
-    <button type="button" class="btn btn-light" (click)="modalRef?.hide()">Close</button>
-    <button type="button" class="btn btn-primary" (click)="saveUser()">{{ isEditMode ? 'Update' : 'Save' }}</button>
+    <button type="button" class="btn btn-light" (click)="modalRef?.hide()" [disabled]="saving">Close</button>
+    <button type="button" class="btn btn-primary" (click)="saveUser()" [disabled]="saving || ordersForm.invalid">
+      <span *ngIf="saving" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+      {{ saving ? 'Saving...' : (isEditMode ? 'Update' : 'Save') }}
+    </button>
   </div>
 </ng-template>
 
@@ -197,10 +236,21 @@
         <i class="mdi mdi-trash-can-outline"></i>
       </div>
     </div>
-    <p class="text-muted font-size-16 mb-4">Are you sure you want to remove this user?</p>
+    <p class="text-muted font-size-16 mb-4">
+      Are you sure you want to remove <br>
+      <span class="fw-bold text-danger">{{ selectedUser?.username | titlecase }}</span>
+      <br>
+      <span *ngIf="selectedUser?.firstname || selectedUser?.lastname">
+        ({{ selectedUser?.firstname | titlecase }} {{ selectedUser?.lastname | titlecase}})
+      </span>
+      ?
+    </p>
     <div class="hstack gap-2 justify-content-center mb-0">
-      <button type="button" class="btn btn-danger" (click)="deleteUser(); modal.close();">Remove Now</button>
-      <button type="button" class="btn btn-secondary" (click)="modal.close()">Close</button>
+      <button type="button" class="btn btn-danger" (click)="deleteUser(); modal.close();" [disabled]="deleting">
+        <span *ngIf="deleting" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+        {{ deleting ? 'Removing...' : 'Remove Now' }}
+      </button>
+      <button type="button" class="btn btn-secondary" (click)="modal.close()" [disabled]="deleting">Close</button>
     </div>
   </div>
 </ng-template>
@@ -218,14 +268,50 @@
     </div>
     <div class="mb-3">
       <label class="form-label">Status</label>
-      <select class="form-select" [(ngModel)]="statusToUpdate">
-        <option [value]="true">Active</option>
-        <option [value]="false">Inactive</option>
-      </select>
+      <ng-select [items]="[
+        { label: 'Active', value: true },
+        { label: 'Inactive', value: false }
+      ]"
+      bindLabel="label"
+      bindValue="value"
+      [(ngModel)]="statusToUpdate"
+      [clearable]="false"
+      placeholder="Select status">
+      </ng-select>
     </div>
   </div>
   <div class="modal-footer">
-    <button type="button" class="btn btn-light" (click)="modalRef?.hide()">Cancel</button>
-    <button type="button" class="btn btn-primary" (click)="updateUserStatus(); modalRef?.hide();">Save</button>
+    <button type="button" class="btn btn-light" (click)="modalRef?.hide()" [disabled]="updatingStatus">Cancel</button>
+    <button type="button" class="btn btn-primary" (click)="updateUserStatus(); modalRef?.hide();" [disabled]="updatingStatus">
+      <span *ngIf="updatingStatus" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+      {{ updatingStatus ? 'Saving...' : 'Save' }}
+    </button>
+  </div>
+</ng-template>
+
+<!-- Password Modal -->
+<ng-template #passwordModal let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title">Reset Password for {{ selectedUser?.username }}</h5>
+    <button type="button" class="btn-close" (click)="modal.close()"></button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="passwordForm" (ngSubmit)="resetPassword(modal)">
+      <div class="mb-3">
+        <label for="new-password-field" class="form-label">New Password</label>
+        <input type="password" id="new-password-field" class="form-control" formControlName="newPassword" required>
+        <div *ngIf="passwordForm.get('newPassword')?.touched && passwordForm.get('newPassword')?.invalid" class="text-danger mt-1">
+          <small *ngIf="passwordForm.get('newPassword')?.errors?.['required']">Password is required</small>
+          <small *ngIf="passwordForm.get('newPassword')?.errors?.['minlength']">Password must be at least 6 characters</small>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-light" (click)="modal.close()" [disabled]="resettingPassword">Cancel</button>
+        <button type="submit" class="btn btn-primary" [disabled]="passwordForm.invalid || resettingPassword">
+          <span *ngIf="resettingPassword" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+          {{ resettingPassword ? 'Resetting...' : 'Reset Password' }}
+        </button>
+      </div>
+    </form>
   </div>
 </ng-template>

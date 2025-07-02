@@ -12,15 +12,15 @@ import { NgStepperModule } from 'angular-ng-stepper';
 import { CdkStepper } from '@angular/cdk/stepper';
 
 @Component({
-  selector: 'app-employees',
-  templateUrl: './employees.component.html',
-  styleUrl: './employees.component.scss'
+  selector: 'app-employee-modification',
+  templateUrl: './employee-modification.component.html',
+  styleUrl: './employee-modification.component.scss'
 })
 
 /**
  *  users component
  */
-export class EmployeesComponent implements OnInit {
+export class EmployeeModificationComponent implements OnInit {
   enditem: any;
   modalRef?: BsModalRef;
   masterSelected!: boolean;
@@ -50,12 +50,12 @@ export class EmployeesComponent implements OnInit {
     'Eritrea', 'Estonia', 'Eswatini', 'Ethiopia', 'Fiji', 'Finland', 'France', 'Gabon', 'Gambia', 'Georgia',
     'Germany', 'Ghana', 'Greece', 'Grenada', 'Guatemala', 'Guinea', 'Guinea-Bissau', 'Guyana', 'Haiti', 'Honduras',
     'Hungary', 'Iceland', 'India', 'Indonesia', 'Iran (Islamic Republic of)', 'Iraq', 'Ireland', 'Israel', 'Italy',
-    'Jamaica', 'Japan', 'Jordan', 'Kazakhstan', 'Kenya', 'Kiribati', 'Kuwait', 'Kyrgyzstan', 'Lao People’s Democratic Republic',
+    'Jamaica', 'Japan', 'Jordan', 'Kazakhstan', 'Kenya', 'Kiribati', 'Kuwait', 'Kyrgyzstan', 'Lao People\'s Democratic Republic',
     'Latvia', 'Lebanon', 'Lesotho', 'Liberia', 'Libya', 'Liechtenstein', 'Lithuania', 'Luxembourg', 'Madagascar',
     'Malawi', 'Malaysia', 'Maldives', 'Mali', 'Malta', 'Marshall Islands', 'Mauritania', 'Mauritius', 'Mexico',
     'Micronesia (Federated States of)', 'Republic of Moldova', 'Monaco', 'Mongolia', 'Montenegro', 'Morocco',
     'Mozambique', 'Myanmar', 'Namibia', 'Nauru', 'Nepal', 'Netherlands', 'New Zealand', 'Nicaragua', 'Niger',
-    'Nigeria', 'Democratic People’s Republic of Korea', 'North Macedonia', 'Norway', 'Oman', 'Pakistan', 'Palau',
+    'Nigeria', 'Democratic People\'s Republic of Korea', 'North Macedonia', 'Norway', 'Oman', 'Pakistan', 'Palau',
     'State of Palestine', 'Panama', 'Papua New Guinea', 'Paraguay', 'Peru', 'Philippines', 'Poland', 'Portugal',
     'Qatar', 'Romania', 'Russian Federation', 'Rwanda', 'Saint Kitts and Nevis', 'Saint Lucia',
     'Saint Vincent and the Grenadines', 'Samoa', 'San Marino', 'Sao Tome and Principe', 'Saudi Arabia', 'Senegal',
@@ -128,6 +128,34 @@ export class EmployeesComponent implements OnInit {
       personalMobile: ['', Validators.required],
       personalEmail: ['', [Validators.required, Validators.email]],
       homePhone: ['', Validators.required]
+    });
+
+    // Example dummy data for demonstration
+    this.basicInfoForm.patchValue({
+      salutation: 'Mr',
+      firstName: 'John',
+      lastName: 'Doe',
+      gender: 'Male',
+      dateOfBirth: '1990-01-01',
+      nationality: 'Rwandan',
+      countryOfBirth: 'Rwanda',
+      maritalStatus: 'single',
+      spouseName: '',
+      numberOfChildren: 0
+    });
+    this.legalInfoForm.patchValue({
+      documentType: 'ID Card',
+      documentNumber: '123456789',
+      documentIssueDate: '2010-01-01',
+      documentExpiryDate: '2030-01-01',
+      placeOfIssue: 'Kigali',
+      rssbNumber: 'RSSB123456',
+      highestEducation: 'Bachelor'
+    });
+    this.contactInfoForm.patchValue({
+      personalMobile: '+250788123456',
+      personalEmail: 'john.doe@example.com',
+      homePhone: '+250252123456'
     });
 
     // Simulate loading delay

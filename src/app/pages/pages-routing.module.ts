@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 
 import { DefaultComponent } from './dashboards/default/default.component';
+import { EmployeeManagementModule } from './employee-management/employee-management.module';
 
 const routes: Routes = [
   // { path: '', redirectTo: 'dashboard' },
@@ -13,7 +14,8 @@ const routes: Routes = [
   { path: 'dashboards', loadChildren: () => import('./dashboards/dashboards.module').then(m => m.DashboardsModule) },
   { path: 'users', loadChildren: () => import('./ecommerce/access-management.module').then(m => m.AccessManagementModule) },
   { path: 'deductions', loadChildren: () => import('./deductions/deductions.module').then(m => m.DeductionsModule) },
-  { path: 'employees', loadChildren: () => import('./employee-management/employee-management.module').then(m => m.EmployeeManagementModule)},
+  { path: 'employees', loadChildren: () => import('./employee-management/employee-management.module').then(m => m.EmployeeManagementModule) },
+  { path: 'employee-modification', loadChildren: () => import('./employee-management/employee-management.module').then(m => m.EmployeeManagementModule) },
   { path: 'allowance-benefits', loadChildren: () => import('./allowance-benefits/allowance-benefits.module').then(m => m.AllowanceBenefitsModule)},
   { path: 'departments', loadChildren: () => import('./department-management/department-management.module').then(m => m.DepartmentManagementModule)}
 

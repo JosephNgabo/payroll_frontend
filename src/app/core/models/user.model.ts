@@ -11,7 +11,7 @@ export interface UserDetail {
     created_at: string;
     updated_at: string;
     deleted_at: string | null;
-    is_active: number;
+    is_active: boolean;
     login_attempts: number;
     avatar: string | null;
     language: string;

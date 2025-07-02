@@ -6,7 +6,7 @@ import { environment } from '../../../environments/environment';
 import { PaginatedUsersResponse, UserDetail } from '../models/user.model';
 import { LaravelAuthService } from './laravel-auth.service';
 
-// Define a type for the create user payload
+// Define a type for the create user payloads
 export type CreateUserPayload = Omit<UserDetail, 'id' | 'id_util' | 'verified_at' | 'created_at' | 'updated_at' | 'deleted_at' | 'login_attempts' | 'avatar'> & { password?: string };
 
 // Define a type for the update user payload (similar to create but with optional password)
@@ -46,9 +46,9 @@ export class UserService {
    * @param id The user ID to update
    * @param userData The updated user data
    */
-  updateUser(id: number, userData: UpdateUserPayload): Observable<UserDetail> {
+  updateUser(id: string, userData: UpdateUserPayload): Observable<UserDetail> {
     const headers = this.authService.getAuthHeaders();
-    return this.http.put<UserDetail>(`${this.API_URL}/user/${id}`, userData, { headers });
+    return this.http.patch<UserDetail>(`${this.API_URL}/user/${id}`, userData, { headers });
   }
 
   /**
@@ -71,6 +71,14 @@ export class UserService {
    */
   updateUserStatus(userId: number | string, status: boolean): Observable<any> {
     const headers = this.authService.getAuthHeaders();
-    return this.http.post(`${this.API_URL}/user/update-status/${userId}`, { status: status ? 1 : 0 }, { headers });
+    return this.http.post(`${this.API_URL}/user/update-status/${userId}`, { status }, { headers });
+  }
+
+  /**
+   * Reset user password
+   */
+  resetPassword(payload: { username: string, password: string }): Observable<any> {
+    const headers = this.authService.getAuthHeaders();
+    return this.http.patch(`${this.API_URL}/user/reset-password`, payload, { headers });
   }
 }

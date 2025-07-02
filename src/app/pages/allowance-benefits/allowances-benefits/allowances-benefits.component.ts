@@ -11,6 +11,7 @@ import { SkeletonComponent } from 'src/app/shared/ui/skeleton/skeleton.component
 import { TableSkeletonComponent } from 'src/app/shared/ui/skeleton/table-skeleton.component';
 import { AllowanceService } from 'src/app/core/services/allowance.service';
 import { Allowance } from 'src/app/core/models/allowance.model';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-allowances-benefits',
@@ -42,6 +43,7 @@ export class AllowancesBenefitsComponent {
   @ViewChild('showModal') showModal!: ModalDirective;
   @ViewChild('removeItemModal', { static: false }) removeItemModal?: ModalDirective;
   selectedAllowance: Allowance | null = null;
+  saving: boolean = false;
 
   constructor(
     private modalService: BsModalService,
@@ -163,8 +165,13 @@ export class AllowancesBenefitsComponent {
   */
   saveUser() {
     this.submitted = true;
-    if (this.ordersForm.invalid) return;
-
+    this.saving = true;
+    if (this.ordersForm.invalid) {
+      setTimeout(() => {
+        this.saving = false;
+      }, 800); // Show spinner briefly even if invalid
+      return;
+    }
     const formValue = this.ordersForm.value;
     if (formValue.id) {
       // Update existing allowance
@@ -177,9 +184,18 @@ export class AllowancesBenefitsComponent {
           this.showModal.hide();
           this.ordersForm.reset();
           this.submitted = false;
+          this.saving = false;
+          Swal.fire({
+            position: 'center',
+            icon: 'success',
+            title: 'Your work has been updated',
+            showConfirmButton: false,
+            timer: 1500
+          });
         },
         error: (err) => {
           // Handle error, show message if needed
+          this.saving = false;
         }
       });
     } else {
@@ -193,10 +209,19 @@ export class AllowancesBenefitsComponent {
           this.showModal.hide();
           this.ordersForm.reset();
           this.submitted = false;
+          this.saving = false;
+          Swal.fire({
+            position: 'center',
+            icon: 'success',
+            title: 'Your work has been saved',
+            showConfirmButton: false,
+            timer: 1500
+          });
         },
         error: (err) => {
           // Handle error, e.g., show validation errors
           console.error('Create allowance error:', err);
+          this.saving = false;
         }
       });
     }

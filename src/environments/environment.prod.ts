@@ -1,7 +1,8 @@
 export const environment = {
   production: true,
   defaultauth: 'laravel',
-  apiUrl: 'http://38.242.240.201:8000/api',
+  apiUrl: 'https://hr-payroll-main-8svwul.laravel.cloud/api',
+  // apiUrl: 'http://localhost:3000',
   firebaseConfig: {
     apiKey: '',
     authDomain: '',
