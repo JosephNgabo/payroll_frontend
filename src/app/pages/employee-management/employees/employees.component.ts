@@ -10,6 +10,36 @@ import { Store } from '@ngrx/store';
 import { TableSkeletonComponent } from 'src/app/shared/ui/skeleton/table-skeleton.component';
 import { NgStepperModule } from 'angular-ng-stepper';
 import { CdkStepper } from '@angular/cdk/stepper';
+import { EmployeeInformationService } from 'src/app/core/services/employee-information.service';
+import { EmployeeInformation } from 'src/app/core/models/employee-information.model';
+import { DepartmentService } from 'src/app/core/services/department.service';
+import { Department } from 'src/app/core/models/department.model';
+import { EmployeeContractService } from 'src/app/core/services/employee-contract.service';
+import { EmployeeContract } from 'src/app/core/models/employee-contract.model';
+import { AllowanceService } from 'src/app/core/services/allowance.service';
+import { Allowance } from 'src/app/core/models/allowance.model';
+import { EmployeeAllowanceService } from 'src/app/core/services/employee-allowance.service';
+import { EmployeeAllowance } from 'src/app/core/models/employee-allowance.model';
+import { DeductionsService } from 'src/app/core/services/deductions.service';
+import { RssbDeduction } from 'src/app/core/models/rssb-deduction.model';
+import { EmployeeRssbContributionService } from 'src/app/core/services/employee-rssb-contribution.service';
+import { EmployeeRssbContribution } from 'src/app/core/models/employee-rssb-contribution.model';
+import { OtherDeductionsService } from 'src/app/core/services/other-deductions.service';
+import { OtherDeduction } from 'src/app/core/models/other-deduction.model';
+import { EmployeeDeductionService } from 'src/app/core/services/employee-deduction.service';
+import { EmployeeDeduction } from 'src/app/core/models/employee-deduction.model';
+import { forkJoin } from 'rxjs';
+import { EmployeeBankInfoService } from 'src/app/core/services/employee-bank-info.service';
+import { EmployeeBankInfo } from 'src/app/core/models/employee-bank-info.model';
+import { LocalizationService } from 'src/app/core/services/localization.service';
+import { EmployeeAddressService } from 'src/app/core/services/employee-address.service';
+import { EmployeeAddress } from 'src/app/core/models/employee-address.model';
+import { EmployeeEmergencyContactService } from 'src/app/core/services/employee-emergency-contact.service';
+import { EmployeeEmergencyContact } from 'src/app/core/models/employee-emergency-contact.model';
+import { EmployeeDocumentService } from 'src/app/core/services/employee-document.service';
+import { EmployeeDocument } from 'src/app/core/models/employee-document.model';
+import Swal from 'sweetalert2';
+import { Router, ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-employees',
@@ -40,51 +70,123 @@ export class EmployeesComponent implements OnInit {
   @ViewChild('removeItemModal', { static: false }) removeItemModal?: ModalDirective;
   isLoading = true;
   saving = false;
-  countries: string[] = [
-    'Afghanistan', 'Albania', 'Algeria', 'Andorra', 'Angola', 'Antigua and Barbuda', 'Argentina', 'Armenia', 'Australia', 'Austria',
-    'Azerbaijan', 'Bahamas', 'Bahrain', 'Bangladesh', 'Barbados', 'Belarus', 'Belgium', 'Belize', 'Benin', 'Bhutan',
-    'Bolivia (Plurinational State of)', 'Bosnia and Herzegovina', 'Botswana', 'Brazil', 'Brunei Darussalam', 'Bulgaria',
-    'Burkina Faso', 'Burundi', 'Cabo Verde', 'Cambodia', 'Cameroon', 'Canada', 'Central African Republic', 'Chad',
-    'Chile', 'China', 'Colombia', 'Comoros', 'Congo', 'Costa Rica', 'Croatia', 'Cuba', 'Cyprus', 'Czechia',
-    'Denmark', 'Djibouti', 'Dominica', 'Dominican Republic', 'Ecuador', 'Egypt', 'El Salvador', 'Equatorial Guinea',
-    'Eritrea', 'Estonia', 'Eswatini', 'Ethiopia', 'Fiji', 'Finland', 'France', 'Gabon', 'Gambia', 'Georgia',
-    'Germany', 'Ghana', 'Greece', 'Grenada', 'Guatemala', 'Guinea', 'Guinea-Bissau', 'Guyana', 'Haiti', 'Honduras',
-    'Hungary', 'Iceland', 'India', 'Indonesia', 'Iran (Islamic Republic of)', 'Iraq', 'Ireland', 'Israel', 'Italy',
-    'Jamaica', 'Japan', 'Jordan', 'Kazakhstan', 'Kenya', 'Kiribati', 'Kuwait', 'Kyrgyzstan', 'Lao People’s Democratic Republic',
-    'Latvia', 'Lebanon', 'Lesotho', 'Liberia', 'Libya', 'Liechtenstein', 'Lithuania', 'Luxembourg', 'Madagascar',
-    'Malawi', 'Malaysia', 'Maldives', 'Mali', 'Malta', 'Marshall Islands', 'Mauritania', 'Mauritius', 'Mexico',
-    'Micronesia (Federated States of)', 'Republic of Moldova', 'Monaco', 'Mongolia', 'Montenegro', 'Morocco',
-    'Mozambique', 'Myanmar', 'Namibia', 'Nauru', 'Nepal', 'Netherlands', 'New Zealand', 'Nicaragua', 'Niger',
-    'Nigeria', 'Democratic People’s Republic of Korea', 'North Macedonia', 'Norway', 'Oman', 'Pakistan', 'Palau',
-    'State of Palestine', 'Panama', 'Papua New Guinea', 'Paraguay', 'Peru', 'Philippines', 'Poland', 'Portugal',
-    'Qatar', 'Romania', 'Russian Federation', 'Rwanda', 'Saint Kitts and Nevis', 'Saint Lucia',
-    'Saint Vincent and the Grenadines', 'Samoa', 'San Marino', 'Sao Tome and Principe', 'Saudi Arabia', 'Senegal',
-    'Serbia', 'Seychelles', 'Sierra Leone', 'Singapore', 'Slovakia', 'Slovenia', 'Solomon Islands', 'Somalia',
-    'South Africa', 'Republic of Korea', 'South Sudan', 'Spain', 'Sri Lanka', 'Sudan', 'Suriname', 'Sweden',
-    'Switzerland', 'Syrian Arab Republic', 'Taiwan', 'Tajikistan', 'United Republic of Tanzania', 'Thailand',
-    'Timor-Leste', 'Togo', 'Tonga', 'Trinidad and Tobago', 'Tunisia', 'Türkiye', 'Turkmenistan', 'Tuvalu', 'Uganda',
-    'Ukraine', 'United Arab Emirates', 'United Kingdom of Great Britain and Northern Ireland', 'United States of America',
-    'Uruguay', 'Uzbekistan', 'Vanuatu', 'Vatican City State', 'Venezuela (Bolivarian Republic of)', 'Viet Nam',
-    'Yemen', 'Zambia', 'Zimbabwe'
-  ];
+  countries: any[] = [];
   
   basicInfoForm: UntypedFormGroup;
   submittedBasicInfo = false;
-  legalInfoForm: UntypedFormGroup;
-  submittedLegalInfo = false;
-  contactInfoForm: UntypedFormGroup;
-  submittedContactInfo = false;
+  legalContactsInfoForm: UntypedFormGroup;
+  submittedLegalContactsInfo = false;
   @ViewChild('cdkStepper') cdkStepper!: CdkStepper;
+  contractInfoForm: UntypedFormGroup;
+  submittedContractInfo = false;
+  departments: Department[] = [];
+  allowanceForm: UntypedFormGroup;
+  submittedAllowance = false;
+  rssbDeductionForm: UntypedFormGroup;
+  submittedRssbDeduction = false;
+  otherDeductionForm: UntypedFormGroup;
+  submittedOtherDeduction = false;
+  deductionsFormGroup: UntypedFormGroup;
+  submittedDeductions = false;
+  bankInfoForm: UntypedFormGroup;
+  submittedBankInfo = false;
+  employeeAddressForm: UntypedFormGroup;
+  submittedEmployeeAddress = false;
+  provinces: any[] = [];
+  districts: any[] = [];
+  sectors: any[] = [];
+  cells: any[] = [];
+  villages: any[] = [];
+  documentsForm: UntypedFormGroup;
+  submittedDocuments = false;
+  salutations = [
+    { label: 'Mr', value: 'mr' },
+    { label: 'Ms', value: 'ms' },
+    { label: 'Mrs', value: 'mrs' },
+    { label: 'Dr', value: 'dr' }
+  ];
+  genders = [
+    { label: 'Male', value: 'male' },
+    { label: 'Female', value: 'female' }
+  ];
+  documentTypes = [];
+  emergencyContactForm: UntypedFormGroup;
+  submittedEmergencyContact = false;
+  employeeId: string;
+  allowances: Allowance[] = [];
+  rssbDeductions: RssbDeduction[] = [];
+  otherDeductions: OtherDeduction[] = [];
+  existingEmployeeDeductions: string[] = [];
+  legalDocumentTypes = [
+    { label: 'Passport', value: 'passport' },
+    { label: 'ID Card', value: 'id_card' },
+    { label: 'Driver License', value: 'driver_license' }
+  ];
+  employeeRssbDeductions: any[] = [];
+  addRssbDeductionForm: UntypedFormGroup;
+  addRssbDeductionModalRef: BsModalRef | undefined;
+  employeeOtherDeductions: any[] = [];
+  addOtherDeductionForm: UntypedFormGroup;
+  addOtherDeductionModalRef: BsModalRef | undefined;
+  @ViewChild('addOtherDeductionModal') addOtherDeductionModal: any;
+  selectedOtherDeduction: any = null;
+
+  @ViewChild('addRssbDeductionModal') addRssbDeductionModal: any;
+
+  selectedDocumentFile: File | null = null;
+
+  highlightedEmployeeId: string | null = null;
+
+  currentPage = 1;
+  itemsPerPage = 10;
+  totalItems = 0;
+  lastPage = 1;
+  employeeList: EmployeeInformation[] = [];
 
   constructor(
     private modalService: BsModalService,
     private formBuilder: UntypedFormBuilder,
     private datePipe: DatePipe,
-    private store: Store
+    private store: Store,
+    private employeeInformationService: EmployeeInformationService,
+    private departmentService: DepartmentService,
+    private employeeContractService: EmployeeContractService,
+    private allowanceService: AllowanceService,
+    private employeeAllowanceService: EmployeeAllowanceService,
+    private deductionsService: DeductionsService,
+    private employeeRssbContributionService: EmployeeRssbContributionService,
+    private otherDeductionsService: OtherDeductionsService,
+    private employeeDeductionService: EmployeeDeductionService,
+    private employeeBankInfoService: EmployeeBankInfoService,
+    private localizationService: LocalizationService,
+    private employeeAddressService: EmployeeAddressService,
+    private employeeEmergencyContactService: EmployeeEmergencyContactService,
+    private employeeDocumentService: EmployeeDocumentService,
+    private router: Router,
+    private route: ActivatedRoute,
   ) { }
 
   ngOnInit() {
     this.breadCrumbItems = [{ label: 'Employee Management' }, { label: 'Employee Creation', active: true }];
+    this.route.queryParams.subscribe(params => {
+      this.highlightedEmployeeId = params['highlight'] || null;
+    });
+    this.employeeInformationService.getCountries().subscribe({
+      next: (data: any) => {
+        // If the API returns an array, use it. If it returns an object, try to use data property, else fallback to []
+        if (Array.isArray(data)) {
+          this.countries = data;
+        } else if (data && Array.isArray(data.data)) {
+          this.countries = data.data;
+        } else {
+          this.countries = [];
+        }
+      },
+      error: (err) => {
+        console.error('Failed to load countries', err);
+        this.countries = [];
+      }
+    });
     setTimeout(() => {
       this.isLoading = false;
     }, 1500); // Simulate loading delay
@@ -114,20 +216,93 @@ export class EmployeesComponent implements OnInit {
       numberOfChildren: ['', [Validators.required, Validators.min(0)]]
     });
 
-    this.legalInfoForm = this.formBuilder.group({
+    this.legalContactsInfoForm = this.formBuilder.group({
       documentType: ['', Validators.required],
       documentNumber: ['', Validators.required],
       documentIssueDate: ['', Validators.required],
       documentExpiryDate: ['', Validators.required],
       placeOfIssue: ['', Validators.required],
       rssbNumber: ['', Validators.required],
-      highestEducation: ['', Validators.required]
-    });
-
-    this.contactInfoForm = this.formBuilder.group({
+      highestEducation: ['', Validators.required],
       personalMobile: ['', Validators.required],
       personalEmail: ['', [Validators.required, Validators.email]],
       homePhone: ['', Validators.required]
+    });
+
+    this.contractInfoForm = this.formBuilder.group({
+      department: ['', Validators.required],
+      job_title: ['', Validators.required],
+      employment_type: ['', Validators.required],
+      hire_date: ['', Validators.required],
+      end_date: [''],
+      salary_basis: ['', Validators.required],
+      salary_amount: ['', [Validators.required, Validators.min(0)]],
+      salary_frequency: ['', Validators.required],
+      tin_number: ['']
+    });
+
+    this.allowanceForm = this.formBuilder.group({
+      name: [''],
+      amount: ['', [Validators.required, Validators.min(0)]],
+      type: ['', Validators.required],
+      allowance_id: ['', Validators.required],
+      description: ['']
+    });
+
+    this.rssbDeductionForm = this.formBuilder.group({
+      employee_contribution: ['', [Validators.required, Validators.min(0)]],
+      employer_contribution: ['', [Validators.required, Validators.min(0)]],
+      rssb_deduction_id: ['', Validators.required]
+    });
+
+    this.otherDeductionForm = this.formBuilder.group({
+      description: [''],
+      amount: ['', [Validators.required, Validators.min(0)]],
+      type: ['', Validators.required],
+      deduction_id: ['', Validators.required]
+    });
+
+    this.deductionsFormGroup = this.formBuilder.group({
+      rssbDeductionForm: this.rssbDeductionForm,
+      otherDeductionForm: this.otherDeductionForm
+    });
+
+    this.bankInfoForm = this.formBuilder.group({
+      bank_name: ['', Validators.required],
+      account_number: ['', Validators.required],
+      account_name: ['', Validators.required],
+      iban: [''],
+      swift_code: ['']
+    });
+
+    this.employeeAddressForm = this.formBuilder.group({
+      type: ['', Validators.required],
+      city: [''],
+      additional_address: [''],
+      country: ['', Validators.required],
+      province: ['', Validators.required],
+      district: ['', Validators.required],
+      sector: ['', Validators.required],
+      cell: ['', Validators.required],
+      village: ['', Validators.required],
+      postal_code: [''],
+      street_address: ['']
+    });
+
+    this.documentsForm = this.formBuilder.group({
+      document_type_id: ['', Validators.required],
+      document: ['', Validators.required],
+      uploaded_at: [new Date().toISOString().slice(0, 19).replace('T', ' ')],
+      description: [''],
+      expiration_date: ['']
+    });
+
+    this.emergencyContactForm = this.formBuilder.group({
+      name: ['', Validators.required],
+      gender: [''],
+      relationship: ['', Validators.required],
+      phone: ['', Validators.required],
+      email: ['']
     });
 
     // Simulate loading delay
@@ -161,6 +336,84 @@ export class EmployeesComponent implements OnInit {
       ];
       this.Allorderlist = this.orderlist;
     }, 1500); // 1.5 second delay to show skeleton
+
+    this.departmentService.getDepartments().subscribe({
+      next: (departments) => {
+        this.departments = departments;
+      },
+      error: (err) => {
+        console.error('Failed to load departments', err);
+        this.departments = [];
+      }
+    });
+
+    this.allowanceService.getAllowances().subscribe({
+      next: (response: any) => {
+        this.allowances = response.data || [];
+      },
+      error: (err) => {
+        console.error('Failed to load allowances', err);
+        this.allowances = [];
+      }
+    });
+
+    this.deductionsService.getRssbDeductions().subscribe({
+      next: (data: any) => {
+        // If paginated, use data.data; otherwise, use data directly
+        this.rssbDeductions = Array.isArray(data) ? data : (data.data || []);
+      },
+      error: (err) => {
+        console.error('Failed to load RSSB deductions', err);
+        this.rssbDeductions = [];
+      }
+    });
+
+    this.otherDeductionsService.getOtherDeductions().subscribe({
+      next: (data: any) => {
+        // If paginated, use data.data; otherwise, use data directly
+        this.otherDeductions = Array.isArray(data) ? data : (data.data || []);
+      },
+      error: (err) => {
+        console.error('Failed to load other deductions', err);
+        this.otherDeductions = [];
+      }
+    });
+
+    this.localizationService.getLocalizations(0).subscribe({
+      next: (data: any) => {
+        this.provinces = data.data || [];
+      }
+    });
+
+    // Fetch document types from backend
+    this.employeeDocumentService.getDocumentTypes().subscribe({
+      next: (res: any) => {
+        if (res && Array.isArray(res.data)) {
+          this.documentTypes = res.data.map((item: any) => ({ label: item.label, value: item.id }));
+        } else {
+          this.documentTypes = [];
+        }
+      },
+      error: (err) => {
+        this.documentTypes = [];
+      }
+    });
+
+    this.addRssbDeductionForm = this.formBuilder.group({
+      rssb_deduction_id: ['', Validators.required],
+      employee_contribution: [{ value: '', disabled: true }, Validators.required],
+      employer_contribution: [{ value: '', disabled: true }, Validators.required]
+    });
+
+    this.addOtherDeductionForm = this.formBuilder.group({
+      description: [''],
+      amount: ['', [Validators.required, Validators.min(0)]],
+      type: ['', Validators.required],
+      deduction_id: ['', Validators.required],
+      deduction_name: ['']
+    });
+
+    this.fetchEmployees(this.currentPage);
   }
 
   /**
@@ -281,6 +534,23 @@ export class EmployeesComponent implements OnInit {
     }, 1500); // Simulate save delay
   }
 
+  onFinalSubmit() {
+    this.saving = true;
+    // Simulate API call or use your real submission logic here
+    setTimeout(() => {
+      this.saving = false;
+      Swal.fire({
+        icon: 'success',
+        title: 'Success',
+        text: 'Employee submitted successfully!',
+        confirmButtonText: 'OK',
+      }).then(() => {
+        // Pass the new employee's ID as a query param
+        this.router.navigate(['/employees/employees-view'], { queryParams: { highlight: this.employeeId } });
+      });
+    }, 1500);
+  }
+
   get basicInfo() {
     return this.basicInfoForm.controls;
   }
@@ -296,29 +566,684 @@ export class EmployeesComponent implements OnInit {
     }
   }
 
-  get legalInfo() {
-    return this.legalInfoForm.controls;
+  get legalContactsInfo() {
+    return this.legalContactsInfoForm.controls;
   }
 
-  onLegalInfoNext() {
-    this.submittedLegalInfo = true;
-    if (this.legalInfoForm.invalid) {
+  onLegalContactsInfoSubmit() {
+    this.submittedLegalContactsInfo = true;
+    if (this.legalContactsInfoForm.invalid || this.basicInfoForm.invalid) {
       return;
     }
+    this.saving = true;
+    // Map form values to API structure
+    const basic = this.basicInfoForm.value;
+    const legal = this.legalContactsInfoForm.value;
+    const payload: EmployeeInformation = {
+      salutation: basic.salutation,
+      first_name: basic.firstName,
+      last_name: basic.lastName,
+      gender: basic.gender,
+      date_of_birth: basic.dateOfBirth,
+      nationality: basic.nationality,
+      country_of_birth: basic.countryOfBirth,
+      marital_status: basic.maritalStatus,
+      name_of_spouse: basic.spouseName || null,
+      number_of_children: basic.numberOfChildren,
+      document_type: legal.documentType,
+      document_number: legal.documentNumber,
+      document_issue_date: legal.documentIssueDate,
+      document_place_of_issue: legal.placeOfIssue,
+      rssb_number: legal.rssbNumber,
+      highest_education: legal.highestEducation,
+      personal_mobile: legal.personalMobile,
+      personal_email: legal.personalEmail
+    };
+    this.employeeInformationService.createEmployeeInformation(payload).subscribe({
+      next: (res: any) => {
+        this.saving = false;
+        console.log('Employee creation response:', res);
+        if (res && res.data && res.data.id) {
+          this.employeeId = res.data.id;
+        }
+        if (this.cdkStepper) {
+          this.cdkStepper.next();
+        }
+      },
+      error: (err) => {
+        this.saving = false;
+        // Optionally show error feedback
+        console.error('Failed to submit employee information', err);
+      }
+    });
+  }
+
+  get contractInfo() {
+    return this.contractInfoForm.controls;
+  }
+
+  onContractInfoSubmit() {
+    this.submittedContractInfo = true;
+    if (this.contractInfoForm.invalid) {
+      return;
+    }
+    if (!this.employeeId) {
+      // Optionally show error feedback
+      console.error('Employee ID is missing. Cannot submit contract info.');
+      return;
+    }
+    const contract: EmployeeContract = {
+      ...this.contractInfoForm.value,
+      employee_id: this.employeeId
+    };
+    this.saving = true;
+    this.employeeContractService.createContract(this.employeeId, contract).subscribe({
+      next: (res) => {
+        this.saving = false;
+        // Handle success, go to next tab
+        if (this.cdkStepper) {
+          this.cdkStepper.next();
+        }
+      },
+      error: (err) => {
+        this.saving = false;
+        // Optionally show error feedback
+        console.error('Failed to submit contract information', err);
+      }
+    });
+  }
+
+  get allowance() {
+    return this.allowanceForm.controls;
+  }
+
+  onAllowanceSubmit() {
+    this.submittedAllowance = true;
+    if (this.allowanceForm.invalid) {
+      return;
+    }
+    if (!this.employeeId) {
+      console.error('Employee ID is missing. Cannot submit allowance info.');
+      return;
+    }
+    const allowance: EmployeeAllowance = {
+      name: this.allowanceForm.value.name,
+      amount: this.allowanceForm.value.amount,
+      type: this.allowanceForm.value.type,
+      allowance_id: this.allowanceForm.value.allowance_id,
+      description: this.allowanceForm.value.description
+    };
+    this.saving = true;
+    this.employeeAllowanceService.createEmployeeAllowance(this.employeeId, allowance).subscribe({
+      next: (res) => {
+        this.saving = false;
+        if (this.cdkStepper) {
+          this.cdkStepper.next();
+        }
+      },
+      error: (err) => {
+        this.saving = false;
+        // The error interceptor will handle displaying errors
+        console.error('Failed to submit allowance information', err);
+      }
+    });
+  }
+
+  get rssbDeduction() {
+    return this.rssbDeductionForm.controls;
+  }
+
+  onRssbDeductionSubmit() {
+    this.submittedRssbDeduction = true;
+    if (this.rssbDeductionForm.invalid || !this.employeeId) {
+      return;
+    }
+    const contribution: EmployeeRssbContribution = {
+      ...this.rssbDeductionForm.value
+    };
+    this.saving = true;
+    this.employeeRssbContributionService.createRssbContribution(this.employeeId, contribution).subscribe({
+      next: (res) => {
+        this.saving = false;
+        // Optionally go to next section or show success
+        if (this.cdkStepper) {
+          this.cdkStepper.next();
+        }
+      },
+      error: (err) => {
+        this.saving = false;
+        // Error interceptor will handle errors
+      }
+    });
+  }
+
+  get otherDeduction() {
+    return this.otherDeductionForm.controls;
+  }
+
+  onOtherDeductionSubmit() {
+    this.submittedOtherDeduction = true;
+    if (this.otherDeductionForm.invalid || !this.employeeId) {
+      return;
+    }
+    const deduction: EmployeeDeduction = {
+      amount: this.otherDeductionForm.value.amount,
+      type: this.otherDeductionForm.value.type,
+      deduction_id: this.otherDeductionForm.value.deduction_id
+    };
+    this.saving = true;
+    this.employeeDeductionService.createEmployeeDeduction(this.employeeId, deduction).subscribe({
+      next: (res) => {
+        this.saving = false;
+        // Optionally go to next section or show success
+        if (this.cdkStepper) {
+          this.cdkStepper.next();
+        }
+      },
+      error: (err) => {
+        this.saving = false;
+        // Error interceptor will handle errors
+      }
+    });
+  }
+
+  onDeductionsSubmit() {
+    this.submittedDeductions = true;
+    
+    // Validate that we have an employee ID
+    if (!this.employeeId) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Validation Error',
+        text: 'Employee ID is required. Please complete previous steps first.',
+      });
+      return;
+    }
+    
+    // Validate that at least one RSSB deduction is added
+    if (this.employeeRssbDeductions.length === 0) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'No Deductions Added',
+        text: 'Please add at least one RSSB deduction before proceeding.',
+      });
+      return;
+    }
+    
+    // Validate that at least one other deduction is added
+    if (this.employeeOtherDeductions.length === 0) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'No Other Deductions Added',
+        text: 'Please add at least one other deduction before proceeding.',
+      });
+      return;
+    }
+    
+    this.saving = true;
+    
+    // Create RSSB deductions
+    const rssbRequests = this.employeeRssbDeductions.map(deduction => {
+      return this.employeeRssbContributionService.createRssbContribution(this.employeeId, {
+        employee_contribution: deduction.rssb_employee_contribution,
+        employer_contribution: deduction.rssb_employer_contribution,
+        rssb_deduction_id: deduction.id
+      });
+    });
+    
+    // Create other deductions
+    const otherRequests = this.employeeOtherDeductions.map(deduction => {
+      return this.employeeDeductionService.createEmployeeDeduction(this.employeeId, {
+        amount: deduction.amount,
+        type: deduction.type,
+        deduction_id: deduction.deduction_id
+      });
+    });
+    
+    // Combine all requests
+    const allRequests = [...rssbRequests, ...otherRequests];
+    
+    forkJoin(allRequests).subscribe({
+      next: (results) => {
+        this.saving = false;
+        Swal.fire({
+          icon: 'success',
+          title: 'Deductions Saved',
+          text: 'Employee deductions have been saved successfully.',
+          timer: 1500,
+          showConfirmButton: false
+        }).then(() => {
+          if (this.cdkStepper) {
+            this.cdkStepper.next();
+          }
+        });
+      },
+      error: (err) => {
+        this.saving = false;
+        console.error('Error saving deductions:', err);
+        Swal.fire({
+          icon: 'error',
+          title: 'Save Failed',
+          text: 'Failed to save deductions. Please try again.',
+        });
+      }
+    });
+  }
+
+  get bankInfo() {
+    return this.bankInfoForm.controls;
+  }
+
+  onBankInfoSubmit() {
+    this.submittedBankInfo = true;
+    if (this.bankInfoForm.invalid || !this.employeeId) {
+      return;
+    }
+    const bankInfo: EmployeeBankInfo = {
+      bank_name: this.bankInfoForm.value.bank_name,
+      account_number: this.bankInfoForm.value.account_number,
+      account_name: this.bankInfoForm.value.account_name,
+      iban: this.bankInfoForm.value.iban,
+      swift_code: this.bankInfoForm.value.swift_code
+    };
+    this.saving = true;
+    this.employeeBankInfoService.createEmployeeBankInfo(this.employeeId, bankInfo).subscribe({
+      next: (res) => {
+        this.saving = false;
+        // Optionally go to next section or show success
+        if (this.cdkStepper) {
+          this.cdkStepper.next();
+        }
+      },
+      error: (err) => {
+        this.saving = false;
+        // Error interceptor will handle errors
+      }
+    });
+  }
+
+  get employeeAddress() {
+    return this.employeeAddressForm.controls;
+  }
+
+  onEmployeeAddressSubmit() {
+    this.submittedEmployeeAddress = true;
+    if (this.employeeAddressForm.invalid || !this.employeeId) {
+      return;
+    }
+    const address: EmployeeAddress = {
+      type: this.employeeAddressForm.value.type,
+      country: this.employeeAddressForm.value.country,
+      province: this.employeeAddressForm.value.province,
+      district: this.employeeAddressForm.value.district,
+      sector: this.employeeAddressForm.value.sector,
+      cell: this.employeeAddressForm.value.cell,
+      village: this.employeeAddressForm.value.village,
+      city: this.employeeAddressForm.value.city,
+      additional_address: this.employeeAddressForm.value.additional_address,
+      postal_code: this.employeeAddressForm.value.postal_code,
+      street_address: this.employeeAddressForm.value.street_address
+    };
+    this.saving = true;
+    this.employeeAddressService.createEmployeeAddress(this.employeeId, address).subscribe({
+      next: (res) => {
+        this.saving = false;
+        // Optionally go to next section or show success
+        if (this.cdkStepper) {
+          this.cdkStepper.next();
+        }
+      },
+      error: (err) => {
+        this.saving = false;
+        // Error interceptor will handle errors
+      }
+    });
+  }
+
+  get documents() {
+    return this.documentsForm.controls;
+  }
+
+  onDocumentFileChange(event: any) {
+    const file = event.target.files[0];
+    if (file) {
+      const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+      if (!allowedTypes.includes(file.type)) {
+        // Show error to user (e.g., with SweetAlert or a form error)
+        alert('Invalid file type. Allowed types: pdf, jpg, jpeg, png, doc, docx.');
+        this.selectedDocumentFile = null;
+        this.documentsForm.patchValue({ document: '' });
+        return;
+      }
+      this.selectedDocumentFile = file;
+      this.documentsForm.patchValue({ document: file.name });
+      this.documentsForm.get('document')?.markAsDirty();
+      this.documentsForm.get('document')?.updateValueAndValidity();
+    }
+  }
+
+  onDocumentsSubmit() {
+    this.submittedDocuments = true;
+    if (this.documentsForm.invalid || !this.employeeId || !this.selectedDocumentFile) {
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('document_type_id', this.documentsForm.value.document_type_id);
+    formData.append('description', this.documentsForm.value.description || '');
+    formData.append('expiration_date', this.documentsForm.value.expiration_date || '');
+    formData.append('document', this.selectedDocumentFile); // The actual file
+
+    this.saving = true;
+    this.employeeDocumentService.createEmployeeDocument(this.employeeId, formData).subscribe({
+      next: (res) => {
+        this.saving = false;
+        // Optionally go to next section or show success
     if (this.cdkStepper) {
       this.cdkStepper.next();
     }
+      },
+      error: (err) => {
+        this.saving = false;
+        // Error interceptor will handle errors
+      }
+    });
   }
 
-  get contactInfo() {
-    return this.contactInfoForm.controls;
+  get emergencyContact() {
+    return this.emergencyContactForm.controls;
   }
 
-  onContactInfoSubmit() {
-    this.submittedContactInfo = true;
-    if (this.contactInfoForm.invalid) {
+  onEmergencyContactSubmit() {
+    this.submittedEmergencyContact = true;
+    if (this.emergencyContactForm.invalid || !this.employeeId) {
       return;
     }
-    this.saveEmployee();
+    const contact: EmployeeEmergencyContact = {
+      name: this.emergencyContactForm.value.name,
+      gender: this.emergencyContactForm.value.gender,
+      relationship: this.emergencyContactForm.value.relationship,
+      phone: this.emergencyContactForm.value.phone,
+      email: this.emergencyContactForm.value.email
+    };
+    this.saving = true;
+    this.employeeEmergencyContactService.createEmployeeEmergencyContact(this.employeeId, contact).subscribe({
+      next: (res) => {
+        this.saving = false;
+        // Optionally go to next section or show success
+        if (this.cdkStepper) {
+          this.cdkStepper.next();
+        }
+      },
+      error: (err) => {
+        this.saving = false;
+        // Error interceptor will handle errors
+      }
+    });
+  }
+
+  get f() { return this.contractInfo.controls; }
+
+  fetchEmployeeDeductions() {
+    this.employeeDeductionService.getEmployeeDeductions(this.employeeId).subscribe({
+      next: (deductions: any[]) => {
+        // Assuming each deduction has a deduction_id
+        this.existingEmployeeDeductions = deductions.map(d => d.deduction_id);
+      },
+      error: (err) => {
+        this.existingEmployeeDeductions = [];
+      }
+    });
+  }
+
+  onProvinceChange(provinceId: number) {
+    this.districts = [];
+    this.sectors = [];
+    this.cells = [];
+    this.villages = [];
+    this.employeeAddressForm.patchValue({ district: '', sector: '', cell: '', village: '' });
+    this.localizationService.getLocalizations(provinceId).subscribe({
+      next: (data: any) => {
+        this.districts = data.data || [];
+      }
+    });
+  }
+
+  onDistrictChange(districtId: number) {
+    this.sectors = [];
+    this.cells = [];
+    this.villages = [];
+    this.employeeAddressForm.patchValue({ sector: '', cell: '', village: '' });
+    this.localizationService.getLocalizations(districtId).subscribe({
+      next: (data: any) => {
+        this.sectors = data.data || [];
+      }
+    });
+  }
+
+  onSectorChange(sectorId: number) {
+    this.cells = [];
+    this.villages = [];
+    this.employeeAddressForm.patchValue({ cell: '', village: '' });
+    this.localizationService.getLocalizations(sectorId).subscribe({
+      next: (data: any) => {
+        this.cells = data.data || [];
+      }
+    });
+  }
+
+  onCellChange(cellId: number) {
+    this.villages = [];
+    this.employeeAddressForm.patchValue({ village: '' });
+    this.localizationService.getLocalizations(cellId).subscribe({
+      next: (data: any) => {
+        this.villages = data.data || [];
+      }
+    });
+  }
+
+  openAddRssbDeductionModal() {
+    this.addRssbDeductionForm.reset();
+    this.addRssbDeductionModalRef = this.modalService.show(this.addRssbDeductionModal);
+  }
+
+  closeAddRssbDeductionModal() {
+    if (this.addRssbDeductionModalRef) {
+      this.addRssbDeductionModalRef.hide();
+    }
+  }
+
+  onRssbDeductionSelected() {
+    const selectedId = this.addRssbDeductionForm.value.rssb_deduction_id;
+    const deduction = this.rssbDeductions.find(d => d.id === selectedId);
+    if (deduction) {
+      this.addRssbDeductionForm.patchValue({
+        employee_contribution: deduction.rssb_employee_contribution,
+        employer_contribution: deduction.rssb_employer_contribution
+      });
+    }
+  }
+
+  addRssbDeduction() {
+    const selectedId = this.addRssbDeductionForm.value.rssb_deduction_id;
+    const deduction = this.rssbDeductions.find(d => d.id === selectedId);
+    if (deduction) {
+      this.employeeRssbDeductions.push({
+        ...deduction,
+        rssb_employee_contribution: deduction.rssb_employee_contribution,
+        rssb_employer_contribution: deduction.rssb_employer_contribution
+      });
+      this.closeAddRssbDeductionModal();
+    }
+  }
+
+  removeRssbDeduction(index: number) {
+    this.employeeRssbDeductions.splice(index, 1);
+  }
+
+  openAddOtherDeductionModal() {
+    this.addOtherDeductionForm.reset();
+    this.selectedOtherDeduction = null;
+    this.addOtherDeductionModalRef = this.modalService.show(this.addOtherDeductionModal);
+  }
+
+  closeAddOtherDeductionModal() {
+    if (this.addOtherDeductionModalRef) {
+      this.addOtherDeductionModalRef.hide();
+    }
+  }
+
+  onOtherDeductionSelected() {
+    const selectedId = this.addOtherDeductionForm.value.deduction_id;
+    const deduction = this.otherDeductions.find(d => d.id === selectedId);
+    if (deduction) {
+      this.addOtherDeductionForm.patchValue({
+        deduction_name: deduction.deduction_name
+      });
+      this.selectedOtherDeduction = deduction;
+    }
+  }
+
+  addOtherDeduction() {
+    if (this.addOtherDeductionForm.valid) {
+      this.employeeOtherDeductions.push({
+        ...this.addOtherDeductionForm.value
+      });
+      this.closeAddOtherDeductionModal();
+    }
+  }
+
+  removeOtherDeduction(index: number) {
+    this.employeeOtherDeductions.splice(index, 1);
+  }
+
+  fetchEmployees(page: number) {
+    this.isLoading = true;
+    this.employeeInformationService.getEmployees(page).subscribe({
+      next: (res) => {
+        this.employeeList = res.data || [];
+        this.currentPage = res.current_page;
+        this.lastPage = res.last_page;
+        this.totalItems = res.total; // res.total should be the total number of employees from the backend
+        this.isLoading = false;
+      },
+      error: () => {
+        this.isLoading = false;
+      }
+    });
+  }
+
+  onPageChange(event: any) {
+    const page = event.page || event;
+    this.fetchEmployees(page);
+  }
+
+  // Helper methods for review form to convert IDs to readable names
+  getSalutationLabel(value: string): string {
+    if (!value) return '';
+    const salutation = this.salutations.find(s => s.value === value);
+    return salutation ? salutation.label : value;
+  }
+
+  getGenderLabel(value: string): string {
+    if (!value) return '';
+    const gender = this.genders.find(g => g.value === value);
+    return gender ? gender.label : value;
+  }
+
+  getCountryName(countryId: string): string {
+    if (!countryId) return '';
+    const country = this.countries.find(c => c.id === countryId || c.id === parseInt(countryId));
+    return country ? country.name : countryId;
+  }
+
+  getDepartmentName(departmentId: string): string {
+    if (!departmentId) return '';
+    const department = this.departments.find(d => d.id === departmentId);
+    return department ? department.name : departmentId;
+  }
+
+  getAllowanceName(allowanceId: string): string {
+    if (!allowanceId) return '';
+    const allowance = this.allowances.find(a => a.id === allowanceId);
+    return allowance ? allowance.name : allowanceId;
+  }
+
+  getDocumentTypeName(documentTypeId: string): string {
+    if (!documentTypeId) return '';
+    const documentType = this.documentTypes.find(d => d.value === documentTypeId);
+    return documentType ? documentType.label : documentTypeId;
+  }
+
+  getProvinceName(provinceId: string): string {
+    if (!provinceId) return '';
+    const province = this.provinces.find(p => p.id === provinceId || p.id === parseInt(provinceId));
+    return province ? province.name : provinceId;
+  }
+
+  getDistrictName(districtId: string): string {
+    if (!districtId) return '';
+    const district = this.districts.find(d => d.id === districtId || d.id === parseInt(districtId));
+    return district ? district.name : districtId;
+  }
+
+  getSectorName(sectorId: string): string {
+    if (!sectorId) return '';
+    const sector = this.sectors.find(s => s.id === sectorId || s.id === parseInt(sectorId));
+    return sector ? sector.name : sectorId;
+  }
+
+  getCellName(cellId: string): string {
+    if (!cellId) return '';
+    const cell = this.cells.find(c => c.id === cellId || c.id === parseInt(cellId));
+    return cell ? cell.name : cellId;
+  }
+
+  getVillageName(villageId: string): string {
+    if (!villageId) return '';
+    const village = this.villages.find(v => v.id === villageId || v.id === parseInt(villageId));
+    return village ? village.name : villageId;
+  }
+
+  getDeductionName(deductionId: string): string {
+    if (!deductionId) return '';
+    const deduction = this.otherDeductions.find(d => d.id === deductionId);
+    return deduction ? deduction.deduction_name : deductionId;
+  }
+
+  // Load all address data for review step
+  loadAddressDataForReview() {
+    const addressForm = this.employeeAddressForm.value;
+    
+    // Load provinces if not already loaded
+    if (this.provinces.length === 0) {
+      this.localizationService.getLocalizations(0).subscribe({
+        next: (data: any) => {
+          this.provinces = data.data || [];
+          
+          // If we have a province selected, load districts
+          if (addressForm.province) {
+            this.onProvinceChange(addressForm.province);
+          }
+        }
+      });
+    } else if (addressForm.province) {
+      // If provinces are loaded but districts aren't, load districts
+      if (this.districts.length === 0) {
+        this.onProvinceChange(addressForm.province);
+      }
+    }
+  }
+
+  // Method to handle review step access
+  onReviewStepAccess() {
+    this.loadAddressDataForReview();
+  }
+
+  // Method to handle stepper changes
+  onStepperChange() {
+    if (this.cdkStepper && this.cdkStepper.selectedIndex === 9) {
+      this.loadAddressDataForReview();
+    }
   }
 }

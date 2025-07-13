@@ -26,3 +26,13 @@ File: Custom Bootstrap Css File
 @import "custom/components/table";
 @import "custom/components/pagination";
 @import "custom/components/progress";
+
+.label {
+  font-weight: 400;
+  margin-bottom: 0.5rem;
+}
+.table {
+    th {
+        font-weight: 500;
+    }
+  }

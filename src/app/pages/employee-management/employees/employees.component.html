@@ -16,20 +16,22 @@
         <div class="card-body">
           <h4 class="card-title mb-4">Employee Creation</h4>
           <div id="basic-example">
-            <ng-stepper #cdkStepper [linear]="true" class="wizard">
+            <ng-stepper #cdkStepper [linear]="true" class="wizard" (selectionChange)="onStepperChange()">
 
               <!-- Step 1: Basic Info -->
               <cdk-step [optional]="false">
                 <ng-template cdkStepLabel>
                   <span class="number">1.</span>
-                  <span>Personal Info</span>
+                  <span>Personal</span>
                 </ng-template>
                 <section *ngIf="cdkStepper.selectedIndex === 0">
                   <form [formGroup]="basicInfoForm" (ngSubmit)="onBasicInfoNext()" novalidate>
                     <div class="row">
                       <div class="col-lg-4 mb-3">
                         <label>Salutation</label>
-                        <ng-select [items]="['Mr', 'Ms', 'Mrs', 'Dr']"
+                        <ng-select [items]="salutations"
+                                   bindLabel="label"
+                                   bindValue="value"
                                    formControlName="salutation"
                                    placeholder="Select Salutation"
                                    [ngClass]="{'is-invalid': submittedBasicInfo && basicInfo.salutation.errors, 'is-valid': submittedBasicInfo && basicInfo.salutation.valid}">
@@ -58,7 +60,9 @@
                     <div class="row">
                       <div class="col-lg-4 mb-3">
                         <label>Gender</label>
-                        <ng-select [items]="['Male', 'Female']"
+                        <ng-select [items]="genders"
+                                   bindLabel="label"
+                                   bindValue="value"
                                    formControlName="gender"
                                    placeholder="Select Gender"
                                    [ngClass]="{'is-invalid': submittedBasicInfo && basicInfo.gender.errors, 'is-valid': submittedBasicInfo && basicInfo.gender.valid}">
@@ -77,9 +81,15 @@
                       </div>
                       <div class="col-lg-4 mb-3">
                         <label>Nationality</label>
-                        <input type="text" class="form-control" formControlName="nationality" placeholder="Enter Nationality"
+                        <ng-select *ngIf="countries && countries.length"
+                                   [items]="countries"
+                                   bindLabel="country"
+                                   bindValue="id"
+                                   formControlName="nationality"
+                                   placeholder="Select Nationality"
                                [ngClass]="{'is-invalid': submittedBasicInfo && basicInfo.nationality.errors, 'is-valid': submittedBasicInfo && basicInfo.nationality.valid}">
-                        <div class="invalid-feedback" *ngIf="submittedBasicInfo && basicInfo.nationality.errors">
+                        </ng-select>
+                        <div class="invalid-feedback d-block" *ngIf="submittedBasicInfo && basicInfo.nationality.errors">
                           <span *ngIf="basicInfo.nationality.errors.required">Nationality is required.</span>
                         </div>
                       </div>
@@ -87,7 +97,10 @@
                     <div class="row">
                       <div class="col-lg-4 mb-3">
                         <label>Country of Birth</label>
-                        <ng-select [items]="countries"
+                        <ng-select *ngIf="countries && countries.length"
+                                   [items]="countries"
+                                   bindLabel="country"
+                                   bindValue="id"
                                    formControlName="countryOfBirth"
                                    placeholder="Select Country of Birth"
                                    [ngClass]="{'is-invalid': submittedBasicInfo && basicInfo.countryOfBirth.errors, 'is-valid': submittedBasicInfo && basicInfo.countryOfBirth.valid}">
@@ -141,73 +154,94 @@
                 </section>
               </cdk-step>
 
-              <!-- Step 2: Legal Info -->
+              <!-- Step 2: Legal & Contacts Info -->
               <cdk-step [optional]="true">
                 <ng-template cdkStepLabel>
                   <span class="number">2.</span>
-                  <span>Legal Info</span>
+                  <span>Legal & Contacts</span>
                 </ng-template>
                 <section *ngIf="cdkStepper.selectedIndex === 1">
-                  <form [formGroup]="legalInfoForm" (ngSubmit)="onLegalInfoNext()" novalidate>
+                  <form [formGroup]="legalContactsInfoForm" (ngSubmit)="onLegalContactsInfoSubmit()" novalidate>
+                    <!-- Legal Info Fields -->
                     <div class="row">
                       <div class="col-lg-4 mb-3">
                         <label>Document Type</label>
-                        <ng-select [items]="['ID Card', 'Passport', 'Driver License']"
+                        <ng-select [items]="legalDocumentTypes"
+                                   bindLabel="label"
+                                   bindValue="value"
                                    formControlName="documentType"
                                    placeholder="Select Document Type"
-                                   [ngClass]="{'is-invalid': submittedLegalInfo && legalInfo.documentType.errors, 'is-valid': submittedLegalInfo && legalInfo.documentType.valid}">
+                                   [ngClass]="{'is-invalid': submittedLegalContactsInfo && legalContactsInfo.documentType.errors, 'is-valid': submittedLegalContactsInfo && legalContactsInfo.documentType.valid}">
                         </ng-select>
-                        <div class="invalid-feedback d-block" *ngIf="submittedLegalInfo && legalInfo.documentType.errors">
-                          <span *ngIf="legalInfo.documentType.errors.required">Document type is required.</span>
+                        <div class="invalid-feedback d-block" *ngIf="submittedLegalContactsInfo && legalContactsInfo.documentType.errors">
+                          <span *ngIf="legalContactsInfo.documentType.errors.required">Document type is required.</span>
                         </div>
-                        <div class="valid-feedback d-block" *ngIf="submittedLegalInfo && legalInfo.documentType.valid"></div>
+                        <div class="valid-feedback d-block" *ngIf="submittedLegalContactsInfo && legalContactsInfo.documentType.valid"></div>
                       </div>
                       <div class="col-lg-4 mb-3">
                         <label>Document Number</label>
                         <input type="text" class="form-control" formControlName="documentNumber" placeholder="Enter Document Number"
-                               [ngClass]="{'is-invalid': submittedLegalInfo && legalInfo.documentNumber.errors, 'is-valid': submittedLegalInfo && legalInfo.documentNumber.valid}">
-                        <div class="invalid-feedback" *ngIf="submittedLegalInfo && legalInfo.documentNumber.errors">
-                          <span *ngIf="legalInfo.documentNumber.errors.required">Document number is required.</span>
+                               [ngClass]="{'is-invalid': submittedLegalContactsInfo && legalContactsInfo.documentNumber.errors, 'is-valid': submittedLegalContactsInfo && legalContactsInfo.documentNumber.valid}">
+                        <div class="invalid-feedback" *ngIf="submittedLegalContactsInfo && legalContactsInfo.documentNumber.errors">
+                          <span *ngIf="legalContactsInfo.documentNumber.errors.required">Document number is required.</span>
                         </div>
-                        <div class="valid-feedback" *ngIf="submittedLegalInfo && legalInfo.documentNumber.valid"></div>
+                        <div class="valid-feedback" *ngIf="submittedLegalContactsInfo && legalContactsInfo.documentNumber.valid"></div>
                       </div>
-                      <div class="col-lg-4 mb-3">
+                      <!-- <div class="col-lg-4 mb-3">
                         <label>Document Issue Date</label>
                         <input type="date" class="form-control" formControlName="documentIssueDate"
-                               [ngClass]="{'is-invalid': submittedLegalInfo && legalInfo.documentIssueDate.errors, 'is-valid': submittedLegalInfo && legalInfo.documentIssueDate.valid}">
-                        <div class="invalid-feedback" *ngIf="submittedLegalInfo && legalInfo.documentIssueDate.errors">
-                          <span *ngIf="legalInfo.documentIssueDate.errors.required">Issue date is required.</span>
+                               [ngClass]="{'is-invalid': submittedLegalContactsInfo && legalContactsInfo.documentIssueDate.errors, 'is-valid': submittedLegalContactsInfo && legalContactsInfo.documentIssueDate.valid}">
+                        <div class="invalid-feedback" *ngIf="submittedLegalContactsInfo && legalContactsInfo.documentIssueDate.errors">
+                          <span *ngIf="legalContactsInfo.documentIssueDate.errors.required">Issue date is required.</span>
                         </div>
-                        <div class="valid-feedback" *ngIf="submittedLegalInfo && legalInfo.documentIssueDate.valid"></div>
+                        <div class="valid-feedback" *ngIf="submittedLegalContactsInfo && legalContactsInfo.documentIssueDate.valid"></div>
+                      </div> -->
+                      <div class="col-lg-4 mb-3">
+                        <label>Place of Issue</label>
+                        <input type="text" class="form-control" formControlName="placeOfIssue" placeholder="Enter Place of Issue"
+                               [ngClass]="{'is-invalid': submittedLegalContactsInfo && legalContactsInfo.placeOfIssue.errors, 'is-valid': submittedLegalContactsInfo && legalContactsInfo.placeOfIssue.valid}">
+                        <div class="invalid-feedback" *ngIf="submittedLegalContactsInfo && legalContactsInfo.placeOfIssue.errors">
+                          <span *ngIf="legalContactsInfo.placeOfIssue.errors.required">Place of issue is required.</span>
+                        </div>
+                        <div class="valid-feedback" *ngIf="submittedLegalContactsInfo && legalContactsInfo.placeOfIssue.valid"></div>
                       </div>
                     </div>
                     <div class="row">
                       <div class="col-lg-4 mb-3">
-                        <label>Document Expiry Date</label>
-                        <input type="date" class="form-control" formControlName="documentExpiryDate"
-                               [ngClass]="{'is-invalid': submittedLegalInfo && legalInfo.documentExpiryDate.errors, 'is-valid': submittedLegalInfo && legalInfo.documentExpiryDate.valid}">
-                        <div class="invalid-feedback" *ngIf="submittedLegalInfo && legalInfo.documentExpiryDate.errors">
-                          <span *ngIf="legalInfo.documentExpiryDate.errors.required">Expiry date is required.</span>
+                        <label>Document Issue Date</label>
+                        <input type="date" class="form-control" formControlName="documentIssueDate"
+                               [ngClass]="{'is-invalid': submittedLegalContactsInfo && legalContactsInfo.documentIssueDate.errors, 'is-valid': submittedLegalContactsInfo && legalContactsInfo.documentIssueDate.valid}">
+                        <div class="invalid-feedback" *ngIf="submittedLegalContactsInfo && legalContactsInfo.documentIssueDate.errors">
+                          <span *ngIf="legalContactsInfo.documentIssueDate.errors.required">Issue date is required.</span>
                         </div>
-                        <div class="valid-feedback" *ngIf="submittedLegalInfo && legalInfo.documentExpiryDate.valid"></div>
+                        <div class="valid-feedback" *ngIf="submittedLegalContactsInfo && legalContactsInfo.documentIssueDate.valid"></div>
                       </div>
                       <div class="col-lg-4 mb-3">
+                        <label>Document Expiry Date</label>
+                        <input type="date" class="form-control" formControlName="documentExpiryDate"
+                               [ngClass]="{'is-invalid': submittedLegalContactsInfo && legalContactsInfo.documentExpiryDate.errors, 'is-valid': submittedLegalContactsInfo && legalContactsInfo.documentExpiryDate.valid}">
+                        <div class="invalid-feedback" *ngIf="submittedLegalContactsInfo && legalContactsInfo.documentExpiryDate.errors">
+                          <span *ngIf="legalContactsInfo.documentExpiryDate.errors.required">Expiry date is required.</span>
+                        </div>
+                        <div class="valid-feedback" *ngIf="submittedLegalContactsInfo && legalContactsInfo.documentExpiryDate.valid"></div>
+                      </div>
+                      <!-- <div class="col-lg-4 mb-3">
                         <label>Place of Issue</label>
                         <input type="text" class="form-control" formControlName="placeOfIssue" placeholder="Enter Place of Issue"
-                               [ngClass]="{'is-invalid': submittedLegalInfo && legalInfo.placeOfIssue.errors, 'is-valid': submittedLegalInfo && legalInfo.placeOfIssue.valid}">
-                        <div class="invalid-feedback" *ngIf="submittedLegalInfo && legalInfo.placeOfIssue.errors">
-                          <span *ngIf="legalInfo.placeOfIssue.errors.required">Place of issue is required.</span>
+                               [ngClass]="{'is-invalid': submittedLegalContactsInfo && legalContactsInfo.placeOfIssue.errors, 'is-valid': submittedLegalContactsInfo && legalContactsInfo.placeOfIssue.valid}">
+                        <div class="invalid-feedback" *ngIf="submittedLegalContactsInfo && legalContactsInfo.placeOfIssue.errors">
+                          <span *ngIf="legalContactsInfo.placeOfIssue.errors.required">Place of issue is required.</span>
                         </div>
-                        <div class="valid-feedback" *ngIf="submittedLegalInfo && legalInfo.placeOfIssue.valid"></div>
-                      </div>
+                        <div class="valid-feedback" *ngIf="submittedLegalContactsInfo && legalContactsInfo.placeOfIssue.valid"></div>
+                      </div> -->
                       <div class="col-lg-4 mb-3">
                         <label>RSSB Number</label>
                         <input type="text" class="form-control" formControlName="rssbNumber" placeholder="Enter RSSB Number"
-                               [ngClass]="{'is-invalid': submittedLegalInfo && legalInfo.rssbNumber.errors, 'is-valid': submittedLegalInfo && legalInfo.rssbNumber.valid}">
-                        <div class="invalid-feedback" *ngIf="submittedLegalInfo && legalInfo.rssbNumber.errors">
-                          <span *ngIf="legalInfo.rssbNumber.errors.required">RSSB number is required.</span>
+                               [ngClass]="{'is-invalid': submittedLegalContactsInfo && legalContactsInfo.rssbNumber.errors, 'is-valid': submittedLegalContactsInfo && legalContactsInfo.rssbNumber.valid}">
+                        <div class="invalid-feedback" *ngIf="submittedLegalContactsInfo && legalContactsInfo.rssbNumber.errors">
+                          <span *ngIf="legalContactsInfo.rssbNumber.errors.required">RSSB number is required.</span>
                         </div>
-                        <div class="valid-feedback" *ngIf="submittedLegalInfo && legalInfo.rssbNumber.valid"></div>
+                        <div class="valid-feedback" *ngIf="submittedLegalContactsInfo && legalContactsInfo.rssbNumber.valid"></div>
                       </div>
                     </div>
                     <div class="row">
@@ -216,12 +250,41 @@
                         <ng-select [items]="['Secondary', 'Bachelor', 'Master', 'PhD', 'Other']"
                                    formControlName="highestEducation"
                                    placeholder="Select Highest Education"
-                                   [ngClass]="{'is-invalid': submittedLegalInfo && legalInfo.highestEducation.errors, 'is-valid': submittedLegalInfo && legalInfo.highestEducation.valid}">
+                                   [ngClass]="{'is-invalid': submittedLegalContactsInfo && legalContactsInfo.highestEducation.errors, 'is-valid': submittedLegalContactsInfo && legalContactsInfo.highestEducation.valid}">
                         </ng-select>
-                        <div class="invalid-feedback d-block" *ngIf="submittedLegalInfo && legalInfo.highestEducation.errors">
-                          <span *ngIf="legalInfo.highestEducation.errors.required">Highest education is required.</span>
+                        <div class="invalid-feedback d-block" *ngIf="submittedLegalContactsInfo && legalContactsInfo.highestEducation.errors">
+                          <span *ngIf="legalContactsInfo.highestEducation.errors.required">Highest education is required.</span>
                         </div>
-                        <div class="valid-feedback d-block" *ngIf="submittedLegalInfo && legalInfo.highestEducation.valid"></div>
+                        <div class="valid-feedback d-block" *ngIf="submittedLegalContactsInfo && legalContactsInfo.highestEducation.valid"></div>
+                      </div>
+                    </div>
+                    <hr/>
+                    <!-- Contact Info Fields -->
+                    <div class="row">
+                      <div class="col-lg-4 mb-3">
+                        <label>Personal Mobile</label>
+                        <input type="text" class="form-control" formControlName="personalMobile" placeholder="Enter Personal Mobile"
+                               [ngClass]="{'is-invalid': submittedLegalContactsInfo && legalContactsInfo.personalMobile.errors, 'is-valid': submittedLegalContactsInfo && legalContactsInfo.personalMobile.valid}">
+                        <div class="invalid-feedback" *ngIf="submittedLegalContactsInfo && legalContactsInfo.personalMobile.errors">
+                          <span *ngIf="legalContactsInfo.personalMobile.errors.required">Personal mobile is required.</span>
+                        </div>
+                      </div>
+                      <div class="col-lg-4 mb-3">
+                        <label>Personal Email</label>
+                        <input type="email" class="form-control" formControlName="personalEmail" placeholder="Enter Personal Email"
+                               [ngClass]="{'is-invalid': submittedLegalContactsInfo && legalContactsInfo.personalEmail.errors, 'is-valid': submittedLegalContactsInfo && legalContactsInfo.personalEmail.valid}">
+                        <div class="invalid-feedback" *ngIf="submittedLegalContactsInfo && legalContactsInfo.personalEmail.errors">
+                          <span *ngIf="legalContactsInfo.personalEmail.errors.required">Personal email is required.</span>
+                          <span *ngIf="legalContactsInfo.personalEmail.errors.email">Please enter a valid email address.</span>
+                        </div>
+                      </div>
+                      <div class="col-lg-4 mb-3">
+                        <label>Home Phone</label>
+                        <input type="text" class="form-control" formControlName="homePhone" placeholder="Enter Home Phone"
+                               [ngClass]="{'is-invalid': submittedLegalContactsInfo && legalContactsInfo.homePhone.errors, 'is-valid': submittedLegalContactsInfo && legalContactsInfo.homePhone.valid}">
+                        <div class="invalid-feedback" *ngIf="submittedLegalContactsInfo && legalContactsInfo.homePhone.errors">
+                          <span *ngIf="legalContactsInfo.homePhone.errors.required">Home phone is required.</span>
+                        </div>
                       </div>
                     </div>
                     <ul class="list-inline wizard d-flex justify-content-end mb-0">
@@ -234,7 +297,7 @@
                       <li class="next list-inline-item" aria-disabled="false">
                         <button class="btn btn-primary" type="submit" [disabled]="saving">
                           <span *ngIf="saving" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                          <i class="mdi mdi-arrow-right me-1" *ngIf="!saving"></i> Next
+                          <i class="mdi mdi-arrow-right me-1" *ngIf="!saving"></i> {{ saving ? 'Saving...' : 'Next' }}
                         </button>
                       </li>
                     </ul>
@@ -242,39 +305,97 @@
                 </section>
               </cdk-step>
 
-              <!-- Step 3: Contact Info -->
+              <!-- Step 3: Contract Info -->
               <cdk-step [optional]="true">
                 <ng-template cdkStepLabel>
                   <span class="number">3.</span>
-                  <span>Contact Info</span>
+                  <span>Contract</span>
                 </ng-template>
                 <section *ngIf="cdkStepper.selectedIndex === 2">
-                  <form [formGroup]="contactInfoForm" (ngSubmit)="onContactInfoSubmit()" novalidate>
+                  <form [formGroup]="contractInfoForm" (ngSubmit)="onContractInfoSubmit()" novalidate>
                     <div class="row">
                       <div class="col-lg-4 mb-3">
-                        <label>Personal Mobile</label>
-                        <input type="text" class="form-control" formControlName="personalMobile" placeholder="Enter Personal Mobile"
-                               [ngClass]="{'is-invalid': submittedContactInfo && contactInfo.personalMobile.errors, 'is-valid': submittedContactInfo && contactInfo.personalMobile.valid}">
-                        <div class="invalid-feedback" *ngIf="submittedContactInfo && contactInfo.personalMobile.errors">
-                          <span *ngIf="contactInfo.personalMobile.errors.required">Personal mobile is required.</span>
+                        <label>Department <span class="text-danger">*</span></label>
+                        <ng-select [items]="departments"
+                                   bindLabel="name"
+                                   bindValue="id"
+                                   formControlName="department"
+                                   placeholder="Select Department"
+                                   [ngClass]="{'is-invalid': submittedContractInfo && contractInfo.department.errors, 'is-valid': submittedContractInfo && contractInfo.department.valid}">
+                        </ng-select>
+                        <div class="invalid-feedback d-block" *ngIf="submittedContractInfo && contractInfo.department.errors">
+                          <span *ngIf="contractInfo.department.errors.required">Department is required.</span>
                         </div>
                       </div>
                       <div class="col-lg-4 mb-3">
-                        <label>Personal Email</label>
-                        <input type="email" class="form-control" formControlName="personalEmail" placeholder="Enter Personal Email"
-                               [ngClass]="{'is-invalid': submittedContactInfo && contactInfo.personalEmail.errors, 'is-valid': submittedContactInfo && contactInfo.personalEmail.valid}">
-                        <div class="invalid-feedback" *ngIf="submittedContactInfo && contactInfo.personalEmail.errors">
-                          <span *ngIf="contactInfo.personalEmail.errors.required">Personal email is required.</span>
-                          <span *ngIf="contactInfo.personalEmail.errors.email">Please enter a valid email address.</span>
+                        <label>Job Title <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" formControlName="job_title" placeholder="Enter Job Title"
+                               [ngClass]="{'is-invalid': submittedContractInfo && contractInfo.job_title.errors, 'is-valid': submittedContractInfo && contractInfo.job_title.valid}">
+                        <div class="invalid-feedback" *ngIf="submittedContractInfo && contractInfo.job_title.errors">
+                          <span *ngIf="contractInfo.job_title.errors.required">Job title is required.</span>
                         </div>
                       </div>
                       <div class="col-lg-4 mb-3">
-                        <label>Home Phone</label>
-                        <input type="text" class="form-control" formControlName="homePhone" placeholder="Enter Home Phone"
-                               [ngClass]="{'is-invalid': submittedContactInfo && contactInfo.homePhone.errors, 'is-valid': submittedContactInfo && contactInfo.homePhone.valid}">
-                        <div class="invalid-feedback" *ngIf="submittedContactInfo && contactInfo.homePhone.errors">
-                          <span *ngIf="contactInfo.homePhone.errors.required">Home phone is required.</span>
+                        <label>Employment Type <span class="text-danger">*</span></label>
+                        <ng-select [items]="['permanent', 'contract', 'internship', 'consultant']"
+                                   formControlName="employment_type"
+                                   placeholder="Select Employment Type"
+                                   [ngClass]="{'is-invalid': submittedContractInfo && contractInfo.employment_type.errors, 'is-valid': submittedContractInfo && contractInfo.employment_type.valid}">
+                        </ng-select>
+                        <div class="invalid-feedback d-block" *ngIf="submittedContractInfo && contractInfo.employment_type.errors">
+                          <span *ngIf="contractInfo.employment_type.errors.required">Employment type is required.</span>
                         </div>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-lg-4 mb-3">
+                        <label>Hire Date <span class="text-danger">*</span></label>
+                        <input type="date" class="form-control" formControlName="hire_date"
+                               [ngClass]="{'is-invalid': submittedContractInfo && contractInfo.hire_date.errors, 'is-valid': submittedContractInfo && contractInfo.hire_date.valid}">
+                        <div class="invalid-feedback" *ngIf="submittedContractInfo && contractInfo.hire_date.errors">
+                          <span *ngIf="contractInfo.hire_date.errors.required">Hire date is required.</span>
+                        </div>
+                      </div>
+                      <div class="col-lg-4 mb-3">
+                        <label>End Date</label>
+                        <input type="date" class="form-control" formControlName="end_date">
+                      </div>
+                      <div class="col-lg-4 mb-3">
+                        <label>Salary Basis <span class="text-danger">*</span></label>
+                        <ng-select [items]="['net', 'gross', 'mass']"
+                                   formControlName="salary_basis"
+                                   placeholder="Select Salary Basis"
+                                   [ngClass]="{'is-invalid': submittedContractInfo && contractInfo.salary_basis.errors, 'is-valid': submittedContractInfo && contractInfo.salary_basis.valid}">
+                        </ng-select>
+                        <div class="invalid-feedback d-block" *ngIf="submittedContractInfo && contractInfo.salary_basis.errors">
+                          <span *ngIf="contractInfo.salary_basis.errors.required">Salary basis is required.</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-lg-4 mb-3">
+                        <label>Salary Amount <span class="text-danger">*</span></label>
+                        <input type="number" class="form-control" formControlName="salary_amount" min="0" step="0.01" placeholder="Enter Salary Amount"
+                               [ngClass]="{'is-invalid': submittedContractInfo && contractInfo.salary_amount.errors, 'is-valid': submittedContractInfo && contractInfo.salary_amount.valid}">
+                        <div class="invalid-feedback" *ngIf="submittedContractInfo && contractInfo.salary_amount.errors">
+                          <span *ngIf="contractInfo.salary_amount.errors.required">Salary amount is required.</span>
+                          <span *ngIf="contractInfo.salary_amount.errors.min">Value must be 0 or greater.</span>
+                        </div>
+                      </div>
+                      <div class="col-lg-4 mb-3">
+                        <label>Salary Frequency <span class="text-danger">*</span></label>
+                        <ng-select [items]="['monthly', 'hourly', 'bi-weekly']"
+                                   formControlName="salary_frequency"
+                                   placeholder="Select Salary Frequency"
+                                   [ngClass]="{'is-invalid': submittedContractInfo && contractInfo.salary_frequency.errors, 'is-valid': submittedContractInfo && contractInfo.salary_frequency.valid}">
+                        </ng-select>
+                        <div class="invalid-feedback d-block" *ngIf="submittedContractInfo && contractInfo.salary_frequency.errors">
+                          <span *ngIf="contractInfo.salary_frequency.errors.required">Salary frequency is required.</span>
+                        </div>
+                      </div>
+                      <div class="col-lg-4 mb-3">
+                        <label>TIN Number</label>
+                        <input type="text" class="form-control" formControlName="tin_number" placeholder="Enter TIN Number">
                       </div>
                     </div>
                     <ul class="list-inline wizard d-flex justify-content-end mb-0">
@@ -287,11 +408,794 @@
                       <li class="next list-inline-item" aria-disabled="false">
                         <button class="btn btn-primary" type="submit" [disabled]="saving">
                           <span *ngIf="saving" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                          <i class="mdi mdi-content-save me-1" *ngIf="!saving"></i> {{ saving ? 'Saving...' : 'Submit' }}
+                          <i class="mdi mdi-arrow-right me-1" *ngIf="!saving"></i> {{ saving ? 'Saving...' : 'Next' }}
                         </button>
                       </li>
                     </ul>
                   </form>
+                </section>
+              </cdk-step>
+
+              <!-- Step 4: Allowance -->
+              <cdk-step [optional]="true">
+                <ng-template cdkStepLabel>
+                  <span class="number">4.</span>
+                  <span>Allowance</span>
+                </ng-template>
+                <section *ngIf="cdkStepper.selectedIndex === 3">
+                  <form [formGroup]="allowanceForm" (ngSubmit)="onAllowanceSubmit()" novalidate>
+                    <div class="row">
+                      <div class="col-lg-4 mb-3">
+                        <label>Name</label>
+                        <input type="text" class="form-control" formControlName="name" placeholder="Enter Allowance Name (optional)">
+                      </div>
+                      <div class="col-lg-4 mb-3">
+                        <label>Amount <span class="text-danger">*</span></label>
+                        <input type="number" class="form-control" formControlName="amount" min="0" step="0.01" placeholder="Enter Amount"
+                               [ngClass]="{'is-invalid': submittedAllowance && allowance.amount.errors, 'is-valid': submittedAllowance && allowance.amount.valid}">
+                        <div class="invalid-feedback" *ngIf="submittedAllowance && allowance.amount.errors">
+                          <span *ngIf="allowance.amount.errors.required">Amount is required.</span>
+                          <span *ngIf="allowance.amount.errors.min">Value must be 0 or greater.</span>
+                        </div>
+                      </div>
+                      <div class="col-lg-4 mb-3">
+                        <label>Type <span class="text-danger">*</span></label>
+                        <ng-select [items]="['fixed', 'percentage']"
+                                   formControlName="type"
+                                   placeholder="Select Type"
+                                   [ngClass]="{'is-invalid': submittedAllowance && allowance.type.errors, 'is-valid': submittedAllowance && allowance.type.valid}">
+                        </ng-select>
+                        <div class="invalid-feedback d-block" *ngIf="submittedAllowance && allowance.type.errors">
+                          <span *ngIf="allowance.type.errors.required">Type is required.</span>
+                        </div>
+                      </div>
+                      <div class="col-lg-4 mb-3">
+                        <label>Allowance <span class="text-danger">*</span></label>
+                        <ng-select [items]="allowances"
+                                   bindLabel="name"
+                                   bindValue="id"
+                                   formControlName="allowance_id"
+                                   placeholder="Select Allowance"
+                                   [ngClass]="{'is-invalid': submittedAllowance && allowance.allowance_id.errors, 'is-valid': submittedAllowance && allowance.allowance_id.valid}">
+                        </ng-select>
+                        <div class="invalid-feedback d-block" *ngIf="submittedAllowance && allowance.allowance_id.errors">
+                          <span *ngIf="allowance.allowance_id.errors.required">Allowance is required.</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-lg-4 mb-3">
+                        <label>Description</label>
+                        <input type="text" class="form-control" formControlName="description" placeholder="Enter Description (optional)">
+                      </div>
+                    </div>
+                    <ul class="list-inline wizard d-flex justify-content-end mb-0">
+                      <li class="previous list-inline-item" aria-disabled="true">
+                        <button class="btn btn-primary" cdkStepperPrevious [disabled]="saving">
+                          <span *ngIf="saving" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                          <i class="mdi mdi-arrow-left me-1" *ngIf="!saving"></i> Previous
+                        </button>
+                      </li>
+                      <li class="next list-inline-item" aria-disabled="false">
+                        <button class="btn btn-primary" type="submit" [disabled]="saving">
+                          <span *ngIf="saving" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                          <i class="mdi mdi-arrow-right me-1" *ngIf="!saving"></i> {{ saving ? 'Saving...' : 'Next' }}
+                        </button>
+                      </li>
+                    </ul>
+                  </form>
+                </section>
+              </cdk-step>
+
+              <!-- Step 5: Deductions -->
+              <cdk-step [optional]="true">
+                <ng-template cdkStepLabel>
+                  <span class="number">5.</span>
+                  <span>Deductions</span>
+                </ng-template>
+                <section *ngIf="cdkStepper.selectedIndex === 4">
+                  <form [formGroup]="deductionsFormGroup" (ngSubmit)="onDeductionsSubmit()" novalidate>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                      <h5>RSSB Deductions</h5>
+                      <button class="btn btn-primary" (click)="openAddRssbDeductionModal()">+ Add Deduction</button>
+                    </div>
+                    <div *ngIf="submittedDeductions && employeeRssbDeductions.length === 0" class="alert alert-warning">
+                      <i class="mdi mdi-alert me-2"></i>
+                      Please add at least one RSSB deduction.
+                    </div>
+                    <table class="table table-bordered">
+                      <thead>
+                        <tr>
+                          <th>Deduction Name</th>
+                          <th>Employee Contribution</th>
+                          <th>Employer Contribution</th>
+                          <th>Action</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr *ngFor="let deduction of employeeRssbDeductions; let i = index">
+                          <td>{{ deduction.rssb_name }}</td>
+                          <td>{{ deduction.rssb_employee_contribution }}</td>
+                          <td>{{ deduction.rssb_employer_contribution }}</td>
+                          <td>
+                            <button class="btn btn-danger btn-sm" (click)="removeRssbDeduction(i)">Remove</button>
+                          </td>
+                        </tr>
+                        <tr *ngIf="employeeRssbDeductions.length === 0">
+                          <td colspan="4" class="text-center">No RSSB deductions added.</td>
+                        </tr>
+                      </tbody>
+                    </table>
+
+                    <!-- Add RSSB Deduction Modal -->
+                    <ng-template #addRssbDeductionModal>
+                      <div class="modal-header">
+                        <h5 class="modal-title">Add RSSB Deduction</h5>
+                        <button type="button" class="btn-close" (click)="closeAddRssbDeductionModal()"></button>
+                      </div>
+                      <div class="modal-body">
+                        <form [formGroup]="addRssbDeductionForm">
+                          <div class="mb-3">
+                            <label>Deduction</label>
+                            <ng-select [items]="rssbDeductions"
+                                       bindLabel="rssb_name"
+                                       bindValue="id"
+                                       formControlName="rssb_deduction_id"
+                                       placeholder="Select RSSB Deduction"
+                                       (change)="onRssbDeductionSelected()">
+                            </ng-select>
+                          </div>
+                          <div class="mb-3">
+                            <label>Employee Contribution</label>
+                            <input type="number" class="form-control" formControlName="employee_contribution" readonly>
+                          </div>
+                          <div class="mb-3">
+                            <label>Employer Contribution</label>
+                            <input type="number" class="form-control" formControlName="employer_contribution" readonly>
+                          </div>
+                        </form>
+                      </div>
+                      <div class="modal-footer">
+                        <button class="btn btn-secondary" (click)="closeAddRssbDeductionModal()">Cancel</button>
+                        <button class="btn btn-primary" (click)="addRssbDeduction()" [disabled]="addRssbDeductionForm.invalid">Add</button>
+                      </div>
+                    </ng-template>
+                    <hr/>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                      <h5>Other Deductions</h5>
+                      <button class="btn btn-primary" (click)="openAddOtherDeductionModal()">+ Add Deduction</button>
+                    </div>
+                    <div *ngIf="submittedDeductions && employeeOtherDeductions.length === 0" class="alert alert-warning">
+                      <i class="mdi mdi-alert me-2"></i>
+                      Please add at least one other deduction.
+                    </div>
+                    <table class="table table-bordered">
+                      <thead>
+                        <tr>
+                          <th>Description</th>
+                          <th>Amount</th>
+                          <th>Type</th>
+                          <th>Deduction Name</th>
+                          <th>Action</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr *ngFor="let deduction of employeeOtherDeductions; let i = index">
+                          <td>{{ deduction.description }}</td>
+                          <td>{{ deduction.amount }}</td>
+                          <td>{{ deduction.type }}</td>
+                          <td>{{ deduction.deduction_name }}</td>
+                          <td>
+                            <button class="btn btn-danger btn-sm" (click)="removeOtherDeduction(i)">Remove</button>
+                          </td>
+                        </tr>
+                        <tr *ngIf="employeeOtherDeductions.length === 0">
+                          <td colspan="5" class="text-center">No other deductions added.</td>
+                        </tr>
+                      </tbody>
+                    </table>
+
+                    <!-- Add Other Deduction Modal -->
+                    <ng-template #addOtherDeductionModal>
+                      <div class="modal-header">
+                        <h5 class="modal-title">Add Other Deduction</h5>
+                        <button type="button" class="btn-close" (click)="closeAddOtherDeductionModal()"></button>
+                      </div>
+                      <div class="modal-body">
+                        <form [formGroup]="addOtherDeductionForm">
+                          <div class="mb-3">
+                            <label>Description</label>
+                            <input type="text" class="form-control" formControlName="description" placeholder="Enter Description (optional)">
+                          </div>
+                          <div class="mb-3">
+                            <label>Amount <span class="text-danger">*</span></label>
+                            <input type="number" class="form-control" formControlName="amount" min="0" step="0.01" placeholder="Enter Amount">
+                          </div>
+                          <div class="mb-3">
+                            <label>Type <span class="text-danger">*</span></label>
+                            <ng-select [items]="['fixed', 'percentage']"
+                                       formControlName="type"
+                                       placeholder="Select Type">
+                            </ng-select>
+                          </div>
+                          <div class="mb-3">
+                            <label>Deduction <span class="text-danger">*</span></label>
+                            <ng-select [items]="otherDeductions"
+                                       bindLabel="deduction_name"
+                                       bindValue="id"
+                                       formControlName="deduction_id"
+                                       placeholder="Select Deduction"
+                                       (change)="onOtherDeductionSelected()">
+                            </ng-select>
+                          </div>
+                        </form>
+                      </div>
+                      <div class="modal-footer">
+                        <button class="btn btn-secondary" (click)="closeAddOtherDeductionModal()">Cancel</button>
+                        <button class="btn btn-primary" (click)="addOtherDeduction()" [disabled]="addOtherDeductionForm.invalid">Add</button>
+                      </div>
+                    </ng-template>
+                    <hr/>
+                    <ul class="list-inline wizard d-flex justify-content-end mb-0">
+                      <li class="previous list-inline-item" aria-disabled="true">
+                        <button class="btn btn-primary" cdkStepperPrevious [disabled]="saving">
+                          <span *ngIf="saving" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                          <i class="mdi mdi-arrow-left me-1" *ngIf="!saving"></i> Previous
+                        </button>
+                      </li>
+                      <li class="next list-inline-item" aria-disabled="false">
+                        <button class="btn btn-primary" type="submit" [disabled]="saving || employeeRssbDeductions.length === 0 || employeeOtherDeductions.length === 0">
+                          <span *ngIf="saving" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                          <i class="mdi mdi-arrow-right me-1" *ngIf="!saving"></i> {{ saving ? 'Saving...' : 'Save & Continue' }}
+                        </button>
+                      </li>
+                    </ul>
+                  </form>
+                </section>
+              </cdk-step>
+
+              <!-- Step 6: Bank Information -->
+              <cdk-step [optional]="true">
+                <ng-template cdkStepLabel>
+                  <span class="number">6.</span>
+                  <span>Bank Info</span>
+                </ng-template>
+                <section *ngIf="cdkStepper.selectedIndex === 5">
+                  <form [formGroup]="bankInfoForm" (ngSubmit)="onBankInfoSubmit()" novalidate>
+                    <div class="row">
+                      <div class="col-lg-4 mb-3">
+                        <label>Bank Name <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" formControlName="bank_name" placeholder="Enter Bank Name"
+                               [ngClass]="{'is-invalid': submittedBankInfo && bankInfo.bank_name.errors, 'is-valid': submittedBankInfo && bankInfo.bank_name.valid}">
+                        <div class="invalid-feedback" *ngIf="submittedBankInfo && bankInfo.bank_name.errors">
+                          <span *ngIf="bankInfo.bank_name.errors.required">Bank name is required.</span>
+                        </div>
+                      </div>
+                      <div class="col-lg-4 mb-3">
+                        <label>Account Number <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" formControlName="account_number" placeholder="Enter Account Number"
+                               [ngClass]="{'is-invalid': submittedBankInfo && bankInfo.account_number.errors, 'is-valid': submittedBankInfo && bankInfo.account_number.valid}">
+                        <div class="invalid-feedback" *ngIf="submittedBankInfo && bankInfo.account_number.errors">
+                          <span *ngIf="bankInfo.account_number.errors.required">Account number is required.</span>
+                        </div>
+                      </div>
+                      <div class="col-lg-4 mb-3">
+                        <label>Account Name <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" formControlName="account_name" placeholder="Enter Account Name"
+                               [ngClass]="{'is-invalid': submittedBankInfo && bankInfo.account_name.errors, 'is-valid': submittedBankInfo && bankInfo.account_name.valid}">
+                        <div class="invalid-feedback" *ngIf="submittedBankInfo && bankInfo.account_name.errors">
+                          <span *ngIf="bankInfo.account_name.errors.required">Account name is required.</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-lg-4 mb-3">
+                        <label>IBAN</label>
+                        <input type="text" class="form-control" formControlName="iban" placeholder="Enter IBAN (optional)">
+                      </div>
+                      <div class="col-lg-4 mb-3">
+                        <label>SWIFT Code</label>
+                        <input type="text" class="form-control" formControlName="swift_code" placeholder="Enter SWIFT Code (optional)">
+                      </div>
+                    </div>
+                    <ul class="list-inline wizard d-flex justify-content-end mb-0">
+                      <li class="previous list-inline-item" aria-disabled="true">
+                        <button class="btn btn-primary" cdkStepperPrevious [disabled]="saving">
+                          <span *ngIf="saving" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                          <i class="mdi mdi-arrow-left me-1" *ngIf="!saving"></i> Previous
+                        </button>
+                      </li>
+                      <li class="next list-inline-item" aria-disabled="false">
+                        <button class="btn btn-primary" type="submit" [disabled]="saving">
+                          <span *ngIf="saving" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                          <i class="mdi mdi-arrow-right me-1" *ngIf="!saving"></i> {{ saving ? 'Saving...' : 'Next' }}
+                        </button>
+                      </li>
+                    </ul>
+                  </form>
+                </section>
+              </cdk-step>
+
+              <!-- Step 7: Employee Address -->
+              <cdk-step [optional]="true">
+                <ng-template cdkStepLabel>
+                  <span class="number">7.</span>
+                  <span>Address</span>
+                </ng-template>
+                <section *ngIf="cdkStepper.selectedIndex === 6">
+                  <form [formGroup]="employeeAddressForm" (ngSubmit)="onEmployeeAddressSubmit()" novalidate>
+                    <div class="row">
+                      <div class="col-lg-4 mb-3">
+                        <label>Type <span class="text-danger">*</span></label>
+                        <ng-select [items]="['current', 'permanent']"
+                                   formControlName="type"
+                                   placeholder="Select Address Type"
+                                   [ngClass]="{'is-invalid': submittedEmployeeAddress && employeeAddress.type.errors, 'is-valid': submittedEmployeeAddress && employeeAddress.type.valid}">
+                        </ng-select>
+                        <div class="invalid-feedback d-block" *ngIf="submittedEmployeeAddress && employeeAddress.type.errors">
+                          <span *ngIf="employeeAddress.type.errors.required">Type is required.</span>
+                        </div>
+                      </div>
+                      <div class="col-lg-4 mb-3">
+                        <label>Country <span class="text-danger">*</span></label>
+                        <ng-select [items]="countries"
+                                   bindLabel="country"
+                                   bindValue="id"
+                                   formControlName="country"
+                                   placeholder="Select Country"
+                                   [ngClass]="{'is-invalid': submittedEmployeeAddress && employeeAddress.country.errors, 'is-valid': submittedEmployeeAddress && employeeAddress.country.valid}">
+                        </ng-select>
+                        <div class="invalid-feedback d-block" *ngIf="submittedEmployeeAddress && employeeAddress.country.errors">
+                          <span *ngIf="employeeAddress.country.errors.required">Country is required.</span>
+                        </div>
+                      </div>
+                      <div class="col-lg-4 mb-3">
+                        <label>Province <span class="text-danger">*</span></label>
+                        <ng-select [items]="provinces"
+                                   bindLabel="libelle_localisation"
+                                   bindValue="id"
+                                   formControlName="province"
+                                   (change)="onProvinceChange($event?.id)"
+                                   placeholder="Select Province"
+                                   [ngClass]="{'is-invalid': submittedEmployeeAddress && employeeAddress.province.errors, 'is-valid': submittedEmployeeAddress && employeeAddress.province.valid}">
+                        </ng-select>
+                        <div class="invalid-feedback d-block" *ngIf="submittedEmployeeAddress && employeeAddress.province.errors">
+                          <span *ngIf="employeeAddress.province.errors.required">Province is required.</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-lg-4 mb-3">
+                        <label>District <span class="text-danger">*</span></label>
+                        <ng-select [items]="districts"
+                                   bindLabel="libelle_localisation"
+                                   bindValue="id"
+                                   formControlName="district"
+                                   (change)="onDistrictChange($event?.id)"
+                                   placeholder="Select District"
+                                   [ngClass]="{'is-invalid': submittedEmployeeAddress && employeeAddress.district.errors, 'is-valid': submittedEmployeeAddress && employeeAddress.district.valid}">
+                        </ng-select>
+                        <div class="invalid-feedback d-block" *ngIf="submittedEmployeeAddress && employeeAddress.district.errors">
+                          <span *ngIf="employeeAddress.district.errors.required">District is required.</span>
+                        </div>
+                      </div>
+                      <div class="col-lg-4 mb-3">
+                        <label>Sector <span class="text-danger">*</span></label>
+                        <ng-select [items]="sectors"
+                                   bindLabel="libelle_localisation"
+                                   bindValue="id"
+                                   formControlName="sector"
+                                   (change)="onSectorChange($event?.id)"
+                                   placeholder="Select Sector"
+                                   [ngClass]="{'is-invalid': submittedEmployeeAddress && employeeAddress.sector.errors, 'is-valid': submittedEmployeeAddress && employeeAddress.sector.valid}">
+                        </ng-select>
+                        <div class="invalid-feedback d-block" *ngIf="submittedEmployeeAddress && employeeAddress.sector.errors">
+                          <span *ngIf="employeeAddress.sector.errors.required">Sector is required.</span>
+                        </div>
+                      </div>
+                      <div class="col-lg-4 mb-3">
+                        <label>Cell <span class="text-danger">*</span></label>
+                        <ng-select [items]="cells"
+                                   bindLabel="libelle_localisation"
+                                   bindValue="id"
+                                   formControlName="cell"
+                                   (change)="onCellChange($event?.id)"
+                                   placeholder="Select Cell"
+                                   [ngClass]="{'is-invalid': submittedEmployeeAddress && employeeAddress.cell.errors, 'is-valid': submittedEmployeeAddress && employeeAddress.cell.valid}">
+                        </ng-select>
+                        <div class="invalid-feedback d-block" *ngIf="submittedEmployeeAddress && employeeAddress.cell.errors">
+                          <span *ngIf="employeeAddress.cell.errors.required">Cell is required.</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-lg-4 mb-3">
+                        <label>Village <span class="text-danger">*</span></label>
+                        <ng-select [items]="villages"
+                                   bindLabel="libelle_localisation"
+                                   bindValue="id"
+                                   formControlName="village"
+                                   placeholder="Select Village"
+                                   [ngClass]="{'is-invalid': submittedEmployeeAddress && employeeAddress.village.errors, 'is-valid': submittedEmployeeAddress && employeeAddress.village.valid}">
+                        </ng-select>
+                        <div class="invalid-feedback d-block" *ngIf="submittedEmployeeAddress && employeeAddress.village.errors">
+                          <span *ngIf="employeeAddress.village.errors.required">Village is required.</span>
+                        </div>
+                      </div>
+                      <div class="col-lg-4 mb-3">
+                        <label>City</label>
+                        <input type="text" class="form-control" formControlName="city" placeholder="Enter City (optional)">
+                      </div>
+                      <div class="col-lg-4 mb-3">
+                        <label>Additional Address</label>
+                        <input type="text" class="form-control" formControlName="additional_address" placeholder="Enter Additional Address (optional)">
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-lg-4 mb-3">
+                        <label>Postal Code</label>
+                        <input type="text" class="form-control" formControlName="postal_code" placeholder="Enter Postal Code (optional)">
+                      </div>
+                      <div class="col-lg-4 mb-3">
+                        <label>Street Address</label>
+                        <input type="text" class="form-control" formControlName="street_address" placeholder="Enter Street Address (optional)">
+                      </div>
+                    </div>
+                    <ul class="list-inline wizard d-flex justify-content-end mb-0">
+                      <li class="previous list-inline-item" aria-disabled="true">
+                        <button class="btn btn-primary" cdkStepperPrevious [disabled]="saving">
+                          <span *ngIf="saving" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                          <i class="mdi mdi-arrow-left me-1" *ngIf="!saving"></i> Previous
+                        </button>
+                      </li>
+                      <li class="next list-inline-item" aria-disabled="false">
+                        <button class="btn btn-primary" type="submit" [disabled]="saving">
+                          <span *ngIf="saving" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                          <i class="mdi mdi-arrow-right me-1" *ngIf="!saving"></i> {{ saving ? 'Saving...' : 'Next' }}
+                        </button>
+                      </li>
+                    </ul>
+                  </form>
+                </section>
+              </cdk-step>
+
+              <!-- Step 8: Emergency -->
+              <cdk-step [optional]="true">
+                <ng-template cdkStepLabel>
+                  <span class="number">8.</span>
+                  <span>Emergency</span>
+                </ng-template>
+                <section *ngIf="cdkStepper.selectedIndex === 7">
+                  <form [formGroup]="emergencyContactForm" (ngSubmit)="onEmergencyContactSubmit()" novalidate>
+                    <div class="row">
+                      <div class="col-lg-4 mb-3">
+                        <label>Name <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" formControlName="name" placeholder="Enter Name"
+                               [ngClass]="{'is-invalid': submittedEmergencyContact && emergencyContact.name.errors, 'is-valid': submittedEmergencyContact && emergencyContact.name.valid}">
+                        <div class="invalid-feedback" *ngIf="submittedEmergencyContact && emergencyContact.name.errors">
+                          <span *ngIf="emergencyContact.name.errors.required">Name is required.</span>
+                        </div>
+                      </div>
+                      <div class="col-lg-4 mb-3">
+                        <label>Gender</label>
+                        <ng-select [items]="['male', 'female', 'other']"
+                                   formControlName="gender"
+                                   placeholder="Select Gender">
+                        </ng-select>
+                      </div>
+                      <div class="col-lg-4 mb-3">
+                        <label>Relationship <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" formControlName="relationship" placeholder="Enter Relationship"
+                               [ngClass]="{'is-invalid': submittedEmergencyContact && emergencyContact.relationship.errors, 'is-valid': submittedEmergencyContact && emergencyContact.relationship.valid}">
+                        <div class="invalid-feedback" *ngIf="submittedEmergencyContact && emergencyContact.relationship.errors">
+                          <span *ngIf="emergencyContact.relationship.errors.required">Relationship is required.</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-lg-4 mb-3">
+                        <label>Phone <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" formControlName="phone" placeholder="Enter Phone"
+                               [ngClass]="{'is-invalid': submittedEmergencyContact && emergencyContact.phone.errors, 'is-valid': submittedEmergencyContact && emergencyContact.phone.valid}">
+                        <div class="invalid-feedback" *ngIf="submittedEmergencyContact && emergencyContact.phone.errors">
+                          <span *ngIf="emergencyContact.phone.errors.required">Phone is required.</span>
+                        </div>
+                      </div>
+                      <div class="col-lg-4 mb-3">
+                        <label>Email</label>
+                        <input type="email" class="form-control" formControlName="email" placeholder="Enter Email (optional)">
+                      </div>
+                    </div>
+                    <ul class="list-inline wizard d-flex justify-content-end mb-0">
+                      <li class="previous list-inline-item" aria-disabled="true">
+                        <button class="btn btn-primary" cdkStepperPrevious [disabled]="saving">
+                          <span *ngIf="saving" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                          <i class="mdi mdi-arrow-left me-1" *ngIf="!saving"></i> Previous
+                        </button>
+                      </li>
+                      <li class="next list-inline-item" aria-disabled="false">
+                        <button class="btn btn-primary" type="submit" [disabled]="saving">
+                          <span *ngIf="saving" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                          <i class="mdi mdi-arrow-right me-1" *ngIf="!saving"></i> {{ saving ? 'Saving...' : 'Next' }}
+                        </button>
+                      </li>
+                    </ul>
+                  </form>
+                </section>
+              </cdk-step>
+
+              <!-- Step 9: Documents -->
+              <cdk-step [optional]="true">
+                <ng-template cdkStepLabel>
+                  <span class="number">9.</span>
+                  <span>Documents</span>
+                </ng-template>
+                <section *ngIf="cdkStepper.selectedIndex === 8">
+                  <form [formGroup]="documentsForm" (ngSubmit)="onDocumentsSubmit()" novalidate>
+                    <div class="row">
+                      <div class="col-lg-4 mb-3">
+                        <label>Document Type <span class="text-danger">*</span></label>
+                        <ng-select [items]="documentTypes"
+                                   bindLabel="label"
+                                   bindValue="value"
+                                   formControlName="document_type_id"
+                                   placeholder="Select Document Type"
+                                   [ngClass]="{'is-invalid': submittedDocuments && documents.document_type_id.errors, 'is-valid': submittedDocuments && documents.document_type_id.valid}">
+                        </ng-select>
+                        <div class="invalid-feedback d-block" *ngIf="submittedDocuments && documents.document_type_id.errors">
+                          <span *ngIf="documents.document_type_id.errors.required">Document type is required.</span>
+                        </div>
+                      </div>
+                      <div class="col-lg-4 mb-3">
+                        <label>Document File <span class="text-danger">*</span></label>
+                        <input type="file" class="form-control" (change)="onDocumentFileChange($event)" [ngClass]="{'is-invalid': submittedDocuments && documents.document.errors, 'is-valid': submittedDocuments && documents.document.valid}">
+                        <div class="invalid-feedback" *ngIf="submittedDocuments && documents.document.errors">
+                          <span *ngIf="documents.document.errors.required">Document file is required.</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-lg-4 mb-3">
+                        <label>Description</label>
+                        <input type="text" class="form-control" formControlName="description" placeholder="Enter Description (optional)">
+                      </div>
+                      <div class="col-lg-4 mb-3">
+                        <label>Expiration Date</label>
+                        <input type="date" class="form-control" formControlName="expiration_date">
+                      </div>
+                    </div>
+                    <ul class="list-inline wizard d-flex justify-content-end mb-0">
+                      <li class="previous list-inline-item" aria-disabled="true">
+                        <button class="btn btn-primary" cdkStepperPrevious [disabled]="saving">
+                          <span *ngIf="saving" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                          <i class="mdi mdi-arrow-left me-1" *ngIf="!saving"></i> Previous
+                        </button>
+                      </li>
+                      <li class="next list-inline-item" aria-disabled="false">
+                        <button class="btn btn-primary" type="submit" [disabled]="saving">
+                          <span *ngIf="saving" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                          <i class="mdi mdi-arrow-right me-1" *ngIf="!saving"></i> {{ saving ? 'Saving...' : 'Next' }}
+                        </button>
+                      </li>
+                    </ul>
+                  </form>
+                </section>
+              </cdk-step>
+
+              <!-- Step 10: Review & Submit -->
+              <cdk-step [optional]="true">
+                <ng-template cdkStepLabel>
+                  <span class="number">10.</span>
+                  <span>Review & Submit</span>
+                </ng-template>
+                <section *ngIf="cdkStepper.selectedIndex === 9">
+                  <div class="row" style="max-height: 500px; overflow-y: auto;">
+                    <!-- First Row: Personal Info & Legal & Contacts -->
+                    <div class="col-md-6 mb-3">
+                      <div class="card h-100">
+                        <div class="card-body">
+                          <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h5 class="mb-0">Personal Info</h5>
+                            <button class="btn btn-link btn-sm p-0" (click)="cdkStepper.selectedIndex = 0">Edit</button>
+                          </div>
+                          <ul class="mb-0">
+                            <li>Salutation: {{ getSalutationLabel(basicInfoForm.value.salutation) }}</li>
+                            <li>First Name: {{ basicInfoForm.value.firstName }}</li>
+                            <li>Last Name: {{ basicInfoForm.value.lastName }}</li>
+                            <li>Gender: {{ getGenderLabel(basicInfoForm.value.gender) }}</li>
+                            <li>Date of Birth: {{ basicInfoForm.value.dateOfBirth }}</li>
+                            <li>Nationality: {{ getCountryName(basicInfoForm.value.nationality) }}</li>
+                            <li>Country of Birth: {{ getCountryName(basicInfoForm.value.countryOfBirth) }}</li>
+                            <li>Marital Status: {{ basicInfoForm.value.maritalStatus }}</li>
+                            <li>Name of Spouse: {{ basicInfoForm.value.spouseName }}</li>
+                            <li>Number of Children: {{ basicInfoForm.value.numberOfChildren }}</li>
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <div class="card h-100">
+                        <div class="card-body">
+                          <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h5 class="mb-0">Legal & Contacts</h5>
+                            <button class="btn btn-link btn-sm p-0" (click)="cdkStepper.selectedIndex = 1">Edit</button>
+                          </div>
+                          <ul class="mb-0">
+                            <li>Document Type: {{ getDocumentTypeName(legalContactsInfoForm.value.documentType) }}</li>
+                            <li>Document Number: {{ legalContactsInfoForm.value.documentNumber }}</li>
+                            <li>Document Issue Date: {{ legalContactsInfoForm.value.documentIssueDate }}</li>
+                            <li>Document Expiry Date: {{ legalContactsInfoForm.value.documentExpiryDate }}</li>
+                            <li>Place of Issue: {{ legalContactsInfoForm.value.placeOfIssue }}</li>
+                            <li>RSSB Number: {{ legalContactsInfoForm.value.rssbNumber }}</li>
+                            <li>Highest Education: {{ legalContactsInfoForm.value.highestEducation }}</li>
+                            <li>Personal Mobile: {{ legalContactsInfoForm.value.personalMobile }}</li>
+                            <li>Personal Email: {{ legalContactsInfoForm.value.personalEmail }}</li>
+                            <li>Home Phone: {{ legalContactsInfoForm.value.homePhone }}</li>
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Second Row: Contract Info & Allowance -->
+                    <div class="col-md-6 mb-3">
+                      <div class="card h-100">
+                        <div class="card-body">
+                          <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h5 class="mb-0">Contract Info</h5>
+                            <button class="btn btn-link btn-sm p-0" (click)="cdkStepper.selectedIndex = 2">Edit</button>
+                          </div>
+                          <ul class="mb-0">
+                            <li>Department: {{ getDepartmentName(contractInfoForm.value.department) }}</li>
+                            <li>Job Title: {{ contractInfoForm.value.job_title }}</li>
+                            <li>Employment Type: {{ contractInfoForm.value.employment_type }}</li>
+                            <li>Hire Date: {{ contractInfoForm.value.hire_date }}</li>
+                            <li>End Date: {{ contractInfoForm.value.end_date }}</li>
+                            <li>Salary Basis: {{ contractInfoForm.value.salary_basis }}</li>
+                            <li>Salary Amount: {{ contractInfoForm.value.salary_amount }}</li>
+                            <li>Salary Frequency: {{ contractInfoForm.value.salary_frequency }}</li>
+                            <li>TIN Number: {{ contractInfoForm.value.tin_number }}</li>
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <div class="card h-100">
+                        <div class="card-body">
+                          <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h5 class="mb-0">Allowance</h5>
+                            <button class="btn btn-link btn-sm p-0" (click)="cdkStepper.selectedIndex = 3">Edit</button>
+                          </div>
+                          <ul class="mb-0">
+                            <li>Amount: {{ allowanceForm.value.amount }}</li>
+                            <li>Type: {{ allowanceForm.value.type }}</li>
+                            <li>Allowance: {{ getAllowanceName(allowanceForm.value.allowance_id) }}</li>
+                            <li>Description: {{ allowanceForm.value.description }}</li>
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Continue for other sections... -->
+                    <div class="col-md-6 mb-3">
+                      <div class="card h-100">
+                        <div class="card-body">
+                          <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h5 class="mb-0">RSSB Deductions</h5>
+                            <button class="btn btn-link btn-sm p-0" (click)="cdkStepper.selectedIndex = 4">Edit</button>
+                          </div>
+                          <ul class="mb-0">
+                            <li *ngFor="let d of employeeRssbDeductions">
+                              {{ d.rssb_name }}: Employee {{ d.rssb_employee_contribution }}, Employer {{ d.rssb_employer_contribution }}
+                            </li>
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <div class="card h-100">
+                        <div class="card-body">
+                          <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h5 class="mb-0">Other Deductions</h5>
+                            <button class="btn btn-link btn-sm p-0" (click)="cdkStepper.selectedIndex = 4">Edit</button>
+                          </div>
+                          <ul class="mb-0">
+                            <li *ngFor="let d of employeeOtherDeductions">
+                              {{ getDeductionName(d.deduction_id) }}: {{ d.amount }} ({{ d.type }}) - {{ d.description }}
+                            </li>
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                      <div class="card h-100">
+                        <div class="card-body">
+                          <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h5 class="mb-0">Bank Info</h5>
+                            <button class="btn btn-link btn-sm p-0" (click)="cdkStepper.selectedIndex = 5">Edit</button>
+                          </div>
+                          <ul class="mb-0">
+                            <li>Bank Name: {{ bankInfoForm.value.bank_name }}</li>
+                            <li>Account Number: {{ bankInfoForm.value.account_number }}</li>
+                            <li>Account Name: {{ bankInfoForm.value.account_name }}</li>
+                            <li>IBAN: {{ bankInfoForm.value.iban }}</li>
+                            <li>SWIFT Code: {{ bankInfoForm.value.swift_code }}</li>
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <div class="card h-100">
+                        <div class="card-body">
+                          <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h5 class="mb-0">Address</h5>
+                            <button class="btn btn-link btn-sm p-0" (click)="cdkStepper.selectedIndex = 6">Edit</button>
+                          </div>
+                          <ul class="mb-0">
+                            <li>Type: {{ employeeAddressForm.value.type }}</li>
+                            <li>Country: {{ getCountryName(employeeAddressForm.value.country) }}</li>
+                            <li>Province: {{ getProvinceName(employeeAddressForm.value.province) }}</li>
+                            <li>District: {{ getDistrictName(employeeAddressForm.value.district) }}</li>
+                            <li>Sector: {{ getSectorName(employeeAddressForm.value.sector) }}</li>
+                            <li>Cell: {{ getCellName(employeeAddressForm.value.cell) }}</li>
+                            <li>Village: {{ getVillageName(employeeAddressForm.value.village) }}</li>
+                            <li>City: {{ employeeAddressForm.value.city }}</li>
+                            <li>Additional Address: {{ employeeAddressForm.value.additional_address }}</li>
+                            <li>Postal Code: {{ employeeAddressForm.value.postal_code }}</li>
+                            <li>Street Address: {{ employeeAddressForm.value.street_address }}</li>
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                      <div class="card h-100">
+                        <div class="card-body">
+                          <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h5 class="mb-0">Emergency Contact</h5>
+                            <button class="btn btn-link btn-sm p-0" (click)="cdkStepper.selectedIndex = 7">Edit</button>
+                          </div>
+                          <ul class="mb-0">
+                            <li>Name: {{ emergencyContactForm.value.name }}</li>
+                            <li>Gender: {{ getGenderLabel(emergencyContactForm.value.gender) }}</li>
+                            <li>Relationship: {{ emergencyContactForm.value.relationship }}</li>
+                            <li>Phone: {{ emergencyContactForm.value.phone }}</li>
+                            <li>Email: {{ emergencyContactForm.value.email }}</li>
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <div class="card h-100">
+                        <div class="card-body">
+                          <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h5 class="mb-0">Documents</h5>
+                            <button class="btn btn-link btn-sm p-0" (click)="cdkStepper.selectedIndex = 8">Edit</button>
+                          </div>
+                          <ul class="mb-0">
+                            <li>Document Type: {{ getDocumentTypeName(documentsForm.value.document_type_id) }}</li>
+                            <li>File: {{ documentsForm.value.document }}</li>
+                            <li>Description: {{ documentsForm.value.description }}</li>
+                            <li>Expiration Date: {{ documentsForm.value.expiration_date }}</li>
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <ul class="list-inline wizard d-flex justify-content-end mt-3">
+                    <li class="previous list-inline-item" aria-disabled="true">
+                      <button class="btn btn-primary" cdkStepperPrevious [disabled]="saving">
+                        <span *ngIf="saving" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                        <i class="mdi mdi-arrow-left me-1" *ngIf="!saving"></i> Previous
+                      </button>
+                    </li>
+                    <li class="next list-inline-item" aria-disabled="false">
+                      <button class="btn btn-success" (click)="onFinalSubmit()" [disabled]="saving">
+                        <span *ngIf="saving" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                        <i class="mdi mdi-check me-1" *ngIf="!saving"></i> Submit
+                      </button>
+                    </li>
+                  </ul>
                 </section>
               </cdk-step>
 

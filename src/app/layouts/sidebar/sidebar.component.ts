@@ -33,10 +33,9 @@ export class SidebarComponent implements OnInit, AfterViewInit, OnChanges {
   @ViewChild('sideMenu') sideMenu: ElementRef;
 
   constructor(private eventService: EventService, private router: Router, public translate: TranslateService, private http: HttpClient) {
-    router.events.forEach((event) => {
+    this.router.events.subscribe((event) => {
       if (event instanceof NavigationEnd) {
-        this._activateMenuDropdown();
-        this._scrollElement();
+        this.handleSidebarOnRoute(event.urlAfterRedirects);
       }
     });
   }
@@ -152,5 +151,22 @@ export class SidebarComponent implements OnInit, AfterViewInit, OnChanges {
    */
   hasItems(item: MenuItem) {
     return item.subItems !== undefined ? item.subItems.length > 0 : false;
+  }
+
+  hideSidebar() {
+    document.body.classList.remove('sidebar-enable');
+    document.body.classList.add('vertical-collpsed');
+  }
+
+  handleSidebarOnRoute(url: string) {
+    if (url === '/employees' || url === '/employees/employees-view') {
+      // Hide sidebar for large forms
+      document.body.classList.remove('sidebar-enable');
+      document.body.classList.add('vertical-collpsed');
+    } else {
+      // Show sidebar for other routes
+      document.body.classList.add('sidebar-enable');
+      document.body.classList.remove('vertical-collpsed');
+    }
   }
 }
