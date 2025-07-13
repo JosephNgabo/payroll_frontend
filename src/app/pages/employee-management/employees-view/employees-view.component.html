@@ -1,87 +1,85 @@
-<app-page-title title="Employees Management" [breadcrumbItems]="breadCrumbItems"></app-page-title>
+<app-page-title title="Employees Management"></app-page-title>
 <div class="container-fluid">
-  <div class="row mb-3">
-    <div class="col-12 d-flex justify-content-between align-items-center">
-      <h3></h3>
-      <button class="btn btn-primary btn-rounded mb-2 me-2" [routerLink]="['/employees']" [disabled]="saving" (click)="onSave()">
-        <span *ngIf="saving" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-        <i class="mdi mdi-plus me-1" *ngIf="!saving"></i> {{ saving ? 'Loading...' : 'Create Employee' }}
-      </button>
-    </div>
-  </div>
-  <div class="row mb-2">
-    <div class="col-sm-4">
-      <div class="search-box me-2 mb-2 d-inline-block">
-        <div class="position-relative">
-          <input type="text" class="form-control" placeholder="Search..." [(ngModel)]="term" (ngModelChange)="searchEmployee()">
-          <i class="bx bx-search-alt search-icon"></i>
-        </div>
+  <div>
+    <div class="row mb-3">
+      <div class="col-12 d-flex justify-content-between align-items-center">
+        <h3></h3>
+        <button class="btn btn-primary btn-rounded mb-2 me-2" [routerLink]="['/employees']">
+          <i class="mdi mdi-plus me-1"></i> Create Employee
+        </button>
       </div>
     </div>
-  </div>
-  <!-- Loading State -->
-  <div *ngIf="isLoading" class="text-center">
-    <div class="spinner-border text-primary" role="status">
-      <span class="visually-hidden">Loading...</span>
-    </div>
-    <p class="mt-2">Loading employees...</p>
-  </div>
-  <div class="row" *ngIf="!isLoading">
-    <div class="col-12">
-      <div class="table-responsive">
-        <table class="table align-middle table-nowrap table-check">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>First Name</th>
-              <th>Last Name</th>
-              <th>Email</th>
-              <th>Department</th>
-              <th>Highest Education</th>
-              <th>Personal Mobile</th>
-              <th><span style="margin-left: 3.5em;"></span>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let emp of filteredEmployeeList; let i = index">
-              <td>{{ emp.id }}</td>
-              <td>{{ emp.firstname }}</td>
-              <td>{{ emp.lastname }}</td>
-              <td>{{ emp.email }}</td>
-              <td>{{ emp.department }}</td>
-              <td>{{ emp.highestEducation }}</td>
-              <td>{{ emp.personalMobile }}</td>
-              <td>
-                <div class="d-flex gap-3">
-                  <button type="button" [routerLink]="['/employee-modification']" class="btn btn-success btn-sm btn-rounded" (click)="onEdit(emp)">
-                    <i class="mdi mdi-pencil font-size-16"></i>
-                  </button>
-                  <button type="button" class="btn btn-danger btn-sm btn-rounded ms-1" (click)="onDelete(emp)">
-                    <i class="mdi mdi-delete font-size-16"></i>
-                  </button>
-                  <button type="button" class="btn btn-warning btn-sm btn-rounded ms-1" (click)="onView(emp)">
-                    <i class="mdi mdi-eye font-size-16"></i>
-                  </button>
-                </div>
-              </td>
-            </tr>
-            <tr *ngIf="!isLoading && filteredEmployeeList.length === 0">
-              <td colspan="8" class="text-center">No employees found.</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <!-- Pagination Placeholder -->
-      <div class="row justify-content-md-between align-items-md-center mt-3">
-        <div class="col-sm-12 col-md-5">
-          <div class="dataTables_info mb-2" role="status" aria-live="polite">
-            Showing page 1 of 1
+    <div class="row mb-2">
+      <div class="col-sm-4">
+        <div class="search-box me-2 mb-2 d-inline-block">
+          <div class="position-relative">
+            <input type="text" class="form-control" placeholder="Search..." [(ngModel)]="term">
+            <i class="bx bx-search-alt search-icon"></i>
           </div>
         </div>
-        <div class="col-sm-12 col-md-7">
-          <div class="text-md-end float-md-end pagination-rounded">
-            <!-- Replace with real pagination when data is dynamic -->
-            <pagination [totalItems]="filteredEmployeeList.length" [itemsPerPage]="10"></pagination>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-12">
+        <div class="table-responsive">
+          <table class="table align-middle table-nowrap table-check">
+            <thead>
+              <tr>
+                <!-- <th>ID</th> -->
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Email</th>
+                <!-- <th>Department</th> -->
+                <th>Highest Education</th>
+                <th>Personal Mobile</th>
+                <th><span style="margin-left: 3.5em;"></span>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let emp of employeeList; let i = index">
+                <!-- <td>{{ emp.id }}</td> -->
+                <td>{{ emp.first_name }}</td>
+                <td>{{ emp.last_name }}</td>
+                <td>{{ emp.personal_email }}</td>
+                <!-- <td>{{ emp.department }}</td> -->
+                <td>{{ emp.highest_education }}</td>
+                <td>{{ emp.personal_mobile }}</td>
+                <td>
+                  <div class="d-flex gap-3">
+                    <button type="button" [routerLink]="['/employees/employee-modification', emp.id]" class="btn btn-success btn-sm btn-rounded">
+                      <i class="mdi mdi-pencil font-size-16"></i>
+                    </button>
+                    <button type="button" class="btn btn-danger btn-sm btn-rounded ms-1" (click)="onDelete(emp)">
+                      <i class="mdi mdi-delete font-size-16"></i>
+                    </button>
+                    <button type="button" class="btn btn-warning btn-sm btn-rounded ms-1" (click)="onView(emp)">
+                      <i class="mdi mdi-eye font-size-16"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              <tr *ngIf="employeeList.length === 0">
+                <td colspan="8" class="text-center">No employees found.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <!-- Pagination Placeholder -->
+        <div class="row justify-content-md-between align-items-md-center mt-3">
+          <div class="col-sm-12 col-md-5">
+            <div class="dataTables_info mb-2" role="status" aria-live="polite">
+              Showing page 1 of 1
+            </div>
+          </div>
+          <div class="col-sm-12 col-md-7">
+            <div class="text-md-end float-md-end pagination-rounded">
+              <pagination
+                [totalItems]="totalItems"
+                [itemsPerPage]="itemsPerPage"
+                [(ngModel)]="currentPage"
+                (pageChanged)="onPageChange($event)">
+              </pagination>
+            </div>
           </div>
         </div>
       </div>

@@ -47,7 +47,7 @@ export class OtherDeductionsComponent implements OnInit {
       name: ['', [Validators.required]],
       description: ['', [Validators.required]],
       has_tax: [false],
-      rate: [null, [Validators.required, Validators.min(0)]]
+      rate: [0, [Validators.required, Validators.min(0)]]
     });
   }
 
@@ -101,7 +101,7 @@ export class OtherDeductionsComponent implements OnInit {
         rate: Number(deduction.tax_rate) * 100 // convert decimal to percent
       });
     } else {
-      this.deductionForm.reset({ has_tax: false, rate: null });
+      this.deductionForm.reset({ has_tax: false, rate: 0 });
     }
     this.modalService.open(content, { size: 'lg' });
   }

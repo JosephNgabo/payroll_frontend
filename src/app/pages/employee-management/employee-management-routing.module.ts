@@ -15,7 +15,7 @@ const routes: Routes = [
         component: EmployeesViewComponent
     },
     {
-        path: 'employee-modification',
+        path: 'employee-modification/:id',
         component: EmployeeModificationComponent
     }
 ];

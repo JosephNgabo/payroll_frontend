@@ -1,0 +1,306 @@
+// Payroll component styles
+.mini-stats-wid {
+  .mini-stat-icon {
+    overflow: hidden;
+    position: relative;
+  }
+  
+  .avatar-title {
+    align-items: center;
+    background-color: rgba(255, 255, 255, 0.2);
+    display: flex;
+    font-weight: 500;
+    height: 100%;
+    justify-content: center;
+    width: 100%;
+  }
+}
+
+.card {
+  .card-body {
+    .btn {
+      margin-top: 10px;
+    }
+  }
+}
+
+.font-size-48 {
+  font-size: 48px !important;
+}
+
+.font-size-24 {
+  font-size: 24px !important;
+}
+
+// Table styles
+.table {
+  th {
+    cursor: pointer;
+    user-select: none;
+    white-space: nowrap;
+    
+    &:hover {
+      background-color: #f8f9fa;
+    }
+    
+    i {
+      margin-left: 5px;
+      font-size: 14px;
+    }
+  }
+  
+  td {
+    vertical-align: middle;
+    white-space: nowrap;
+  }
+  
+  .expand-row {
+    cursor: pointer;
+    color: #007bff;
+    font-weight: bold;
+    
+    &:hover {
+      color: #0056b3;
+    }
+  }
+  
+  .sub-table {
+    background-color: #f8f9fa;
+    
+    .table {
+      margin-bottom: 0;
+      
+      th {
+        background-color: #343a40 !important;
+        color: white !important;
+        border-color: #454d55;
+      }
+      
+      td {
+        border-color: #dee2e6;
+      }
+    }
+  }
+}
+
+// Badge styles
+.badge {
+  &.bg-success {
+    background-color: #28a745 !important;
+  }
+  
+  &.bg-warning {
+    background-color: #ffc107 !important;
+    color: #212529 !important;
+  }
+  
+  &.bg-danger {
+    background-color: #dc3545 !important;
+  }
+  
+  &.bg-primary {
+    background-color: #007bff !important;
+  }
+}
+
+// Dropdown styles
+.dropdown-menu {
+  .dropdown-item {
+    i {
+      margin-right: 8px;
+    }
+    
+    &:hover {
+      background-color: #f8f9fa;
+    }
+  }
+}
+
+// Pagination styles
+.pagination-rounded {
+  .pagination {
+    .page-link {
+      border-radius: 50%;
+      margin: 0 2px;
+      border: 1px solid #dee2e6;
+      
+      &:hover {
+        background-color: #007bff;
+        border-color: #007bff;
+        color: white;
+      }
+    }
+    
+    .page-item.active .page-link {
+      background-color: #007bff;
+      border-color: #007bff;
+    }
+  }
+}
+
+// Loading state styles
+.spinner-border {
+  width: 3rem;
+  height: 3rem;
+}
+
+// Currency formatting
+.text-success {
+  color: #28a745 !important;
+}
+
+.text-danger {
+  color: #dc3545 !important;
+}
+
+// Table responsive improvements
+.table-responsive {
+  overflow-x: auto;
+  
+  .table {
+    min-width: 1200px; // Ensure table doesn't get too cramped
+  }
+}
+
+// Employee info styling
+.employee-info {
+  .avatar {
+    border: 2px solid #e9ecef;
+  }
+  
+  .employee-name {
+    font-weight: 600;
+    color: #495057;
+  }
+  
+  .employee-email {
+    font-size: 0.875rem;
+    color: #6c757d;
+  }
+}
+
+// Enhanced employee display in table
+.table {
+  .employee-cell {
+    .d-flex {
+      align-items: center;
+      
+      img {
+        border: 2px solid #e9ecef;
+        transition: border-color 0.2s ease;
+        
+        &:hover {
+          border-color: #007bff;
+        }
+      }
+      
+      .employee-details {
+        .employee-name {
+          font-weight: 600;
+          color: #495057;
+          margin-bottom: 2px;
+          line-height: 1.2;
+        }
+        
+        .employee-email {
+          font-size: 0.75rem;
+          color: #6c757d;
+          line-height: 1.2;
+        }
+        
+        .employee-id {
+          font-size: 0.75rem;
+          color: #007bff;
+          font-weight: 500;
+        }
+      }
+    }
+  }
+}
+
+// Status dropdown styling
+.status-dropdown {
+  .btn-outline-secondary {
+    border-color: #6c757d;
+    color: #6c757d;
+    
+    &:hover {
+      background-color: #6c757d;
+      border-color: #6c757d;
+      color: white;
+    }
+  }
+}
+
+// Empty state styling
+.empty-state {
+  .icon {
+    opacity: 0.5;
+  }
+  
+  h5 {
+    color: #6c757d;
+  }
+  
+  p {
+    color: #adb5bd;
+  }
+}
+
+// Custom date picker styles
+.custom-day {
+  text-align: center;
+  padding: 0.185rem 0.25rem;
+  display: inline-block;
+  height: 2rem;
+  width: 2rem;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  
+  &:hover {
+    background-color: #e9ecef;
+  }
+  
+  &.focused {
+    background-color: #e9ecef;
+  }
+  
+  &.range {
+    background-color: #007bff;
+    color: white;
+    
+    &:hover {
+      background-color: #0056b3;
+    }
+  }
+  
+  &.filled {
+    background-color: #007bff;
+    color: white;
+    font-weight: bold;
+    
+    &:hover {
+      background-color: #0056b3;
+    }
+  }
+}
+
+// Date picker modal improvements
+.modal-body {
+  .ngb-dp-month {
+    &:first-child {
+      margin-right: 1rem;
+    }
+  }
+  
+  .ngb-dp-weekday {
+    font-weight: 600;
+    color: #495057;
+  }
+  
+  .ngb-dp-day {
+    &:not(.disabled) {
+      cursor: pointer;
+    }
+  }
+} 

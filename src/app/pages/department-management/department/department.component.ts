@@ -221,8 +221,8 @@ export class DepartmentComponent {
     } else {
       // Add new department
       const payload = {
-        departement_name: formValue.name,
-        departement_description: formValue.description
+        department_name: formValue.name,
+        department_description: formValue.description
       };
       console.log('Payload sent to createDepartment:', payload);
       this.departmentService.createDepartment(payload).subscribe({

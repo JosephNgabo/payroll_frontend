@@ -54,7 +54,7 @@
                 }
               </ul>}
               @else{
-              <a routerLink="{{subitem.link}}" class="side-nav-link-ref" [attr.data-parent]="subitem.parentId" routerLinkActive="active">
+              <a routerLink="{{subitem.link}}" class="side-nav-link-ref" [attr.data-parent]="subitem.parentId" routerLinkActive="active" (click)="onMenuItemClick(subitem)">
                 {{ subitem.label | translate}}
                 @if(subitem.badge){
                 <span class="badge rounded-pill bg-{{subitem.badge.variant}} float-end">{{subitem.badge.text |

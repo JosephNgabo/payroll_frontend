@@ -1,0 +1,191 @@
+<div class="container-fluid payroll-header">
+  
+  <div class="row align-items-center mb-3">
+    <div class="col-md-6">
+      <h2 class="fw-bold mb-0">Payroll</h2>
+      <div class="text-muted small">Your report payroll sofar</div>
+    </div>
+    <div class="col-md-6 d-flex justify-content-end align-items-center">
+      <div class="me-2">
+        <input type="text" class="form-control" style="width: 220px; display: inline-block;" placeholder="01 Jan 2023 - 10 Mar 2023" [(ngModel)]="dateRange" readonly>
+        <button class="btn btn-link p-0 ms-n4" (click)="openDateRangePicker()">
+          <i class="bx bx-calendar font-size-20"></i>
+        </button>
+      </div>
+      <button class="btn btn-primary ms-2" (click)="onGeneratePayrollClick()" [disabled]="loading || !selectedPayrollRange">
+        <i class="bx bx-file me-1"></i> Generate Payroll
+      </button>
+    </div>
+  </div>
+  <div class="row mb-3">
+    <div class="col-md-4 mb-2 mb-md-0">
+      <div class="input-group">
+        <span class="input-group-text bg-white border-end-0"><i class="bx bx-search"></i></span>
+        <input type="text" class="form-control border-start-0" placeholder="Search employee" [(ngModel)]="searchTerm" (input)="onSearch()">
+      </div>
+    </div>
+    <div class="col-md-3 mb-2 mb-md-0">
+      <ng-select
+        [items]="paymentPeriods"
+        bindLabel=""
+        bindValue=""
+        placeholder="Payment period"
+        [(ngModel)]="selectedPaymentPeriod"
+        (change)="onPaymentPeriodChange()"
+        [clearable]="true">
+      </ng-select>
+    </div>
+    <div class="col-md-3">
+      <ng-select
+        [items]="statusOptions"
+        bindLabel="label"
+        bindValue="value"
+        placeholder="All Status"
+        [(ngModel)]="selectedStatus"
+        [clearable]="true">
+      </ng-select>
+    </div>
+  </div>
+</div>
+
+<!-- Date Range Picker Modal -->
+<ng-template #dateRangePicker let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title">Select Date Range</h5>
+    <button type="button" class="btn-close" aria-hidden="true" (click)="modal.dismiss()"></button>
+  </div>
+  <div class="modal-body">
+    <ngb-datepicker 
+      #dp 
+      [displayMonths]="2"
+      [firstDayOfWeek]="1"
+      [dayTemplate]="t"
+      outsideDays="visible">
+    </ngb-datepicker>
+    
+    <ng-template #t let-date let-focused="focused">
+      <span class="custom-day" 
+            [class.focused]="focused" 
+            [class.range]="isDateInRange(date)"
+            [class.filled]="isFromDate(date) || isToDate(date)"
+            (click)="onDateSelect(date)">
+        {{ date.day }}
+      </span>
+    </ng-template>
+    
+    <div class="mt-3">
+      <small class="text-muted">
+        <strong>Selected Range:</strong> 
+        <span *ngIf="dateRangeModel.from">
+          {{ dateRangeModel.from.day }}/{{ dateRangeModel.from.month }}/{{ dateRangeModel.from.year }}
+        </span>
+        <span *ngIf="dateRangeModel.from && dateRangeModel.to"> - </span>
+        <span *ngIf="dateRangeModel.to">
+          {{ dateRangeModel.to.day }}/{{ dateRangeModel.to.month }}/{{ dateRangeModel.to.year }}
+        </span>
+        <span *ngIf="!dateRangeModel.from && !dateRangeModel.to">No dates selected</span>
+      </small>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="modal.dismiss()">Cancel</button>
+    <button type="button" class="btn btn-primary" (click)="applyDateRange()" [disabled]="!canApplyDateRange()">Apply</button>
+  </div>
+</ng-template>
+
+<!-- Generate Payroll Modal -->
+<ng-template #generatePayrollModal let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title">Generate Payroll</h5>
+    <button type="button" class="btn-close" aria-hidden="true" (click)="modal.dismiss()"></button>
+  </div>
+  <div class="modal-body">
+    <p>Are you sure you want to generate payroll for the selected date range?</p>
+    <p class="text-muted">Date Range: {{ dateRange }}</p>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="modal.dismiss()">Cancel</button>
+    <button type="button" class="btn btn-primary" (click)="generatePayroll(); modal.dismiss()" [disabled]="loading">
+      <span *ngIf="loading" class="spinner-border spinner-border-sm me-1"></span>
+      Generate Payroll
+    </button>
+  </div>
+</ng-template>
+
+<!-- Loading State -->
+<div *ngIf="loading" class="text-center py-5">
+  <div class="spinner-border text-primary" role="status">
+    <span class="visually-hidden">Loading...</span>
+  </div>
+  <p class="mt-2">{{ loadingMessage }}</p>
+</div>
+
+<!-- Payroll Table -->
+<div class="card" *ngIf="!loading && filteredEmployees.length > 0">
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0 payroll-table">
+        <thead class="bg-light">
+          <tr>
+            <th style="width: 40px;"><input type="checkbox" [(ngModel)]="selectAll" (change)="toggleSelectAll()"></th>
+            <th>Employee ID</th>
+            <th>Basic Salary</th>
+            <th>Allowances</th>
+            <th>Gross Salary</th>
+            <th>RSSB Employee</th>
+            <th>RSSB Employer</th>
+            <th>Mandatory Deductions</th>
+            <th>Other Deductions</th>
+            <th>PAYE</th>
+            <th>Net Salary</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let employee of filteredEmployees; let i = index">
+            <td><input type="checkbox" [(ngModel)]="employee.selected"></td>
+            <td>{{ employee.employee_id }}</td>
+            <td>{{ employee.basic_salary | currency:'RWF':'symbol':'1.0-0' }}</td>
+            <td>{{ employee.total_allowances | currency:'RWF':'symbol':'1.0-0' }}</td>
+            <td>{{ employee.gross_salary | currency:'RWF':'symbol':'1.0-0' }}</td>
+            <td>{{ employee.total_rssb_employee_contributions | currency:'RWF':'symbol':'1.0-0' }}</td>
+            <td>{{ employee.total_rssb_employer_contributions | currency:'RWF':'symbol':'1.0-0' }}</td>
+            <td>{{ employee.total_mandatory_employee_deductions | currency:'RWF':'symbol':'1.0-0' }}</td>
+            <td>{{ employee.total_other_deductions | currency:'RWF':'symbol':'1.0-0' }}</td>
+            <td>{{ employee.total_paye | currency:'RWF':'symbol':'1.0-0' }}</td>
+            <td>
+              <span class="fw-bold" [class.text-success]="employee.net_salary >= 0" [class.text-danger]="employee.net_salary < 0">
+                {{ employee.net_salary | currency:'RWF':'symbol':'1.0-0' }}
+              </span>
+            </td>
+            <td>
+              <div class="dropdown">
+                <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                  {{ employee.status || 'PENDING' }}
+                </button>
+                <ul class="dropdown-menu">
+                  <li><a class="dropdown-item" href="#" (click)="setStatus(employee, 'APPROVE')">
+                    <i class="bx bx-check text-success me-2"></i>Approve
+                  </a></li>
+                  <li><a class="dropdown-item" href="#" (click)="setStatus(employee, 'PENDING')">
+                    <i class="bx bx-time text-warning me-2"></i>Pending
+                  </a></li>
+                  <li><a class="dropdown-item" href="#" (click)="setStatus(employee, 'REJECT')">
+                    <i class="bx bx-x text-danger me-2"></i>Reject
+                  </a></li>
+                </ul>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Empty State -->
+<div *ngIf="!loading && filteredEmployees.length === 0" class="text-center py-5">
+  <i class="bx bx-file font-size-48 text-muted"></i>
+  <h5 class="mt-3">No payroll data found</h5>
+  <p class="text-muted">Click "Generate Payroll" to create payroll data for your employees.</p>
+</div> 

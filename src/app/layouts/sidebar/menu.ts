@@ -97,6 +97,12 @@ export const MENU: MenuItem[] = [
         label: 'Departments',
         icon: 'bx-cog',
         link: '/departments'
+    },
+    {
+        id: 9,
+        label: 'Payroll',
+        icon: 'bx-calculator',
+        link: '/payroll'
     }
 
 
