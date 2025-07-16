@@ -213,20 +213,20 @@ export class EmployeesComponent implements OnInit {
       countryOfBirth: ['', Validators.required],
       maritalStatus: ['', Validators.required],
       spouseName: [''],
-      numberOfChildren: ['', [Validators.required, Validators.min(0)]]
+      numberOfChildren: ['', [Validators.min(0)]],
+      personalMobile: ['', Validators.required],
+      personalEmail: ['', [Validators.required, Validators.email]],
+      homePhone: ['']
     });
 
     this.legalContactsInfoForm = this.formBuilder.group({
       documentType: ['', Validators.required],
-      documentNumber: ['', Validators.required],
-      documentIssueDate: ['', Validators.required],
-      documentExpiryDate: ['', Validators.required],
-      placeOfIssue: ['', Validators.required],
+      documentNumber: [''],
+      documentIssueDate: [''],
+      documentExpiryDate: [''],
+      placeOfIssue: [''],
       rssbNumber: ['', Validators.required],
-      highestEducation: ['', Validators.required],
-      personalMobile: ['', Validators.required],
-      personalEmail: ['', [Validators.required, Validators.email]],
-      homePhone: ['', Validators.required]
+      highestEducation: ['', Validators.required]
     });
 
     this.contractInfoForm = this.formBuilder.group({
@@ -298,10 +298,10 @@ export class EmployeesComponent implements OnInit {
     });
 
     this.emergencyContactForm = this.formBuilder.group({
-      name: ['', Validators.required],
+      name: [''],
       gender: [''],
-      relationship: ['', Validators.required],
-      phone: ['', Validators.required],
+      relationship: [''],
+      phone: [''],
       email: ['']
     });
 
@@ -596,8 +596,9 @@ export class EmployeesComponent implements OnInit {
       document_place_of_issue: legal.placeOfIssue,
       rssb_number: legal.rssbNumber,
       highest_education: legal.highestEducation,
-      personal_mobile: legal.personalMobile,
-      personal_email: legal.personalEmail
+      personal_mobile: basic.personalMobile,
+      personal_email: basic.personalEmail
+      // home_phone: basic.homePhone // Removed to fix linter error
     };
     this.employeeInformationService.createEmployeeInformation(payload).subscribe({
       next: (res: any) => {
