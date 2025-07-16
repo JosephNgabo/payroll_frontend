@@ -131,9 +131,31 @@
                           <input type="number" class="form-control" formControlName="numberOfChildren" min="0" placeholder="Enter Number of Children"
                                  [ngClass]="{'is-invalid': submittedBasicInfo && basicInfo.numberOfChildren.errors, 'is-valid': submittedBasicInfo && basicInfo.numberOfChildren.valid}">
                           <div class="invalid-feedback" *ngIf="submittedBasicInfo && basicInfo.numberOfChildren.errors">
-                            <span *ngIf="basicInfo.numberOfChildren.errors.required">Number of children is required.</span>
                             <span *ngIf="basicInfo.numberOfChildren.errors.min">Value must be 0 or greater.</span>
                           </div>
+                        </div>
+                      </div>
+                      <hr/>
+                      <div class="row">
+                        <div class="col-lg-4 mb-3">
+                          <label>Personal Mobile</label>
+                          <input type="text" class="form-control" formControlName="personalMobile" placeholder="Enter Personal Mobile"
+                                 [ngClass]="{'is-invalid': submittedBasicInfo && basicInfo.personalMobile.errors, 'is-valid': submittedBasicInfo && basicInfo.personalMobile.valid}">
+                          <div class="invalid-feedback" *ngIf="submittedBasicInfo && basicInfo.personalMobile.errors"></div>
+                        </div>
+                        <div class="col-lg-4 mb-3">
+                          <label>Personal Email</label>
+                          <input type="email" class="form-control" formControlName="personalEmail" placeholder="Enter Personal Email"
+                                 [ngClass]="{'is-invalid': submittedBasicInfo && basicInfo.personalEmail.errors, 'is-valid': submittedBasicInfo && basicInfo.personalEmail.valid}">
+                          <div class="invalid-feedback" *ngIf="submittedBasicInfo && basicInfo.personalEmail.errors">
+                            <span *ngIf="basicInfo.personalEmail.errors.email">Please enter a valid email address.</span>
+                          </div>
+                        </div>
+                        <div class="col-lg-4 mb-3">
+                          <label>Home Phone</label>
+                          <input type="text" class="form-control" formControlName="homePhone" placeholder="Enter Home Phone"
+                                 [ngClass]="{'is-invalid': submittedBasicInfo && basicInfo.homePhone.errors, 'is-valid': submittedBasicInfo && basicInfo.homePhone.valid}">
+                          <div class="invalid-feedback" *ngIf="submittedBasicInfo && basicInfo.homePhone.errors"></div>
                         </div>
                       </div>
                       <ul class="list-inline wizard d-flex justify-content-end mb-0">
@@ -182,7 +204,6 @@
                           <input type="text" class="form-control" formControlName="documentNumber" placeholder="Enter Document Number"
                                  [ngClass]="{'is-invalid': submittedLegalContactsInfo && legalContactsInfo.documentNumber.errors, 'is-valid': submittedLegalContactsInfo && legalContactsInfo.documentNumber.valid}">
                           <div class="invalid-feedback" *ngIf="submittedLegalContactsInfo && legalContactsInfo.documentNumber.errors">
-                            <span *ngIf="legalContactsInfo.documentNumber.errors.required">Document number is required.</span>
                           </div>
                           <div class="valid-feedback" *ngIf="submittedLegalContactsInfo && legalContactsInfo.documentNumber.valid"></div>
                         </div>
@@ -191,7 +212,6 @@
                           <input type="date" class="form-control" formControlName="documentIssueDate"
                                  [ngClass]="{'is-invalid': submittedLegalContactsInfo && legalContactsInfo.documentIssueDate.errors, 'is-valid': submittedLegalContactsInfo && legalContactsInfo.documentIssueDate.valid}">
                           <div class="invalid-feedback" *ngIf="submittedLegalContactsInfo && legalContactsInfo.documentIssueDate.errors">
-                            <span *ngIf="legalContactsInfo.documentIssueDate.errors.required">Issue date is required.</span>
                           </div>
                           <div class="valid-feedback" *ngIf="submittedLegalContactsInfo && legalContactsInfo.documentIssueDate.valid"></div>
                         </div>
@@ -202,7 +222,6 @@
                           <input type="date" class="form-control" formControlName="documentExpiryDate"
                                  [ngClass]="{'is-invalid': submittedLegalContactsInfo && legalContactsInfo.documentExpiryDate.errors, 'is-valid': submittedLegalContactsInfo && legalContactsInfo.documentExpiryDate.valid}">
                           <div class="invalid-feedback" *ngIf="submittedLegalContactsInfo && legalContactsInfo.documentExpiryDate.errors">
-                            <span *ngIf="legalContactsInfo.documentExpiryDate.errors.required">Expiry date is required.</span>
                           </div>
                           <div class="valid-feedback" *ngIf="submittedLegalContactsInfo && legalContactsInfo.documentExpiryDate.valid"></div>
                         </div>
@@ -211,7 +230,6 @@
                           <input type="text" class="form-control" formControlName="placeOfIssue" placeholder="Enter Place of Issue"
                                  [ngClass]="{'is-invalid': submittedLegalContactsInfo && legalContactsInfo.placeOfIssue.errors, 'is-valid': submittedLegalContactsInfo && legalContactsInfo.placeOfIssue.valid}">
                           <div class="invalid-feedback" *ngIf="submittedLegalContactsInfo && legalContactsInfo.placeOfIssue.errors">
-                            <span *ngIf="legalContactsInfo.placeOfIssue.errors.required">Place of issue is required.</span>
                           </div>
                           <div class="valid-feedback" *ngIf="submittedLegalContactsInfo && legalContactsInfo.placeOfIssue.valid"></div>
                         </div>
@@ -241,21 +259,18 @@
                       </div>
                       <hr/>
                       <!-- Contact Info Fields -->
-                      <div class="row">
+                      <!-- <div class="row">
                         <div class="col-lg-4 mb-3">
                           <label>Personal Mobile</label>
                           <input type="text" class="form-control" formControlName="personalMobile" placeholder="Enter Personal Mobile"
                                  [ngClass]="{'is-invalid': submittedLegalContactsInfo && legalContactsInfo.personalMobile.errors, 'is-valid': submittedLegalContactsInfo && legalContactsInfo.personalMobile.valid}">
-                          <div class="invalid-feedback" *ngIf="submittedLegalContactsInfo && legalContactsInfo.personalMobile.errors">
-                            <span *ngIf="legalContactsInfo.personalMobile.errors.required">Personal mobile is required.</span>
-                          </div>
+                          <div class="invalid-feedback" *ngIf="submittedLegalContactsInfo && legalContactsInfo.personalMobile.errors"></div>
                         </div>
                         <div class="col-lg-4 mb-3">
                           <label>Personal Email</label>
                           <input type="email" class="form-control" formControlName="personalEmail" placeholder="Enter Personal Email"
                                  [ngClass]="{'is-invalid': submittedLegalContactsInfo && legalContactsInfo.personalEmail.errors, 'is-valid': submittedLegalContactsInfo && legalContactsInfo.personalEmail.valid}">
                           <div class="invalid-feedback" *ngIf="submittedLegalContactsInfo && legalContactsInfo.personalEmail.errors">
-                            <span *ngIf="legalContactsInfo.personalEmail.errors.required">Personal email is required.</span>
                             <span *ngIf="legalContactsInfo.personalEmail.errors.email">Please enter a valid email address.</span>
                           </div>
                         </div>
@@ -263,11 +278,9 @@
                           <label>Home Phone</label>
                           <input type="text" class="form-control" formControlName="homePhone" placeholder="Enter Home Phone"
                                  [ngClass]="{'is-invalid': submittedLegalContactsInfo && legalContactsInfo.homePhone.errors, 'is-valid': submittedLegalContactsInfo && legalContactsInfo.homePhone.valid}">
-                          <div class="invalid-feedback" *ngIf="submittedLegalContactsInfo && legalContactsInfo.homePhone.errors">
-                            <span *ngIf="legalContactsInfo.homePhone.errors.required">Home phone is required.</span>
-                          </div>
+                          <div class="invalid-feedback" *ngIf="submittedLegalContactsInfo && legalContactsInfo.homePhone.errors"></div>
                         </div>
-                      </div>
+                      </div> -->
                       <ul class="list-inline wizard d-flex justify-content-end mb-0">
                         <li class="previous list-inline-item" aria-disabled="true">
                           <button class="btn btn-primary" cdkStepperPrevious [disabled]="saving">
@@ -875,12 +888,10 @@
                     <form [formGroup]="emergencyContactForm" novalidate>
                       <div class="row">
                         <div class="col-lg-4 mb-3">
-                          <label>Name <span class="text-danger">*</span></label>
+                          <label>Name</label>
                           <input type="text" class="form-control" formControlName="name" placeholder="Enter Name"
                                  [ngClass]="{'is-invalid': submittedEmergencyContact && emergencyContact.name.errors, 'is-valid': submittedEmergencyContact && emergencyContact.name.valid}">
-                          <div class="invalid-feedback" *ngIf="submittedEmergencyContact && emergencyContact.name.errors">
-                            <span *ngIf="emergencyContact.name.errors.required">Name is required.</span>
-                          </div>
+                          <div class="invalid-feedback" *ngIf="submittedEmergencyContact && emergencyContact.name.errors"></div>
                         </div>
                         <div class="col-lg-4 mb-3">
                           <label>Gender</label>
@@ -890,22 +901,18 @@
                           </ng-select>
                         </div>
                         <div class="col-lg-4 mb-3">
-                          <label>Relationship <span class="text-danger">*</span></label>
+                          <label>Relationship</label>
                           <input type="text" class="form-control" formControlName="relationship" placeholder="Enter Relationship"
                                  [ngClass]="{'is-invalid': submittedEmergencyContact && emergencyContact.relationship.errors, 'is-valid': submittedEmergencyContact && emergencyContact.relationship.valid}">
-                          <div class="invalid-feedback" *ngIf="submittedEmergencyContact && emergencyContact.relationship.errors">
-                            <span *ngIf="emergencyContact.relationship.errors.required">Relationship is required.</span>
-                          </div>
+                          <div class="invalid-feedback" *ngIf="submittedEmergencyContact && emergencyContact.relationship.errors"></div>
                         </div>
                       </div>
                       <div class="row">
                         <div class="col-lg-4 mb-3">
-                          <label>Phone <span class="text-danger">*</span></label>
+                          <label>Phone</label>
                           <input type="text" class="form-control" formControlName="phone" placeholder="Enter Phone"
                                  [ngClass]="{'is-invalid': submittedEmergencyContact && emergencyContact.phone.errors, 'is-valid': submittedEmergencyContact && emergencyContact.phone.valid}">
-                          <div class="invalid-feedback" *ngIf="submittedEmergencyContact && emergencyContact.phone.errors">
-                            <span *ngIf="emergencyContact.phone.errors.required">Phone is required.</span>
-                          </div>
+                          <div class="invalid-feedback" *ngIf="submittedEmergencyContact && emergencyContact.phone.errors"></div>
                         </div>
                         <div class="col-lg-4 mb-3">
                           <label>Email</label>

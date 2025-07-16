@@ -260,20 +260,20 @@ export class EmployeeModificationComponent implements OnInit {
       countryOfBirth: ['', Validators.required],
       maritalStatus: ['', Validators.required],
       spouseName: [''],
-      numberOfChildren: ['', [Validators.required, Validators.min(0)]]
+      numberOfChildren: ['', [Validators.min(0)]],
+      personalMobile: [''],
+      personalEmail: ['', [Validators.email]],
+      homePhone: ['']
     });
 
     this.legalContactsInfoForm = this.formBuilder.group({
       documentType: ['', Validators.required],
-      documentNumber: ['', Validators.required],
-      documentIssueDate: ['', Validators.required],
-      documentExpiryDate: ['', Validators.required],
-      placeOfIssue: ['', Validators.required],
+      documentNumber: [''],
+      documentIssueDate: [''],
+      documentExpiryDate: [''],
+      placeOfIssue: [''],
       rssbNumber: ['', Validators.required],
-      highestEducation: ['', Validators.required],
-      personalMobile: ['', Validators.required],
-      personalEmail: ['', [Validators.required, Validators.email]],
-      homePhone: ['', Validators.required]
+      highestEducation: ['', Validators.required]
     });
 
     this.contractInfoForm = this.formBuilder.group({
@@ -339,10 +339,10 @@ export class EmployeeModificationComponent implements OnInit {
     });
 
     this.emergencyContactForm = this.formBuilder.group({
-      name: ['', Validators.required],
+      name: [''],
       gender: [''],
-      relationship: ['', Validators.required],
-      phone: ['', Validators.required],
+      relationship: [''],
+      phone: [''],
       email: ['']
     });
 
@@ -395,6 +395,9 @@ export class EmployeeModificationComponent implements OnInit {
           nationality: (employee.nationality && typeof employee.nationality === 'object') ? employee.nationality.id : employee.nationality,
           countryOfBirth: (employee.country_of_birth && typeof employee.country_of_birth === 'object') ? employee.country_of_birth.id : employee.country_of_birth,
           maritalStatus: employee.marital_status,
+          personalMobile: employee.personal_mobile,
+          personalEmail: employee.personal_email,
+          homePhone: employee.home_phone,
         });
         this.originalBasicInfo = this.basicInfoForm.value;
         if (this.legalContactsInfoForm) {
@@ -406,9 +409,6 @@ export class EmployeeModificationComponent implements OnInit {
             placeOfIssue: employee.document_place_of_issue,
             rssbNumber: employee.rssb_number,
             highestEducation: employee.highest_education,
-            personalMobile: employee.personal_mobile,
-            personalEmail: employee.personal_email,
-            homePhone: employee.home_phone,
           });
           this.originalLegalContactsInfo = this.legalContactsInfoForm.value;
         }
@@ -1159,7 +1159,7 @@ export class EmployeeModificationComponent implements OnInit {
   }
 
   get contactInfo() {
-    return this.legalContactsInfoForm.controls;
+    return this.basicInfoForm.controls;
   }
 
   get bankInfo() {
@@ -1359,6 +1359,9 @@ export class EmployeeModificationComponent implements OnInit {
       marital_status: basic.maritalStatus,
       name_of_spouse: basic.spouseName,
       number_of_children: basic.numberOfChildren,
+      personal_mobile: basic.personalMobile,
+      personal_email: basic.personalEmail,
+      home_phone: basic.homePhone,
       document_type: legal.documentType,
       document_number: legal.documentNumber,
       document_issue_date: legal.documentIssueDate,
@@ -1366,9 +1369,6 @@ export class EmployeeModificationComponent implements OnInit {
       document_place_of_issue: legal.placeOfIssue,
       rssb_number: legal.rssbNumber,
       highest_education: legal.highestEducation,
-      personal_mobile: legal.personalMobile,
-      personal_email: legal.personalEmail,
-      home_phone: legal.homePhone,
       // Add any other required fields, but DO NOT include the full country object!
     };
   }
