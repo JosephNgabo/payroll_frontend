@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
+import { catchError } from 'rxjs/operators';
+import { throwError } from 'rxjs';
 
 export interface PayrollData {
   employee_id: string;
@@ -35,28 +37,54 @@ export class PayrollService {
   constructor(private http: HttpClient) {}
 
   generatePayroll(payload?: any): Observable<PayrollResponse> {
-    return this.http.post<PayrollResponse>(`${this.apiUrl}/payroll/generate`, payload || {});
+    return this.http.post<PayrollResponse>(`${this.apiUrl}/payroll/generate`, payload || {})
+      .pipe(catchError(this.handleError));
   }
 
   getPayrolls(page: number = 1): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}/payroll?page=${page}`);
+    return this.http.get<any>(`${this.apiUrl}/payroll?page=${page}`)
+      .pipe(catchError(this.handleError));
   }
 
   getPayrollDetails(payrollId: string): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}/payroll/payslips/${payrollId}`);
+    return this.http.get<any>(`${this.apiUrl}/payroll/payslips/${payrollId}`)
+      .pipe(catchError(this.handleError));
   }
 
   deletePayslip(id: string): Observable<any> {
-    return this.http.delete<any>(`${this.apiUrl}/payroll/payslip/${id}`);
+    return this.http.delete<any>(`${this.apiUrl}/payroll/payslip/${id}`)
+      .pipe(catchError(this.handleError));
   }
 
   regeneratePayroll(payrollId: string): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/payroll/${payrollId}/refresh`, {});
+    return this.http.post<any>(`${this.apiUrl}/payroll/${payrollId}/refresh`, {})
+      .pipe(catchError(this.handleError));
   }
 
   deletePayroll(id: string): Observable<any> {
-    return this.http.delete<any>(`${this.apiUrl}/payroll/${id}`);
+    return this.http.delete<any>(`${this.apiUrl}/payroll/${id}`)
+      .pipe(catchError(this.handleError));
   }
 
+  /**
+   * Handle HTTP errors and extract backend validation messages
+   */
+  private handleError(error: any) {
+    let errorMessage = 'An unexpected error occurred. Please try again.';
+    if (error && error.error) {
+      if (error.error.errors) {
+        // Laravel validation errors
+        errorMessage = error.error.errors;
+      } else if (error.error.message) {
+        errorMessage = error.error.message;
+      }
+    } else if (error && error.message) {
+      errorMessage = error.message;
+    } else if (typeof error === 'string') {
+      errorMessage = error;
+    }
+    console.error('PayrollService Error:', error);
+    return throwError(() => errorMessage);
+  }
   
 } 

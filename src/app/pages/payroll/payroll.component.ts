@@ -123,7 +123,17 @@ export class PayrollComponent implements OnInit {
       },
       error: (err) => {
         this.loading = false;
-        Swal.fire({ icon: 'error', text: 'Failed to generate payroll.' });
+        let errorMsg = 'Failed to generate payroll.';
+        if (typeof err === 'string') {
+          errorMsg = err;
+        } else if (err && typeof err === 'object') {
+          if (err.message) {
+            errorMsg = err.message;
+          } else if (err.errors) {
+            errorMsg = Object.values(err.errors).flat().join(' ');
+          }
+        }
+        Swal.fire({ icon: 'error', text: errorMsg });
       }
     });
   }
