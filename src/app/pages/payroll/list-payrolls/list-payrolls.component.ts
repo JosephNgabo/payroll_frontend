@@ -1,0 +1,154 @@
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { PayrollService } from 'src/app/core/services/payroll.service';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import Swal from 'sweetalert2';
+import { timer } from 'rxjs';
+
+@Component({
+  selector: 'app-list-payrolls',
+  templateUrl: './list-payrolls.component.html',
+  styleUrls: ['./list-payrolls.component.scss']
+})
+export class ListPayrollsComponent implements OnInit {
+  payrolls: any[] = [];
+  loading = false;
+  error: string = '';
+  currentPage = 1;
+  totalPages = 1;
+  perPage = 10;
+  total = 0;
+  links: any[] = [];
+
+  monthNames = [
+    '', 'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'
+  ];
+  monthOptions = [
+    { label: 'January', value: 1 },
+    { label: 'February', value: 2 },
+    { label: 'March', value: 3 },
+    { label: 'April', value: 4 },
+    { label: 'May', value: 5 },
+    { label: 'June', value: 6 },
+    { label: 'July', value: 7 },
+    { label: 'August', value: 8 },
+    { label: 'September', value: 9 },
+    { label: 'October', value: 10 },
+    { label: 'November', value: 11 },
+    { label: 'December', value: 12 }
+  ];
+  selectedRegenerateMonth: number | null = null;
+  selectedRegeneratePayroll: any = null;
+  @ViewChild('regenerateModal') regenerateModal: any;
+
+  constructor(private payrollService: PayrollService, private modalService: NgbModal) {}
+
+  ngOnInit(): void {
+    this.fetchPayrolls(1);
+  }
+
+  fetchPayrolls(page: number) {
+    this.loading = true;
+    this.error = '';
+    this.payrollService.getPayrolls(page).subscribe({
+      next: (res) => {
+        this.payrolls = res.data || [];
+        this.currentPage = res.current_page;
+        this.totalPages = res.last_page;
+        this.perPage = res.per_page;
+        this.total = res.total;
+        this.links = res.links || [];
+        this.loading = false;
+      },
+      error: (err) => {
+        this.error = 'Failed to load payrolls.';
+        this.loading = false;
+      }
+    });
+  }
+
+  getMonthName(month: number): string {
+    return this.monthNames[month] || '';
+  }
+
+  getStatusText(status: number): string {
+    switch (status) {
+      case 1: return 'Active';
+      case 0: return 'Inactive';
+      default: return 'Unknown';
+    }
+  }
+
+  onPageChange(page: number) {
+    if (page !== this.currentPage && page > 0 && page <= this.totalPages) {
+      this.fetchPayrolls(page);
+    }
+  }
+
+  getPageNumberFromUrl(url: string | null): number {
+    if (!url) return this.currentPage;
+    const match = url.match(/page=(\d+)/);
+    return match ? parseInt(match[1], 10) : this.currentPage;
+  }
+
+  openRegenerateModal(payroll: any) {
+    this.selectedRegeneratePayroll = payroll;
+    this.selectedRegenerateMonth = payroll.payroll_month;
+    this.modalService.open(this.regenerateModal, { centered: true });
+  }
+
+  confirmRegenerate(modal: any) {
+    if (!this.selectedRegeneratePayroll || !this.selectedRegenerateMonth) return;
+    Swal.fire({
+      title: 'Regenerate Payroll',
+      text: `Are you sure you want to regenerate payroll for ${this.getMonthName(this.selectedRegenerateMonth)}?`,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, regenerate',
+      cancelButtonText: 'Cancel'
+    }).then(result => {
+      if (result.isConfirmed) {
+        this.loading = true;
+        this.payrollService.regeneratePayroll(this.selectedRegeneratePayroll.id).subscribe({
+          next: (res) => {
+            this.loading = false;
+            Swal.fire('Success', 'Payroll has been regenerated.', 'success');
+            modal.close();
+            this.fetchPayrolls(this.currentPage);
+          },
+          error: (err) => {
+            this.loading = false;
+            Swal.fire('Error', 'Failed to regenerate payroll.', 'error');
+          }
+        });
+      }
+    });
+  }
+
+  deletePayroll(payroll: any) {
+    if (!payroll?.id) return;
+    Swal.fire({
+      title: 'Delete Payroll',
+      text: 'Are you sure you want to delete this payroll? This action cannot be undone.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, delete it',
+      cancelButtonText: 'Cancel'
+    }).then(result => {
+      if (result.isConfirmed) {
+        this.loading = true;
+        this.payrollService.deletePayroll(payroll.id).subscribe({
+          next: (res) => {
+            this.loading = false;
+            Swal.fire('Deleted!', 'Payroll has been deleted.', 'success');            
+            this.fetchPayrolls(this.currentPage);
+          },
+          error: (err) => {
+            this.loading = false;
+            Swal.fire('Error', 'Failed to delete payroll.', 'error');
+          }
+        });
+      }
+    });
+  }
+} 

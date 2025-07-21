@@ -227,10 +227,8 @@
                         </div>
                         <div class="col-lg-4 mb-3">
                           <label>Place of Issue</label>
-                          <input type="text" class="form-control" formControlName="placeOfIssue" placeholder="Enter Place of Issue"
-                                 [ngClass]="{'is-invalid': submittedLegalContactsInfo && legalContactsInfo.placeOfIssue.errors, 'is-valid': submittedLegalContactsInfo && legalContactsInfo.placeOfIssue.valid}">
-                          <div class="invalid-feedback" *ngIf="submittedLegalContactsInfo && legalContactsInfo.placeOfIssue.errors">
-                          </div>
+                          <input type="text" class="form-control" formControlName="placeOfIssue" placeholder="Enter Place of Issue">
+                          <div class="invalid-feedback" *ngIf="submittedLegalContactsInfo && legalContactsInfo.placeOfIssue.errors"></div>
                           <div class="valid-feedback" *ngIf="submittedLegalContactsInfo && legalContactsInfo.placeOfIssue.valid"></div>
                         </div>
                         <div class="col-lg-4 mb-3">
@@ -408,280 +406,317 @@
                   </section>
                 </cdk-step>
   
-                <!-- Step 4: Allowance -->
+                <!-- Step 4: Allowance & Deductions (merged) -->
                 <cdk-step [optional]="true">
                   <ng-template cdkStepLabel>
                     <span class="number">4.</span>
-                    <span>Allowance</span>
+                    <span>Allowance & Deductions</span>
                   </ng-template>
                   <section *ngIf="cdkStepper.selectedIndex === 3">
-                    <form [formGroup]="allowanceForm" novalidate>
-                      <div class="row">
-                        <div class="col-lg-4 mb-3">
-                          <label>Amount <span class="text-danger">*</span></label>
-                          <input type="number" class="form-control" formControlName="amount" min="0" step="0.01" placeholder="Enter Amount"
-                                 [ngClass]="{'is-invalid': submittedAllowance && allowance.amount.errors, 'is-valid': submittedAllowance && allowance.amount.valid}">
-                          <div class="invalid-feedback" *ngIf="submittedAllowance && allowance.amount.errors">
-                            <span *ngIf="allowance.amount.errors.required">Amount is required.</span>
-                            <span *ngIf="allowance.amount.errors.min">Value must be 0 or greater.</span>
-                          </div>
-                        </div>
-                        <div class="col-lg-4 mb-3">
-                          <label>Type <span class="text-danger">*</span></label>
-                          <ng-select [items]="['fixed', 'percentage']"
-                                     formControlName="type"
-                                     placeholder="Select Type"
-                                     [ngClass]="{'is-invalid': submittedAllowance && allowance.type.errors, 'is-valid': submittedAllowance && allowance.type.valid}">
-                          </ng-select>
-                          <div class="invalid-feedback d-block" *ngIf="submittedAllowance && allowance.type.errors">
-                            <span *ngIf="allowance.type.errors.required">Type is required.</span>
-                          </div>
-                        </div>
-                        <div class="col-lg-4 mb-3">
-                          <label>Allowance <span class="text-danger">*</span></label>
-                          <ng-select [items]="allowances"
-                                     bindLabel="name"
-                                     bindValue="id"
-                                     formControlName="allowance_id"
-                                     placeholder="Select Allowance"
-                                     [ngClass]="{'is-invalid': submittedAllowance && allowance.allowance_id.errors, 'is-valid': submittedAllowance && allowance.allowance_id.valid}">
-                          </ng-select>
-                          <div class="invalid-feedback d-block" *ngIf="submittedAllowance && allowance.allowance_id.errors">
-                            <span *ngIf="allowance.allowance_id.errors.required">Allowance is required.</span>
-                          </div>
-                        </div>
+                    <!-- Allowance Section -->
+                    <div class="card mb-4">
+                      <div class="card-header bg-success text-white fw-bold d-flex justify-content-between align-items-center">
+                        <span>Allowances</span>
+                        <button class="btn btn-primary btn-sm" (click)="openAddAllowanceModal()" type="button" [disabled]="!isEditingStep[3]">+ Add Allowance</button>
                       </div>
-                      <div class="row">
-                        <div class="col-lg-4 mb-3">
-                          <label>Description</label>
-                          <input type="text" class="form-control" formControlName="description" placeholder="Enter Description (optional)">
-                        </div>
+                      <div class="card-body">
+                        <table class="table table-bordered">
+                          <thead>
+                            <tr>
+                              <th>Name</th>
+                              <th>Amount</th>
+                              <th>Type</th>
+                              <th>Allowance</th>
+                              <th>Description</th>
+                              <th>Action</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr *ngFor="let allowance of employeeAllowances; let i = index">
+                              <td>{{ allowance.name }}</td>
+                              <td>{{ allowance.amount }}</td>
+                              <td>{{ allowance.type }}</td>
+                              <td>{{ allowance.allowance_name }}</td>
+                              <td>{{ allowance.description }}</td>
+                              <td>
+                                <button class="btn btn-danger btn-sm" (click)="removeAllowance(i)" type="button" [disabled]="!isEditingStep[3]">Remove</button>
+                              </td>
+                            </tr>
+                            <tr *ngIf="employeeAllowances && employeeAllowances.length === 0">
+                              <td colspan="6" class="text-center">No allowances added.</td>
+                            </tr>
+                          </tbody>
+                        </table>
                       </div>
-                      <ul class="list-inline wizard d-flex justify-content-end mb-0">
-                        <li class="previous list-inline-item" aria-disabled="true">
-                          <button class="btn btn-primary" cdkStepperPrevious [disabled]="saving">
-                            <span *ngIf="saving" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                            <i class="mdi mdi-arrow-left me-1" *ngIf="!saving"></i> Previous
-                          </button>
-                        </li>
-                        <li class="next list-inline-item" aria-disabled="false">
-                          <button *ngIf="!isEditingStep[3]" class="btn btn-primary" type="button" (click)="onEditStep(3)">Edit</button>
-                          <button *ngIf="isEditingStep[3]" class="btn btn-success me-2" type="button" (click)="onUpdateStep(3)">Update</button>
-                          <button *ngIf="isEditingStep[3]" class="btn btn-outline-danger" type="button" (click)="onCancelEditStep(3)">Cancel</button>
-                        </li>
-                      </ul>
-                    </form>
+                    </div>
+
+                    <!-- Add Allowance Modal -->
+                    <ng-template #addAllowanceModal>
+                      <div class="modal-header">
+                        <h5 class="modal-title">Add Allowance</h5>
+                        <button type="button" class="btn-close" (click)="closeAddAllowanceModal()"></button>
+                      </div>
+                      <div class="modal-body">
+                        <form [formGroup]="allowanceForm" (ngSubmit)="onAllowanceSubmit()" novalidate>
+                          <div class="row">
+                            <div class="col-lg-4 mb-3">
+                              <label>Name</label>
+                              <input type="text" class="form-control" formControlName="name" placeholder="Enter Allowance Name (optional)">
+                            </div>
+                            <div class="col-lg-4 mb-3">
+                              <label>Amount <span class="text-danger">*</span></label>
+                              <input type="number" class="form-control" formControlName="amount" min="0" step="0.01" placeholder="Enter Amount"
+                                     [ngClass]="{'is-invalid': submittedAllowance && allowance.amount.errors, 'is-valid': submittedAllowance && allowance.amount.valid}">
+                              <div class="invalid-feedback" *ngIf="submittedAllowance && allowance.amount.errors">
+                                <span *ngIf="allowance.amount.errors.required">Amount is required.</span>
+                                <span *ngIf="allowance.amount.errors.min">Value must be 0 or greater.</span>
+                              </div>
+                            </div>
+                            <div class="col-lg-4 mb-3">
+                              <label>Type <span class="text-danger">*</span></label>
+                              <ng-select [items]="['fixed', 'percentage']"
+                                         formControlName="type"
+                                         placeholder="Select Type"
+                                         [ngClass]="{'is-invalid': submittedAllowance && allowance.type.errors, 'is-valid': submittedAllowance && allowance.type.valid}">
+                              </ng-select>
+                              <div class="invalid-feedback d-block" *ngIf="submittedAllowance && allowance.type.errors">
+                                <span *ngIf="allowance.type.errors.required">Type is required.</span>
+                              </div>
+                            </div>
+                            <div class="col-lg-4 mb-3">
+                              <label>Allowance <span class="text-danger">*</span></label>
+                              <ng-select [items]="allowances"
+                                         bindLabel="name"
+                                         bindValue="id"
+                                         formControlName="allowance_id"
+                                         placeholder="Select Allowance"
+                                         [ngClass]="{'is-invalid': submittedAllowance && allowance.allowance_id.errors, 'is-valid': submittedAllowance && allowance.allowance_id.valid}">
+                              </ng-select>
+                              <div class="invalid-feedback d-block" *ngIf="submittedAllowance && allowance.allowance_id.errors">
+                                <span *ngIf="allowance.allowance_id.errors.required">Allowance is required.</span>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="row">
+                            <div class="col-lg-4 mb-3">
+                              <label>Description</label>
+                              <input type="text" class="form-control" formControlName="description" placeholder="Enter Description (optional)">
+                            </div>
+                          </div>
+                          <div class="modal-footer">
+                            <button class="btn btn-secondary" type="button" (click)="closeAddAllowanceModal()">Cancel</button>
+                            <button class="btn btn-primary" type="submit" [disabled]="saving">
+                              <span *ngIf="saving" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                              Add Allowance
+                            </button>
+                          </div>
+                        </form>
+                      </div>
+                    </ng-template>
+
+                    <!-- Deductions Section (copy from Deductions step) -->
+                    <div class="card mb-4">
+                      <div class="card-header bg-warning text-dark fw-bold">Deductions</div>
+                      <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                          <h5>RSSB Deductions</h5>
+                          <button class="btn btn-primary" (click)="openAddRssbDeductionModal()" type="button" [disabled]="!isEditingStep[3]">+ Add Deduction</button>
+                        </div>
+                        <table class="table table-bordered">
+                          <thead>
+                            <tr>
+                              <th>Deduction Name</th>
+                              <th>Employee Contribution</th>
+                              <th>Employer Contribution</th>
+                              <th>Action</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr *ngFor="let deduction of employeeRssbDeductions; let i = index">
+                              <td>{{ deduction.rssb_name }}</td>
+                              <td>{{ deduction.rssb_employee_contribution }}</td>
+                              <td>{{ deduction.rssb_employer_contribution }}</td>
+                              <td>
+                                <button class="btn btn-danger btn-sm" (click)="removeRssbDeduction(i)" type="button" [disabled]="!isEditingStep[3]">Remove</button>
+                              </td>
+                            </tr>
+                            <tr *ngIf="employeeRssbDeductions && employeeRssbDeductions.length === 0">
+                              <td colspan="4" class="text-center">No RSSB deductions added.</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                        <!-- Add RSSB Deduction Modal (unchanged) -->
+                        <ng-template #addRssbDeductionModal>
+                          <div class="modal-header">
+                            <h5 class="modal-title">Add RSSB Deduction</h5>
+                            <button type="button" class="btn-close" (click)="closeAddRssbDeductionModal()"></button>
+                          </div>
+                          <div class="modal-body">
+                            <form [formGroup]="addRssbDeductionForm">
+                              <div class="mb-3">
+                                <label>Deduction</label>
+                                <ng-select [items]="rssbDeductions"
+                                           bindLabel="rssb_name"
+                                           bindValue="id"
+                                           formControlName="rssb_deduction_id"
+                                           placeholder="Select RSSB Deduction"
+                                           (change)="onRssbDeductionSelected()">
+                                </ng-select>
+                              </div>
+                              <div class="mb-3">
+                                <label>Employee Contribution</label>
+                                <input type="number" class="form-control" formControlName="employee_contribution" readonly>
+                              </div>
+                              <div class="mb-3">
+                                <label>Employer Contribution</label>
+                                <input type="number" class="form-control" formControlName="employer_contribution" readonly>
+                              </div>
+                            </form>
+                          </div>
+                          <div class="modal-footer">
+                            <button class="btn btn-secondary" (click)="closeAddRssbDeductionModal()" type="button">Cancel</button>
+                            <button class="btn btn-primary" (click)="addRssbDeduction()" [disabled]="addRssbDeductionForm.invalid" type="button">Add</button>
+                          </div>
+                        </ng-template>
+                        <hr/>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                          <h5>Other Deductions</h5>
+                          <button class="btn btn-primary" (click)="openAddOtherDeductionModal()" type="button" [disabled]="!isEditingStep[3]">+ Add Deduction</button>
+                        </div>
+                        <table class="table table-bordered">
+                          <thead>
+                            <tr>
+                              <th>Description</th>
+                              <th>Amount</th>
+                              <th>Type</th>
+                              <th>Deduction Name</th>
+                              <th>Action</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr *ngFor="let deduction of employeeOtherDeductions; let i = index">
+                              <td>{{ deduction.description }}</td>
+                              <td>{{ deduction.amount }}</td>
+                              <td>{{ deduction.type }}</td>
+                              <td>{{ getDeductionName(deduction.deduction_id) }}</td>
+                              <td>
+                                <button class="btn btn-warning btn-sm me-1" (click)="openEditOtherDeductionModal(deduction, i)" type="button" [disabled]="!isEditingStep[3]">Modify</button>
+                                <button class="btn btn-danger btn-sm" (click)="removeOtherDeduction(i)" type="button" [disabled]="!isEditingStep[3]">Remove</button>
+                              </td>
+                            </tr>
+                            <tr *ngIf="employeeOtherDeductions && employeeOtherDeductions.length === 0">
+                              <td colspan="5" class="text-center">No other deductions added.</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                        <!-- Add Other Deduction Modal (unchanged) -->
+                        <ng-template #addOtherDeductionModal>
+                          <div class="modal-header">
+                            <h5 class="modal-title">Add Other Deduction</h5>
+                            <button type="button" class="btn-close" (click)="closeAddOtherDeductionModal()"></button>
+                          </div>
+                          <div class="modal-body">
+                            <form [formGroup]="addOtherDeductionForm">
+                              <div class="mb-3">
+                                <label>Description</label>
+                                <input type="text" class="form-control" formControlName="description" placeholder="Enter Description (optional)">
+                              </div>
+                              <div class="mb-3">
+                                <label>Amount <span class="text-danger">*</span></label>
+                                <input type="number" class="form-control" formControlName="amount" min="0" step="0.01" placeholder="Enter Amount">
+                              </div>
+                              <div class="mb-3">
+                                <label>Type <span class="text-danger">*</span></label>
+                                <ng-select [items]="['fixed', 'percentage']"
+                                           formControlName="type"
+                                           placeholder="Select Type">
+                                </ng-select>
+                              </div>
+                              <div class="mb-3">
+                                <label>Deduction <span class="text-danger">*</span></label>
+                                <ng-select [items]="otherDeductions"
+                                           bindLabel="deduction_name"
+                                           bindValue="id"
+                                           formControlName="deduction_id"
+                                           placeholder="Select Deduction"
+                                           (change)="onOtherDeductionSelected()">
+                                </ng-select>
+                              </div>
+                            </form>
+                          </div>
+                          <div class="modal-footer">
+                            <button class="btn btn-secondary" (click)="closeAddOtherDeductionModal()" type="button">Cancel</button>
+                            <button class="btn btn-primary" (click)="addOtherDeduction()" [disabled]="addOtherDeductionForm.invalid" type="button">Add</button>
+                          </div>
+                        </ng-template>
+                        <!-- Edit Other Deduction Modal (unchanged) -->
+                        <ng-template #editOtherDeductionModal>
+                          <div class="modal-header">
+                            <h5 class="modal-title">Edit Other Deduction</h5>
+                            <button type="button" class="btn-close" (click)="closeEditOtherDeductionModal()"></button>
+                          </div>
+                          <div class="modal-body">
+                            <form [formGroup]="editOtherDeductionForm">
+                              <div class="mb-3">
+                                <label>Description</label>
+                                <input type="text" class="form-control" formControlName="description" placeholder="Enter Description (optional)">
+                              </div>
+                              <div class="mb-3">
+                                <label>Amount <span class="text-danger">*</span></label>
+                                <input type="number" class="form-control" formControlName="amount" min="0" step="0.01" placeholder="Enter Amount">
+                              </div>
+                              <div class="mb-3">
+                                <label>Type <span class="text-danger">*</span></label>
+                                <ng-select [items]="['fixed', 'percentage']"
+                                           formControlName="type"
+                                           placeholder="Select Type">
+                                </ng-select>
+                              </div>
+                              <div class="mb-3">
+                                <label>Deduction <span class="text-danger">*</span></label>
+                                <ng-select [items]="otherDeductions"
+                                           bindLabel="deduction_name"
+                                           bindValue="id"
+                                           formControlName="deduction_id"
+                                           placeholder="Select Deduction">
+                                </ng-select>
+                              </div>
+                            </form>
+                          </div>
+                          <div class="modal-footer">
+                            <button class="btn btn-secondary" (click)="closeEditOtherDeductionModal()" type="button">Cancel</button>
+                            <button class="btn btn-primary" (click)="updateOtherDeduction()" [disabled]="editOtherDeductionForm.invalid || saving" type="button">
+                              <span *ngIf="saving" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                              Update
+                            </button>
+                          </div>
+                        </ng-template>
+                        <hr/>
+                        <ul class="list-inline wizard d-flex justify-content-end mb-0">
+                          <li class="previous list-inline-item" aria-disabled="true">
+                            <button class="btn btn-primary" cdkStepperPrevious [disabled]="saving" type="button">
+                              <span *ngIf="saving" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                              <i class="mdi mdi-arrow-left me-1" *ngIf="!saving"></i> Previous
+                            </button>
+                          </li>
+                          <li class="next list-inline-item" aria-disabled="false">
+                            <button *ngIf="!isEditingStep[3]" class="btn btn-primary" type="button" (click)="onEditStep(3)">Edit</button>
+                            <button *ngIf="isEditingStep[3]" class="btn btn-success me-2" type="button" (click)="onUpdateStep(3)">Update</button>
+                            <button *ngIf="isEditingStep[3]" class="btn btn-outline-danger me-2" type="button" (click)="onCancelEditStep(3)">Cancel</button>
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
                   </section>
                 </cdk-step>
   
-                <!-- Step 5: Deductions -->
+                <!-- Step 5: Bank Information -->
                 <cdk-step [optional]="true">
                   <ng-template cdkStepLabel>
                     <span class="number">5.</span>
-                    <span>Deductions</span>
-                  </ng-template>
-                  <section *ngIf="cdkStepper.selectedIndex === 4">
-                   <div>
-                      <div class="d-flex justify-content-between align-items-center mb-2">
-                        <h5>RSSB Deductions</h5>
-                        <button class="btn btn-primary" (click)="openAddRssbDeductionModal()" type="button" [disabled]="!isEditingStep[4]">+ Add Deduction</button>
-                      </div>
-                      <table class="table table-bordered">
-                        <thead>
-                          <tr>
-                            <th>Deduction Name</th>
-                            <th>Employee Contribution</th>
-                            <th>Employer Contribution</th>
-                            <th>Action</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <tr *ngFor="let deduction of employeeRssbDeductions; let i = index">
-                            <td>{{ deduction.rssb_name }}</td>
-                            <td>{{ deduction.rssb_employee_contribution }}</td>
-                            <td>{{ deduction.rssb_employer_contribution }}</td>
-                            <td>
-                             <button class="btn btn-danger btn-sm" (click)="removeRssbDeduction(i)" type="button" [disabled]="!isEditingStep[4]">Remove</button>
-                            </td>
-                          </tr>
-                          <tr *ngIf="employeeRssbDeductions.length === 0">
-                            <td colspan="4" class="text-center">No RSSB deductions added.</td>
-                          </tr>
-                        </tbody>
-                      </table>
-                      <!-- Add RSSB Deduction Modal -->
-                      <ng-template #addRssbDeductionModal>
-                        <div class="modal-header">
-                          <h5 class="modal-title">Add RSSB Deduction</h5>
-                          <button type="button" class="btn-close" (click)="closeAddRssbDeductionModal()"></button>
-                        </div>
-                        <div class="modal-body">
-                          <form [formGroup]="addRssbDeductionForm">
-                            <div class="mb-3">
-                              <label>Deduction</label>
-                              <ng-select [items]="rssbDeductions"
-                                         bindLabel="rssb_name"
-                                         bindValue="id"
-                                         formControlName="rssb_deduction_id"
-                                         placeholder="Select RSSB Deduction"
-                                         (change)="onRssbDeductionSelected()">
-                              </ng-select>
-                            </div>
-                            <div class="mb-3">
-                              <label>Employee Contribution</label>
-                              <input type="number" class="form-control" formControlName="employee_contribution" readonly>
-                            </div>
-                            <div class="mb-3">
-                              <label>Employer Contribution</label>
-                              <input type="number" class="form-control" formControlName="employer_contribution" readonly>
-                            </div>
-                          </form>
-                        </div>
-                        <div class="modal-footer">
-                          <button class="btn btn-secondary" (click)="closeAddRssbDeductionModal()" type="button">Cancel</button>
-                          <button class="btn btn-primary" (click)="addRssbDeduction()" [disabled]="addRssbDeductionForm.invalid" type="button">Add</button>
-                        </div>
-                      </ng-template>
-                      <hr/>
-                      <div class="d-flex justify-content-between align-items-center mb-2">
-                        <h5>Other Deductions</h5>
-                        <button class="btn btn-primary" (click)="openAddOtherDeductionModal()" type="button" [disabled]="!isEditingStep[4]">+ Add Deduction</button>
-                      </div>
-                      <table class="table table-bordered">
-                        <thead>
-                          <tr>
-                            <th>Description</th>
-                            <th>Amount</th>
-                            <th>Type</th>
-                            <th>Deduction Name</th>
-                            <th>Action</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <tr *ngFor="let deduction of employeeOtherDeductions; let i = index">
-                            <td>{{ deduction.description }}</td>
-                            <td>{{ deduction.amount }}</td>
-                            <td>{{ deduction.type }}</td>
-                            <td>{{ getDeductionName(deduction.deduction_id) }}</td>
-                            <td>
-                              <button class="btn btn-warning btn-sm me-1" (click)="openEditOtherDeductionModal(deduction, i)" type="button" [disabled]="!isEditingStep[4]">Modify</button>
-                              <button class="btn btn-danger btn-sm" (click)="removeOtherDeduction(i)" type="button" [disabled]="!isEditingStep[4]">Remove</button>
-                            </td>
-                          </tr>
-                          <tr *ngIf="employeeOtherDeductions.length === 0">
-                            <td colspan="5" class="text-center">No other deductions added.</td>
-                          </tr>
-                        </tbody>
-                      </table>
-                      <!-- Add Other Deduction Modal -->
-                      <ng-template #addOtherDeductionModal>
-                        <div class="modal-header">
-                          <h5 class="modal-title">Add Other Deduction</h5>
-                          <button type="button" class="btn-close" (click)="closeAddOtherDeductionModal()"></button>
-                        </div>
-                        <div class="modal-body">
-                          <form [formGroup]="addOtherDeductionForm">
-                            <div class="mb-3">
-                              <label>Description</label>
-                              <input type="text" class="form-control" formControlName="description" placeholder="Enter Description (optional)">
-                            </div>
-                            <div class="mb-3">
-                              <label>Amount <span class="text-danger">*</span></label>
-                              <input type="number" class="form-control" formControlName="amount" min="0" step="0.01" placeholder="Enter Amount">
-                            </div>
-                            <div class="mb-3">
-                              <label>Type <span class="text-danger">*</span></label>
-                              <ng-select [items]="['fixed', 'percentage']"
-                                         formControlName="type"
-                                         placeholder="Select Type">
-                              </ng-select>
-                            </div>
-                            <div class="mb-3">
-                              <label>Deduction <span class="text-danger">*</span></label>
-                              <ng-select [items]="otherDeductions"
-                                         bindLabel="deduction_name"
-                                         bindValue="id"
-                                         formControlName="deduction_id"
-                                         placeholder="Select Deduction"
-                                         (change)="onOtherDeductionSelected()">
-                              </ng-select>
-                            </div>
-                          </form>
-                        </div>
-                        <div class="modal-footer">
-                          <button class="btn btn-secondary" (click)="closeAddOtherDeductionModal()" type="button">Cancel</button>
-                          <button class="btn btn-primary" (click)="addOtherDeduction()" [disabled]="addOtherDeductionForm.invalid" type="button">Add</button>
-                        </div>
-                      </ng-template>
-                      
-                      <!-- Edit Other Deduction Modal -->
-                      <ng-template #editOtherDeductionModal>
-                        <div class="modal-header">
-                          <h5 class="modal-title">Edit Other Deduction</h5>
-                          <button type="button" class="btn-close" (click)="closeEditOtherDeductionModal()"></button>
-                        </div>
-                        <div class="modal-body">
-                          <form [formGroup]="editOtherDeductionForm">
-                            <div class="mb-3">
-                              <label>Description</label>
-                              <input type="text" class="form-control" formControlName="description" placeholder="Enter Description (optional)">
-                            </div>
-                            <div class="mb-3">
-                              <label>Amount <span class="text-danger">*</span></label>
-                              <input type="number" class="form-control" formControlName="amount" min="0" step="0.01" placeholder="Enter Amount">
-                            </div>
-                            <div class="mb-3">
-                              <label>Type <span class="text-danger">*</span></label>
-                              <ng-select [items]="['fixed', 'percentage']"
-                                         formControlName="type"
-                                         placeholder="Select Type">
-                              </ng-select>
-                            </div>
-                            <div class="mb-3">
-                              <label>Deduction <span class="text-danger">*</span></label>
-                              <ng-select [items]="otherDeductions"
-                                         bindLabel="deduction_name"
-                                         bindValue="id"
-                                         formControlName="deduction_id"
-                                         placeholder="Select Deduction">
-                              </ng-select>
-                            </div>
-                          </form>
-                        </div>
-                        <div class="modal-footer">
-                          <button class="btn btn-secondary" (click)="closeEditOtherDeductionModal()" type="button">Cancel</button>
-                          <button class="btn btn-primary" (click)="updateOtherDeduction()" [disabled]="editOtherDeductionForm.invalid || saving" type="button">
-                            <span *ngIf="saving" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                            Update
-                          </button>
-                        </div>
-                      </ng-template>
-                      <hr/>
-                      <ul class="list-inline wizard d-flex justify-content-end mb-0">
-                        <li class="previous list-inline-item" aria-disabled="true">
-                          <button class="btn btn-primary" cdkStepperPrevious [disabled]="saving" type="button">
-                            <span *ngIf="saving" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                            <i class="mdi mdi-arrow-left me-1" *ngIf="!saving"></i> Previous
-                          </button>
-                        </li>
-                        <li class="next list-inline-item" aria-disabled="false">
-                          <button *ngIf="!isEditingStep[4]" class="btn btn-primary" type="button" (click)="onEditStep(4)">Edit</button>
-                          <button *ngIf="isEditingStep[4]" class="btn btn-success me-2" type="button" (click)="onUpdateStep(4)">Update</button>
-                          <button *ngIf="isEditingStep[4]" class="btn btn-outline-danger me-2" type="button" (click)="onCancelEditStep(4)">Cancel</button>
-                          <!-- <button *ngIf="!isEditingStep[4]" class="btn btn-primary" type="button" (click)="cdkStepper.next()">Next</button> -->
-                        </li>
-                      </ul>
-                   </div>
-                  </section>
-                </cdk-step>
-  
-                <!-- Step 6: Bank Information -->
-                <cdk-step [optional]="true">
-                  <ng-template cdkStepLabel>
-                    <span class="number">6.</span>
                     <span>Bank Info</span>
                   </ng-template>
-                  <section *ngIf="cdkStepper.selectedIndex === 5">
+                  <section *ngIf="cdkStepper.selectedIndex === 4">
                     <form [formGroup]="bankInfoForm" novalidate>
                       <div class="row">
                         <div class="col-lg-4 mb-3">
@@ -727,22 +762,22 @@
                           </button>
                         </li>
                         <li class="next list-inline-item" aria-disabled="false">
-                          <button *ngIf="!isEditingStep[5]" class="btn btn-primary" type="button" (click)="onEditStep(5)">Edit</button>
-                          <button *ngIf="isEditingStep[5]" class="btn btn-success me-2" type="button" (click)="onUpdateStep(5)">Update</button>
-                          <button *ngIf="isEditingStep[5]" class="btn btn-outline-danger" type="button" (click)="onCancelEditStep(5)">Cancel</button>
+                          <button *ngIf="!isEditingStep[4]" class="btn btn-primary" type="button" (click)="onEditStep(4)">Edit</button>
+                          <button *ngIf="isEditingStep[4]" class="btn btn-success me-2" type="button" (click)="onUpdateStep(4)">Update</button>
+                          <button *ngIf="isEditingStep[4]" class="btn btn-outline-danger" type="button" (click)="onCancelEditStep(4)">Cancel</button>
                         </li>
                       </ul>
                     </form>
                   </section>
                 </cdk-step>
 
-                <!-- Step 7: Employee Address -->
+                <!-- Step 6: Employee Address -->
                 <cdk-step [optional]="true">
                   <ng-template cdkStepLabel>
-                    <span class="number">7.</span>
+                    <span class="number">6.</span>
                     <span>Address</span>
                   </ng-template>
-                  <section *ngIf="cdkStepper.selectedIndex === 6">
+                  <section *ngIf="cdkStepper.selectedIndex === 5">
                     <form [formGroup]="employeeAddressForm" novalidate>
                       <div class="row">
                         <div class="col-lg-4 mb-3">
@@ -869,22 +904,22 @@
                           </button>
                         </li>
                         <li class="next list-inline-item" aria-disabled="false">
-                          <button *ngIf="!isEditingStep[6]" class="btn btn-primary" type="button" (click)="onEditStep(6)">Edit</button>
-                          <button *ngIf="isEditingStep[6]" class="btn btn-success me-2" type="button" (click)="onUpdateStep(6)">Update</button>
-                          <button *ngIf="isEditingStep[6]" class="btn btn-outline-danger" type="button" (click)="onCancelEditStep(6)">Cancel</button>
+                          <button *ngIf="!isEditingStep[5]" class="btn btn-primary" type="button" (click)="onEditStep(5)">Edit</button>
+                          <button *ngIf="isEditingStep[5]" class="btn btn-success me-2" type="button" (click)="onUpdateStep(5)">Update</button>
+                          <button *ngIf="isEditingStep[5]" class="btn btn-outline-danger" type="button" (click)="onCancelEditStep(5)">Cancel</button>
                         </li>
                       </ul>
                     </form>
                   </section>
                 </cdk-step>
 
-                <!-- Step 8: Emergency -->
+                <!-- Step 7: Emergency -->
                 <cdk-step [optional]="true">
                   <ng-template cdkStepLabel>
-                    <span class="number">8.</span>
+                    <span class="number">7.</span>
                     <span>Emergency</span>
                   </ng-template>
-                  <section *ngIf="cdkStepper.selectedIndex === 7">
+                  <section *ngIf="cdkStepper.selectedIndex === 6">
                     <form [formGroup]="emergencyContactForm" novalidate>
                       <div class="row">
                         <div class="col-lg-4 mb-3">
@@ -927,22 +962,22 @@
                           </button>
                         </li>
                         <li class="next list-inline-item" aria-disabled="false">
-                          <button *ngIf="!isEditingStep[7]" class="btn btn-primary" type="button" (click)="onEditStep(7)">Edit</button>
-                          <button *ngIf="isEditingStep[7]" class="btn btn-success me-2" type="button" (click)="onUpdateStep(7)">Update</button>
-                          <button *ngIf="isEditingStep[7]" class="btn btn-outline-danger" type="button" (click)="onCancelEditStep(7)">Cancel</button>
+                          <button *ngIf="!isEditingStep[6]" class="btn btn-primary" type="button" (click)="onEditStep(6)">Edit</button>
+                          <button *ngIf="isEditingStep[6]" class="btn btn-success me-2" type="button" (click)="onUpdateStep(6)">Update</button>
+                          <button *ngIf="isEditingStep[6]" class="btn btn-outline-danger" type="button" (click)="onCancelEditStep(6)">Cancel</button>
                         </li>
                       </ul>
                     </form>
                   </section>
                 </cdk-step>
   
-                <!-- Step 9: Documents -->
+                <!-- Step 8: Documents -->
                 <cdk-step [optional]="true">
                   <ng-template cdkStepLabel>
-                    <span class="number">9.</span>
+                    <span class="number">8.</span>
                     <span>Documents</span>
                   </ng-template>
-                  <section *ngIf="cdkStepper.selectedIndex === 8">
+                  <section *ngIf="cdkStepper.selectedIndex === 7">
                     <form [formGroup]="documentsForm" novalidate>
                       <div class="row">
                         <div class="col-lg-4 mb-3">
@@ -984,9 +1019,9 @@
                           </button>
                         </li>
                         <li class="next list-inline-item" aria-disabled="false">
-                          <button *ngIf="!isEditingStep[8]" class="btn btn-primary" type="button" (click)="onEditStep(8)">Edit</button>
-                          <button *ngIf="isEditingStep[8]" class="btn btn-success me-2" type="button" (click)="onUpdateStep(8)">Update</button>
-                          <button *ngIf="isEditingStep[8]" class="btn btn-outline-danger" type="button" (click)="onCancelEditStep(8)">Cancel</button>
+                          <button *ngIf="!isEditingStep[7]" class="btn btn-primary" type="button" (click)="onEditStep(7)">Edit</button>
+                          <button *ngIf="isEditingStep[7]" class="btn btn-success me-2" type="button" (click)="onUpdateStep(7)">Update</button>
+                          <button *ngIf="isEditingStep[7]" class="btn btn-outline-danger" type="button" (click)="onCancelEditStep(7)">Cancel</button>
                         </li>
                       </ul>
                     </form>

@@ -37,4 +37,26 @@ export class PayrollService {
   generatePayroll(payload?: any): Observable<PayrollResponse> {
     return this.http.post<PayrollResponse>(`${this.apiUrl}/payroll/generate`, payload || {});
   }
+
+  getPayrolls(page: number = 1): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/payroll?page=${page}`);
+  }
+
+  getPayrollDetails(payrollId: string): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/payroll/payslips/${payrollId}`);
+  }
+
+  deletePayslip(id: string): Observable<any> {
+    return this.http.delete<any>(`${this.apiUrl}/payroll/payslip/${id}`);
+  }
+
+  regeneratePayroll(payrollId: string): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/payroll/${payrollId}/refresh`, {});
+  }
+
+  deletePayroll(id: string): Observable<any> {
+    return this.http.delete<any>(`${this.apiUrl}/payroll/${id}`);
+  }
+
+  
 } 

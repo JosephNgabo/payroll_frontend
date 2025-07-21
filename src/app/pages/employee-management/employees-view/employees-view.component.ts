@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { EmployeeInformationService } from 'src/app/core/services/employee-information.service';
 import { EmployeeInformation } from 'src/app/core/models/employee-information.model';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-employees-view',
@@ -41,5 +42,37 @@ export class EmployeesViewComponent implements OnInit {
           console.error('API error:', err);
         }
       });
+  }
+
+  onDelete(emp: EmployeeInformation) {
+    console.log('Deleting employee:', emp);
+    if (!emp || !emp.id) return;
+    const empName = (emp as any).name || (emp as any).full_name ||
+      ((emp as any).first_name && (emp as any).last_name
+        ? `${(emp as any).first_name} ${(emp as any).last_name}`
+        : 'Unknown');
+    Swal.fire({
+      title: 'Are you sure?',
+      html: `This action will permanently delete the employee: <b>${empName}</b>.`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Yes, delete it!'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.employeeInformationService.deleteEmployee(emp.id).subscribe({
+          next: () => {
+            this.employeeList = this.employeeList.filter(e => e.id !== emp.id);
+            this.totalItems--;
+            Swal.fire('Deleted!', `Employee <b>${empName}</b> has been deleted.`, 'success');
+          },
+          error: (err) => {
+            console.error('Failed to delete employee:', err);
+            Swal.fire('Error', 'Failed to delete employee.', 'error');
+          }
+        });
+      }
+    });
   }
 }

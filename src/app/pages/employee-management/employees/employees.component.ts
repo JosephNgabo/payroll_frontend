@@ -132,6 +132,8 @@ export class EmployeesComponent implements OnInit {
   selectedOtherDeduction: any = null;
 
   @ViewChild('addRssbDeductionModal') addRssbDeductionModal: any;
+  addAllowanceModalRef: BsModalRef | undefined;
+  @ViewChild('addAllowanceModal') addAllowanceModal: any;
 
   selectedDocumentFile: File | null = null;
 
@@ -142,6 +144,9 @@ export class EmployeesComponent implements OnInit {
   totalItems = 0;
   lastPage = 1;
   employeeList: EmployeeInformation[] = [];
+  employeeAllowances: any[] = [];
+  savingNext: boolean = false;
+  savingPrevious: boolean = false;
 
   constructor(
     private modalService: BsModalService,
@@ -298,11 +303,11 @@ export class EmployeesComponent implements OnInit {
     });
 
     this.emergencyContactForm = this.formBuilder.group({
-      name: [''],
-      gender: [''],
-      relationship: [''],
-      phone: [''],
-      email: ['']
+      name: ['', Validators.required],
+      gender: ['', Validators.required],
+      relationship: ['', Validators.required],
+      phone: ['', Validators.required],
+      email: [''] // Optional
     });
 
     // Simulate loading delay
@@ -560,10 +565,23 @@ export class EmployeesComponent implements OnInit {
     if (this.basicInfoForm.invalid) {
       return;
     }
-    // Advance the stepper (assume cdkStepper is available via ViewChild)
-    if (this.cdkStepper) {
-      this.cdkStepper.next();
-    }
+    this.savingNext = true;
+    setTimeout(() => {
+      this.savingNext = false;
+      if (this.cdkStepper) {
+        this.cdkStepper.next();
+      }
+    }, 1500);
+  }
+
+  onPreviousStep() {
+    this.savingPrevious = true;
+    setTimeout(() => {
+      this.savingPrevious = false;
+      if (this.cdkStepper) {
+        this.cdkStepper.previous();
+      }
+    }, 500);
   }
 
   get legalContactsInfo() {
@@ -575,7 +593,7 @@ export class EmployeesComponent implements OnInit {
     if (this.legalContactsInfoForm.invalid || this.basicInfoForm.invalid) {
       return;
     }
-    this.saving = true;
+    this.savingNext = true;
     // Map form values to API structure
     const basic = this.basicInfoForm.value;
     const legal = this.legalContactsInfoForm.value;
@@ -593,7 +611,7 @@ export class EmployeesComponent implements OnInit {
       document_type: legal.documentType,
       document_number: legal.documentNumber,
       document_issue_date: legal.documentIssueDate,
-      document_place_of_issue: legal.placeOfIssue,
+      document_place_of_issue: (legal.placeOfIssue ?? '').toString(),
       rssb_number: legal.rssbNumber,
       highest_education: legal.highestEducation,
       personal_mobile: basic.personalMobile,
@@ -602,7 +620,7 @@ export class EmployeesComponent implements OnInit {
     };
     this.employeeInformationService.createEmployeeInformation(payload).subscribe({
       next: (res: any) => {
-        this.saving = false;
+        this.savingNext = false;
         console.log('Employee creation response:', res);
         if (res && res.data && res.data.id) {
           this.employeeId = res.data.id;
@@ -612,7 +630,7 @@ export class EmployeesComponent implements OnInit {
         }
       },
       error: (err) => {
-        this.saving = false;
+        this.savingNext = false;
         // Optionally show error feedback
         console.error('Failed to submit employee information', err);
       }
@@ -633,21 +651,21 @@ export class EmployeesComponent implements OnInit {
       console.error('Employee ID is missing. Cannot submit contract info.');
       return;
     }
+    this.savingNext = true;
     const contract: EmployeeContract = {
       ...this.contractInfoForm.value,
       employee_id: this.employeeId
     };
-    this.saving = true;
     this.employeeContractService.createContract(this.employeeId, contract).subscribe({
       next: (res) => {
-        this.saving = false;
+        this.savingNext = false;
         // Handle success, go to next tab
         if (this.cdkStepper) {
           this.cdkStepper.next();
         }
       },
       error: (err) => {
-        this.saving = false;
+        this.savingNext = false;
         // Optionally show error feedback
         console.error('Failed to submit contract information', err);
       }
@@ -660,34 +678,35 @@ export class EmployeesComponent implements OnInit {
 
   onAllowanceSubmit() {
     this.submittedAllowance = true;
-    if (this.allowanceForm.invalid) {
+    if (this.allowanceForm.invalid || !this.employeeId) {
       return;
     }
-    if (!this.employeeId) {
-      console.error('Employee ID is missing. Cannot submit allowance info.');
-      return;
-    }
-    const allowance: EmployeeAllowance = {
-      name: this.allowanceForm.value.name,
-      amount: this.allowanceForm.value.amount,
-      type: this.allowanceForm.value.type,
-      allowance_id: this.allowanceForm.value.allowance_id,
-      description: this.allowanceForm.value.description
-    };
-    this.saving = true;
-    this.employeeAllowanceService.createEmployeeAllowance(this.employeeId, allowance).subscribe({
+    this.savingNext = true;
+    this.employeeAllowanceService.createEmployeeAllowance(this.employeeId, this.allowanceForm.value).subscribe({
       next: (res) => {
-        this.saving = false;
-        if (this.cdkStepper) {
-          this.cdkStepper.next();
+        this.savingNext = false;
+        if (res && res.data) {
+          this.employeeAllowances.push(res.data);
+        } else {
+          this.employeeAllowances.push({ ...this.allowanceForm.value });
         }
+        this.closeAddAllowanceModal();
+        this.submittedAllowance = false;
+        this.allowanceForm.reset();
       },
       error: (err) => {
-        this.saving = false;
-        // The error interceptor will handle displaying errors
-        console.error('Failed to submit allowance information', err);
+        this.savingNext = false;
+        Swal.fire({
+          icon: 'error',
+          title: 'Failed to add allowance',
+          text: 'Please try again.',
+        });
       }
     });
+  }
+
+  removeAllowance(index: number) {
+    this.employeeAllowances.splice(index, 1);
   }
 
   get rssbDeduction() {
@@ -699,20 +718,20 @@ export class EmployeesComponent implements OnInit {
     if (this.rssbDeductionForm.invalid || !this.employeeId) {
       return;
     }
+    this.savingNext = true;
     const contribution: EmployeeRssbContribution = {
       ...this.rssbDeductionForm.value
     };
-    this.saving = true;
     this.employeeRssbContributionService.createRssbContribution(this.employeeId, contribution).subscribe({
       next: (res) => {
-        this.saving = false;
+        this.savingNext = false;
         // Optionally go to next section or show success
         if (this.cdkStepper) {
           this.cdkStepper.next();
         }
       },
       error: (err) => {
-        this.saving = false;
+        this.savingNext = false;
         // Error interceptor will handle errors
       }
     });
@@ -727,22 +746,22 @@ export class EmployeesComponent implements OnInit {
     if (this.otherDeductionForm.invalid || !this.employeeId) {
       return;
     }
+    this.savingNext = true;
     const deduction: EmployeeDeduction = {
       amount: this.otherDeductionForm.value.amount,
       type: this.otherDeductionForm.value.type,
       deduction_id: this.otherDeductionForm.value.deduction_id
     };
-    this.saving = true;
     this.employeeDeductionService.createEmployeeDeduction(this.employeeId, deduction).subscribe({
       next: (res) => {
-        this.saving = false;
+        this.savingNext = false;
         // Optionally go to next section or show success
         if (this.cdkStepper) {
           this.cdkStepper.next();
         }
       },
       error: (err) => {
-        this.saving = false;
+        this.savingNext = false;
         // Error interceptor will handle errors
       }
     });
@@ -781,7 +800,7 @@ export class EmployeesComponent implements OnInit {
       return;
     }
     
-    this.saving = true;
+    this.savingNext = true;
     
     // Create RSSB deductions
     const rssbRequests = this.employeeRssbDeductions.map(deduction => {
@@ -806,7 +825,7 @@ export class EmployeesComponent implements OnInit {
     
     forkJoin(allRequests).subscribe({
       next: (results) => {
-        this.saving = false;
+        this.savingNext = false;
         Swal.fire({
           icon: 'success',
           title: 'Deductions Saved',
@@ -820,7 +839,7 @@ export class EmployeesComponent implements OnInit {
         });
       },
       error: (err) => {
-        this.saving = false;
+        this.savingNext = false;
         console.error('Error saving deductions:', err);
         Swal.fire({
           icon: 'error',
@@ -840,6 +859,7 @@ export class EmployeesComponent implements OnInit {
     if (this.bankInfoForm.invalid || !this.employeeId) {
       return;
     }
+    this.savingNext = true;
     const bankInfo: EmployeeBankInfo = {
       bank_name: this.bankInfoForm.value.bank_name,
       account_number: this.bankInfoForm.value.account_number,
@@ -847,17 +867,16 @@ export class EmployeesComponent implements OnInit {
       iban: this.bankInfoForm.value.iban,
       swift_code: this.bankInfoForm.value.swift_code
     };
-    this.saving = true;
     this.employeeBankInfoService.createEmployeeBankInfo(this.employeeId, bankInfo).subscribe({
       next: (res) => {
-        this.saving = false;
+        this.savingNext = false;
         // Optionally go to next section or show success
         if (this.cdkStepper) {
           this.cdkStepper.next();
         }
       },
       error: (err) => {
-        this.saving = false;
+        this.savingNext = false;
         // Error interceptor will handle errors
       }
     });
@@ -872,6 +891,7 @@ export class EmployeesComponent implements OnInit {
     if (this.employeeAddressForm.invalid || !this.employeeId) {
       return;
     }
+    this.savingNext = true;
     const address: EmployeeAddress = {
       type: this.employeeAddressForm.value.type,
       country: this.employeeAddressForm.value.country,
@@ -885,17 +905,16 @@ export class EmployeesComponent implements OnInit {
       postal_code: this.employeeAddressForm.value.postal_code,
       street_address: this.employeeAddressForm.value.street_address
     };
-    this.saving = true;
     this.employeeAddressService.createEmployeeAddress(this.employeeId, address).subscribe({
       next: (res) => {
-        this.saving = false;
+        this.savingNext = false;
         // Optionally go to next section or show success
         if (this.cdkStepper) {
           this.cdkStepper.next();
         }
       },
       error: (err) => {
-        this.saving = false;
+        this.savingNext = false;
         // Error interceptor will handle errors
       }
     });
@@ -928,24 +947,22 @@ export class EmployeesComponent implements OnInit {
     if (this.documentsForm.invalid || !this.employeeId || !this.selectedDocumentFile) {
       return;
     }
-
+    this.savingNext = true;
     const formData = new FormData();
     formData.append('document_type_id', this.documentsForm.value.document_type_id);
     formData.append('description', this.documentsForm.value.description || '');
     formData.append('expiration_date', this.documentsForm.value.expiration_date || '');
     formData.append('document', this.selectedDocumentFile); // The actual file
-
-    this.saving = true;
     this.employeeDocumentService.createEmployeeDocument(this.employeeId, formData).subscribe({
       next: (res) => {
-        this.saving = false;
+        this.savingNext = false;
         // Optionally go to next section or show success
     if (this.cdkStepper) {
       this.cdkStepper.next();
     }
       },
       error: (err) => {
-        this.saving = false;
+        this.savingNext = false;
         // Error interceptor will handle errors
       }
     });
@@ -956,10 +973,6 @@ export class EmployeesComponent implements OnInit {
   }
 
   onEmergencyContactSubmit() {
-    this.submittedEmergencyContact = true;
-    if (this.emergencyContactForm.invalid || !this.employeeId) {
-      return;
-    }
     const contact: EmployeeEmergencyContact = {
       name: this.emergencyContactForm.value.name,
       gender: this.emergencyContactForm.value.gender,
@@ -967,20 +980,40 @@ export class EmployeesComponent implements OnInit {
       phone: this.emergencyContactForm.value.phone,
       email: this.emergencyContactForm.value.email
     };
-    this.saving = true;
+    // If all fields are empty or null, do not call the API
+    const allEmpty = Object.values(contact).every(v => v === null || v === undefined || v === '');
+    if (allEmpty) {
+      return;
+    }
+    this.submittedEmergencyContact = true;
+    if (this.emergencyContactForm.invalid || !this.employeeId) {
+      return;
+    }
+    this.savingNext = true;
     this.employeeEmergencyContactService.createEmployeeEmergencyContact(this.employeeId, contact).subscribe({
       next: (res) => {
-        this.saving = false;
+        this.savingNext = false;
         // Optionally go to next section or show success
         if (this.cdkStepper) {
           this.cdkStepper.next();
         }
       },
       error: (err) => {
-        this.saving = false;
+        this.savingNext = false;
         // Error interceptor will handle errors
       }
     });
+  }
+
+  onSkipEmergency() {
+    this.savingNext = true;
+    this.emergencyContactForm.reset();
+    setTimeout(() => {
+      this.savingNext = false;
+      if (this.cdkStepper) {
+        this.cdkStepper.next();
+      }
+    }, 500);
   }
 
   get f() { return this.contractInfo.controls; }
@@ -1116,6 +1149,17 @@ export class EmployeesComponent implements OnInit {
 
   removeOtherDeduction(index: number) {
     this.employeeOtherDeductions.splice(index, 1);
+  }
+
+  openAddAllowanceModal() {
+    this.allowanceForm.reset();
+    this.addAllowanceModalRef = this.modalService.show(this.addAllowanceModal);
+  }
+
+  closeAddAllowanceModal() {
+    if (this.addAllowanceModalRef) {
+      this.addAllowanceModalRef.hide();
+    }
   }
 
   fetchEmployees(page: number) {

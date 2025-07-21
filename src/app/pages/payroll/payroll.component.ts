@@ -32,8 +32,6 @@ interface PayrollEmployee extends PayrollData {
 export class PayrollComponent implements OnInit {
   // Filters
   searchTerm: string = '';
-  selectedPaymentPeriod: string = '';
-  paymentPeriods: string[] = [];
   selectedStatus: string = '';
   statusOptions = [
     { label: 'All Status', value: '' },
@@ -41,6 +39,25 @@ export class PayrollComponent implements OnInit {
     { label: 'Pending', value: 'PENDING' },
     { label: 'Reject', value: 'REJECT' }
   ];
+
+  // Month/Year selection
+  monthOptions = [
+    { label: 'January', value: 1 },
+    { label: 'February', value: 2 },
+    { label: 'March', value: 3 },
+    { label: 'April', value: 4 },
+    { label: 'May', value: 5 },
+    { label: 'June', value: 6 },
+    { label: 'July', value: 7 },
+    { label: 'August', value: 8 },
+    { label: 'September', value: 9 },
+    { label: 'October', value: 10 },
+    { label: 'November', value: 11 },
+    { label: 'December', value: 12 }
+  ];
+  yearOptions: { label: string, value: number }[] = [];
+  selectedMonth: number | null = null;
+  selectedYear: number | null = null;
 
   // Table selection
   selectAll: boolean = false;
@@ -51,15 +68,11 @@ export class PayrollComponent implements OnInit {
   loading = false;
   loadingMessage = '';
 
-  // Date range (for header) - dynamic
-  dateRange: string = '';
-
-  // Date range picker
-  dateRangeModel: DateRangeModel = { from: null, to: null };
-  selectedPayrollRange: { from: Date; to: Date } | null = null; // Store selected range for payroll
-  @ViewChild('dateRangePicker') dateRangePicker: any;
-
-  @ViewChild('generatePayrollModal') generatePayrollModal: any;
+  // Details modal
+  detailsModalData: any[] = [];
+  detailsModalType: 'rssb' | 'allowance' | 'other_deduction' | '' = '';
+  detailsModalTitle: string = '';
+  @ViewChild('detailsModal') detailsModal: any;
 
   constructor(
     private modalService: NgbModal,
@@ -68,100 +81,64 @@ export class PayrollComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.initializeDynamicDates();
-    // Set default selected payment period to current month
-    const currentDate = new Date();
-    const currentYear = currentDate.getFullYear();
-    const currentMonth = currentDate.getMonth();
-    const startDate = new Date(currentYear, currentMonth, 1);
-    const endDate = new Date(currentYear, currentMonth + 1, 0);
-    const startStr = startDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
-    const endStr = endDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
-    const currentPeriod = `${startStr} - ${endStr}`;
-    this.selectedPaymentPeriod = currentPeriod;
-    this.onPaymentPeriodChange();
-  }
-
-  initializeDynamicDates() {
-    const currentDate = new Date();
-    const currentYear = currentDate.getFullYear();
-    this.paymentPeriods = [];
-    for (let month = 0; month < 12; month++) {
-      const startDate = new Date(currentYear, month, 1);
-      const endDate = new Date(currentYear, month + 1, 0);
-      const startStr = startDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
-      const endStr = endDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
-      this.paymentPeriods.push(`${startStr} - ${endStr}`);
+    // Populate year options (current year ±5 years)
+    const currentYear = new Date().getFullYear();
+    this.yearOptions = [];
+    for (let y = currentYear - 5; y <= currentYear + 5; y++) {
+      this.yearOptions.push({ label: y.toString(), value: y });
     }
-    const currentMonthStart = new Date(currentYear, currentDate.getMonth(), 1);
-    const currentMonthEnd = new Date(currentYear, currentDate.getMonth() + 1, 0);
-    this.dateRange = `${currentMonthStart.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })} - ${currentMonthEnd.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}`;
-    this.dateRangeModel = {
-      from: new NgbDate(currentMonthStart.getFullYear(), currentMonthStart.getMonth() + 1, currentMonthStart.getDate()),
-      to: new NgbDate(currentMonthEnd.getFullYear(), currentMonthEnd.getMonth() + 1, currentMonthEnd.getDate())
-    };
+    this.selectedYear = currentYear;
+    this.selectedMonth = new Date().getMonth() + 1;
   }
 
-  generatePayroll(dateRange?: { from: Date; to: Date }) {
+  generatePayroll() {
+    if (!this.selectedMonth || !this.selectedYear) return;
     this.loading = true;
     this.loadingMessage = 'Generating payroll data...';
-    const payload = dateRange ? {
-      from_date: dateRange.from.toISOString().split('T')[0],
-      to_date: dateRange.to.toISOString().split('T')[0]
-    } : {};
-    console.log('Sending generatePayroll payload:', payload);
-    const timeout = setTimeout(() => {
-      console.error('Payroll generation timeout - taking too long');
-      this.loading = false;
-      this.loadingMessage = '';
-      Swal.fire('Error', 'Payroll generation timed out. Please try again.', 'error');
-    }, 30000);
+    const payload = {
+      payroll_month: this.selectedMonth.toString(),
+      payroll_year: this.selectedYear.toString()
+    };
     this.payrollService.generatePayroll(payload).subscribe({
-      next: (response) => {
-        console.log('Received generatePayroll response:', response);
-        clearTimeout(timeout);
-        if (response.status) {
-          this.employees = response.data;
-          this.filteredEmployees = this.employees;
-          Swal.fire('Success', response.message, 'success');
-        } else {
-          Swal.fire('Error', response.message || 'Failed to generate payroll', 'error');
-        }
+      next: (response: any) => {
+        // Map employee info and payroll fields for the table
+        this.employees = (response.data || []).map((item: any) => ({
+          employee: item.employee,
+          status: item.payroll_status,
+          selected: false,
+          payroll_date: item.payroll_date,
+          payslip_number: item.payslip_number,
+          basic_salary: +item.basic_salary,
+          total_allowances: +item.total_allowances,
+          total_gross_salary: +item.total_gross_salary,
+          total_rssb_employee_deductions: +item.total_rssb_employee_deductions,
+          total_rssb_employer_deductions: +item.total_rssb_employer_deductions,
+          total_other_deductions: +item.total_other_deductions,
+          total_paye_deductions: +item.total_paye_deductions,
+          total_net_salary: +item.total_net_salary,
+          total_mass_salary: +item.total_mass_salary
+        }));
+        this.filteredEmployees = [...this.employees];
         this.loading = false;
-        this.loadingMessage = '';
       },
       error: (err) => {
-        clearTimeout(timeout);
-        console.error('Payroll generation error:', err);
-        Swal.fire('Error', err?.error?.message || 'Server error occurred', 'error');
         this.loading = false;
-        this.loadingMessage = '';
+        Swal.fire({ icon: 'error', text: 'Failed to generate payroll.' });
       }
     });
   }
 
-  onPaymentPeriodChange() {
-    if (this.selectedPaymentPeriod) {
-      const periodMatch = this.selectedPaymentPeriod.match(/(\d{2} \w{3} \d{4}) - (\d{2} \w{3} \d{4})/);
-      if (periodMatch) {
-        const fromDate = new Date(periodMatch[1]);
-        const toDate = new Date(periodMatch[2]);
-        this.dateRange = this.selectedPaymentPeriod;
-        this.dateRangeModel = {
-          from: new NgbDate(fromDate.getFullYear(), fromDate.getMonth() + 1, fromDate.getDate()),
-          to: new NgbDate(toDate.getFullYear(), toDate.getMonth() + 1, toDate.getDate())
-        };
-        this.selectedPayrollRange = { from: fromDate, to: toDate };
-      }
-    }
+  onGeneratePayrollClick() {
+    this.generatePayroll();
   }
 
   applyFilters() {
     this.filteredEmployees = this.employees.filter(emp => {
       const matchesSearch =
         !this.searchTerm ||
-        (emp.employee_id && emp.employee_id.includes(this.searchTerm));
-      // You can add more filter logic if needed
+        (emp.employee?.id && emp.employee.id.includes(this.searchTerm)) ||
+        (emp.employee?.first_name && emp.employee.first_name.toLowerCase().includes(this.searchTerm.toLowerCase())) ||
+        (emp.employee?.last_name && emp.employee.last_name.toLowerCase().includes(this.searchTerm.toLowerCase()));
       return matchesSearch;
     });
     this.updateSelectAllState();
@@ -190,63 +167,20 @@ export class PayrollComponent implements OnInit {
     this.applyFilters();
   }
 
-  // Date picker methods
-  onDateSelect(date: NgbDate) {
-    if (!this.dateRangeModel.from || (this.dateRangeModel.from && this.dateRangeModel.to)) {
-      this.dateRangeModel = { from: date, to: null };
-    } else {
-      if (date.after(this.dateRangeModel.from)) {
-        this.dateRangeModel.to = date;
-      } else {
-        this.dateRangeModel = { from: date, to: null };
-      }
+  openDetailsModal(employee: any, type: 'rssb' | 'allowance' | 'other_deduction') {
+    if (type === 'rssb') {
+      this.detailsModalData = employee.rssb_details || [];
+      this.detailsModalType = 'rssb';
+      this.detailsModalTitle = 'RSSB Details';
+    } else if (type === 'allowance') {
+      this.detailsModalData = employee.allowance_details || [];
+      this.detailsModalType = 'allowance';
+      this.detailsModalTitle = 'Allowance Details';
+    } else if (type === 'other_deduction') {
+      this.detailsModalData = employee.other_deduction_details || [];
+      this.detailsModalType = 'other_deduction';
+      this.detailsModalTitle = 'Other Deduction Details';
     }
-  }
-
-  applyDateRange() {
-    if (this.dateRangeModel.from && this.dateRangeModel.to) {
-      const fromDate = new Date(this.dateRangeModel.from.year, this.dateRangeModel.from.month - 1, this.dateRangeModel.from.day);
-      const toDate = new Date(this.dateRangeModel.to.year, this.dateRangeModel.to.month - 1, this.dateRangeModel.to.day);
-      this.dateRange = `${fromDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })} - ${toDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}`;
-      this.modalService.dismissAll();
-      this.selectedPayrollRange = { from: fromDate, to: toDate };
-    }
-  }
-
-  isDateInRange(date: NgbDate): boolean {
-    if (!this.dateRangeModel.from || !this.dateRangeModel.to) {
-      return false;
-    }
-    return date.after(this.dateRangeModel.from) && date.before(this.dateRangeModel.to) || 
-           date.equals(this.dateRangeModel.from) || 
-           date.equals(this.dateRangeModel.to);
-  }
-
-  isFromDate(date: NgbDate): boolean {
-    return this.dateRangeModel.from && date.equals(this.dateRangeModel.from);
-  }
-
-  isToDate(date: NgbDate): boolean {
-    return this.dateRangeModel.to && date.equals(this.dateRangeModel.to);
-  }
-
-  canApplyDateRange(): boolean {
-    return !!(this.dateRangeModel.from && this.dateRangeModel.to);
-  }
-
-  openGeneratePayrollModal() {
-    this.modalService.open(this.generatePayrollModal, { centered: true });
-  }
-
-  openDateRangePicker() {
-    this.modalService.open(this.dateRangePicker, { centered: true });
-  }
-
-  onGeneratePayrollClick() {
-    if (!this.selectedPayrollRange) {
-      Swal.fire('Error', 'Please select a valid date range before generating payroll.', 'error');
-      return;
-    }
-    this.generatePayroll(this.selectedPayrollRange);
+    this.modalService.open(this.detailsModal, { size: 'lg' });
   }
 } 

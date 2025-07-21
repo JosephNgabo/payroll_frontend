@@ -4,13 +4,18 @@ import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { NgSelectModule } from '@ng-select/ng-select';
+import { ScrollingModule } from '@angular/cdk/scrolling';
 
 import { PayrollRoutingModule } from './payroll-routing.module';
 import { PayrollComponent } from './payroll.component';
+import { ListPayrollsComponent } from './list-payrolls/list-payrolls.component';
+import { PayrollDetailsComponent } from './payroll-details/payroll-details.component';
 
 @NgModule({
   declarations: [
-    PayrollComponent
+    PayrollComponent,
+    ListPayrollsComponent,
+    PayrollDetailsComponent
   ],
   imports: [
     CommonModule,
@@ -18,7 +23,13 @@ import { PayrollComponent } from './payroll.component';
     HttpClientModule,
     NgbModule,
     NgSelectModule,
-    PayrollRoutingModule
+    PayrollRoutingModule,
+    ScrollingModule
+  ],
+  exports: [
+    PayrollComponent,
+    ListPayrollsComponent,
+    PayrollDetailsComponent
   ]
 })
 export class PayrollModule { } 

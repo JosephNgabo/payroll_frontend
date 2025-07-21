@@ -29,4 +29,8 @@ export class EmployeeInformationService {
   getEmployeeById(id: string): Observable<EmployeeInformation> {
     return this.http.get<EmployeeInformation>(`${this.API_URL}/employee-information/${id}`);
   }
+
+  deleteEmployee(id: string): Observable<any> {
+    return this.http.delete(`${this.API_URL}/employee-information/${id}`);
+  }
 }
