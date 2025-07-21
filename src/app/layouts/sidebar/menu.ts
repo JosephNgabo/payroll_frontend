@@ -102,7 +102,18 @@ export const MENU: MenuItem[] = [
         id: 9,
         label: 'Payroll',
         icon: 'bx-calculator',
-        link: '/payroll'
+        subItems: [
+            {
+                id: 91,
+                label: 'Generate Payroll',
+                link: '/payroll'
+            },
+            {
+                id: 92,
+                label: 'List Payrolls',
+                link: '/payroll/list'
+            }
+        ]
     }
 
 

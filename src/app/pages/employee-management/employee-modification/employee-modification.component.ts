@@ -140,6 +140,10 @@ export class EmployeeModificationComponent implements OnInit {
   private employeeId: string;
   // Store the full employee object for merging updates
   fullEmployeeData: any = null;
+  addAllowanceModalRef: BsModalRef | undefined;
+  @ViewChild('addAllowanceModal') addAllowanceModal: any;
+  employeeAllowances: any[] = [];
+  editingAllowanceIndex: number | null = null;
 
   constructor(
     private modalService: BsModalService,
@@ -271,7 +275,7 @@ export class EmployeeModificationComponent implements OnInit {
       documentNumber: [''],
       documentIssueDate: [''],
       documentExpiryDate: [''],
-      placeOfIssue: [''],
+      placeOfIssue: [''], // Not required
       rssbNumber: ['', Validators.required],
       highestEducation: ['', Validators.required]
     });
@@ -289,6 +293,7 @@ export class EmployeeModificationComponent implements OnInit {
     });
 
     this.allowanceForm = this.formBuilder.group({
+      name: [''],
       amount: ['', [Validators.required, Validators.min(0)]],
       type: ['', Validators.required],
       allowance_id: ['', Validators.required],
@@ -438,25 +443,18 @@ export class EmployeeModificationComponent implements OnInit {
             this.employeeContractId = contractData.id || '';
           }
         }
-        if (this.allowanceForm) {
-          // Handle allowance data - it might be an array or single object
-          let allowanceData = employee.employee_allowances;
-          if (Array.isArray(allowanceData) && allowanceData.length > 0) {
-            allowanceData = allowanceData[0]; // Take the first allowance
-          }
-          
-          if (allowanceData) {
-            this.allowanceForm.patchValue({
-              amount: allowanceData.amount || '',
-              type: allowanceData.type || '',
-              allowance_id: allowanceData.allowance_id || '',
-              description: allowanceData.description || ''
-            });
-            this.originalAllowance = this.allowanceForm.value;
-            // Store the allowance ID for updates
-            this.employeeAllowanceId = allowanceData.id || '';
-          }
-        }
+        // Handle allowance data - it might be an array or single object
+        // Remove old allowance loading logic here
+        // this.employeeAllowances = Array.isArray(allowanceData) ? allowanceData.map(a => ({ ...a })) : [{ ...allowanceData }];
+        // this.allowanceForm.patchValue({
+        //   name: allowanceData[0].name || '',
+        //   amount: allowanceData[0].amount || '',
+        //   type: allowanceData[0].type || '',
+        //   allowance_id: allowanceData[0].allowance_id || '',
+        //   description: allowanceData[0].description || ''
+        // });
+        // this.originalAllowance = this.allowanceForm.value;
+        // this.employeeAllowanceId = allowanceData[0].id || '';
         // Load existing deductions
         if (employee.employee_rssb_contribution) {
           this.employeeRssbDeductions = [...employee.employee_rssb_contribution];
@@ -493,21 +491,20 @@ export class EmployeeModificationComponent implements OnInit {
       this.contractInfoForm.enable();
       this.isEditingStep[stepIndex] = true;
     } else if (stepIndex === 3) {
+      // Allowance, RSSB, and Other Deductions combined step
       this.allowanceForm.enable();
+      // No form group for deductions, just set editing state
       this.isEditingStep[stepIndex] = true;
     } else if (stepIndex === 4) {
-      // Enable editing for deductions (no form to enable, just set editing state)
-      this.isEditingStep[stepIndex] = true;
-    } else if (stepIndex === 5) {
       this.bankInfoForm.enable();
       this.isEditingStep[stepIndex] = true;
-    } else if (stepIndex === 6) {
+    } else if (stepIndex === 5) {
       this.employeeAddressForm.enable();
       this.isEditingStep[stepIndex] = true;
-    } else if (stepIndex === 7) {
+    } else if (stepIndex === 6) {
       this.emergencyContactForm.enable();
       this.isEditingStep[stepIndex] = true;
-    } else if (stepIndex === 8) {
+    } else if (stepIndex === 7) {
       this.documentsForm.enable();
       this.isEditingStep[stepIndex] = true;
     }
@@ -600,13 +597,16 @@ export class EmployeeModificationComponent implements OnInit {
         });
       }
     } else if (stepIndex === 3) {
-      // Handle allowance update through employee-allowance endpoint
-      const allowancePayload = this.buildAllowancePayload();
+      // Combined Allowance, RSSB, and Other Deductions update logic
+      // Allowance update (existing logic)
+      const allowanceToUpdate = this.employeeAllowances[0];
+      const allowancePayload = {
+        ...allowanceToUpdate,
+        employee_id: this.employeeId
+      };
       this.saving = true;
-      
-      // Use allowance ID if available, otherwise create new allowance
-      if (this.employeeAllowanceId) {
-        this.employeeAllowanceService.updateEmployeeAllowance(this.employeeId, this.employeeAllowanceId, allowancePayload).subscribe({
+      if (allowanceToUpdate && allowanceToUpdate.id) {
+        this.employeeAllowanceService.updateEmployeeAllowance(this.employeeId, allowanceToUpdate.id, allowancePayload).subscribe({
           next: () => {
             this.allowanceForm.disable();
             this.isEditingStep[stepIndex] = false;
@@ -631,7 +631,6 @@ export class EmployeeModificationComponent implements OnInit {
           }
         });
       } else {
-        // Create new allowance if no existing allowance ID
         this.employeeAllowanceService.createEmployeeAllowance(this.employeeId, allowancePayload).subscribe({
           next: () => {
             this.allowanceForm.disable();
@@ -657,25 +656,9 @@ export class EmployeeModificationComponent implements OnInit {
           }
         });
       }
+      // TODO: Add update logic for RSSB and Other Deductions here if needed
     } else if (stepIndex === 4) {
-      // Handle deductions update
-      this.saving = true;
-      // For now, using mock update until we have the correct deductions API
-      setTimeout(() => {
-        this.isEditingStep[stepIndex] = false;
-        this.originalRssbDeductions = [...this.employeeRssbDeductions];
-        this.originalOtherDeductions = [...this.employeeOtherDeductions];
-        this.saving = false;
-        Swal.fire({
-          icon: 'success',
-          title: 'Update Successful',
-          text: 'Deductions information has been updated successfully.',
-          timer: 1000,
-          showConfirmButton: false
-        });
-      }, 1000);
-    } else if (stepIndex === 5) {
-      // Handle bank info update
+      // Bank Info
       const bankInfoPayload = this.buildBankInfoPayload();
       this.saving = true;
       
@@ -734,8 +717,8 @@ export class EmployeeModificationComponent implements OnInit {
           }
         });
       }
-    } else if (stepIndex === 6) {
-      // Handle address update
+    } else if (stepIndex === 5) {
+      // Address
       const addressPayload = this.buildAddressPayload();
       this.saving = true;
       
@@ -796,14 +779,23 @@ export class EmployeeModificationComponent implements OnInit {
           }
         });
       }
-    } else if (stepIndex === 7) {
-      // Handle emergency contact update
-      const emergencyContactPayload = this.buildEmergencyContactPayload();
+    } else if (stepIndex === 6) {
+      // Emergency
+      const contact = {
+        name: this.emergencyContactForm.value.name,
+        gender: this.emergencyContactForm.value.gender,
+        relationship: this.emergencyContactForm.value.relationship,
+        phone: this.emergencyContactForm.value.phone,
+        email: this.emergencyContactForm.value.email
+      };
+      const allEmpty = Object.values(contact).every(v => v === null || v === undefined || v === '');
+      if (allEmpty) {
+        return;
+      }
       this.saving = true;
-      
-      // Use emergency contact ID if available, otherwise create new emergency contact
+      // Use update API if contact ID exists, otherwise create
       if (this.employeeEmergencyContactId) {
-        this.employeeEmergencyContactService.updateEmployeeEmergencyContact(this.employeeEmergencyContactId, emergencyContactPayload).subscribe({
+        this.employeeEmergencyContactService.updateEmployeeEmergencyContact(this.employeeEmergencyContactId, contact).subscribe({
           next: () => {
             this.emergencyContactForm.disable();
             this.isEditingStep[stepIndex] = false;
@@ -812,7 +804,7 @@ export class EmployeeModificationComponent implements OnInit {
             Swal.fire({
               icon: 'success',
               title: 'Update Successful',
-              text: 'Emergency contact information has been updated successfully.',
+              text: 'Emergency contact has been updated successfully.',
               timer: 1000,
               showConfirmButton: false
             });
@@ -823,18 +815,13 @@ export class EmployeeModificationComponent implements OnInit {
             Swal.fire({
               icon: 'error',
               title: 'Update Failed',
-              text: 'Failed to update emergency contact information. Please try again.',
+              text: 'Failed to update emergency contact. Please try again.',
             });
           }
         });
       } else {
-        // Create new emergency contact if no existing emergency contact ID
-        this.employeeEmergencyContactService.createEmployeeEmergencyContact(this.employeeId, emergencyContactPayload).subscribe({
-          next: (response) => {
-            // Store the new emergency contact ID for future updates
-            if (response && response.data) {
-              this.employeeEmergencyContactId = response.data.id || '';
-            }
+        this.employeeEmergencyContactService.createEmployeeEmergencyContact(this.employeeId, contact).subscribe({
+          next: () => {
             this.emergencyContactForm.disable();
             this.isEditingStep[stepIndex] = false;
             this.originalEmergencyContact = { ...this.emergencyContactForm.value };
@@ -842,7 +829,7 @@ export class EmployeeModificationComponent implements OnInit {
             Swal.fire({
               icon: 'success',
               title: 'Create Successful',
-              text: 'Emergency contact information has been created successfully.',
+              text: 'Emergency contact has been created successfully.',
               timer: 1000,
               showConfirmButton: false
             });
@@ -853,13 +840,14 @@ export class EmployeeModificationComponent implements OnInit {
             Swal.fire({
               icon: 'error',
               title: 'Create Failed',
-              text: 'Failed to create emergency contact information. Please try again.',
+              text: 'Failed to create emergency contact. Please try again.',
             });
           }
         });
       }
-    } else if (stepIndex === 8) {
-      // Handle documents update
+      return;
+    } else if (stepIndex === 7) {
+      // Documents
       this.submittedDocuments = true;
       
       // Check if required fields are filled
@@ -1452,6 +1440,9 @@ export class EmployeeModificationComponent implements OnInit {
       next: (response: any) => {
         if (response && response.data) {
           this.allowances = response.data;
+          if (this.employeeId) {
+            this.loadEmployeeAllowances();
+          }
         }
       },
       error: (error) => {
@@ -1482,6 +1473,25 @@ export class EmployeeModificationComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error loading other deductions:', error);
+      }
+    });
+  }
+
+  loadEmployeeAllowances() {
+    this.employeeAllowanceService.getEmployeeAllowances(this.employeeId).subscribe({
+      next: (response: any) => {
+        const data = response && response.data ? response.data : [];
+        this.employeeAllowances = data.map((a: any) => {
+          const found = this.allowances.find(alw => String(alw.id) === String(a.allowance_id));
+          return {
+            ...a,
+            allowance_name: found ? (found.name || found.allowance_name) : a.allowance_id
+          };
+        });
+      },
+      error: (error) => {
+        console.error('Error loading employee allowances:', error);
+        this.employeeAllowances = [];
       }
     });
   }
@@ -1720,8 +1730,14 @@ export class EmployeeModificationComponent implements OnInit {
   // Helper method to get allowance name from allowance ID
   getAllowanceName(allowanceId: string): string {
     if (!allowanceId) return '';
-    const allowance = this.allowances.find(a => a.id === allowanceId);
-    return allowance ? allowance.allowance_name : allowanceId;
+    const allowance = this.allowances.find(
+      a => String(a.id) === String(allowanceId)
+    );
+    if (!allowance) {
+      console.warn('Allowance not found for id:', allowanceId, 'in', this.allowances);
+    }
+    // Cast to any to avoid linter error for allowance_name
+    return allowance ? (allowance.name || (allowance as any).allowance_name || allowanceId) : allowanceId;
   }
 
   // Helper method to get document type name from document type ID
@@ -1729,5 +1745,101 @@ export class EmployeeModificationComponent implements OnInit {
     if (!documentTypeId) return '';
     const documentType = this.documentTypes.find(d => d.value === documentTypeId);
     return documentType ? documentType.label : documentTypeId;
+  }
+
+  onAllowanceSubmit() {
+    this.submittedAllowance = true;
+    if (this.allowanceForm.invalid) {
+      return;
+    }
+    const allowanceData = { ...this.allowanceForm.value };
+    const selectedAllowance = this.allowances.find(a => String(a.id) === String(allowanceData.allowance_id));
+    if (this.editingAllowanceIndex !== null && this.editingAllowanceIndex > -1) {
+      // Update in array
+      const existing = this.employeeAllowances[this.editingAllowanceIndex];
+      if (existing && existing.id) {
+        this.saving = true;
+        this.employeeAllowanceService.updateEmployeeAllowance(this.employeeId, existing.id, allowanceData).subscribe({
+          next: () => {
+            this.employeeAllowances[this.editingAllowanceIndex!] = { ...existing, ...allowanceData, id: existing.id, allowance_name: selectedAllowance ? (selectedAllowance.name || selectedAllowance.allowance_name) : '' };
+            this.allowanceForm.patchValue(this.employeeAllowances[this.editingAllowanceIndex!]);
+            this.saving = false;
+            this.closeAddAllowanceModal();
+            this.submittedAllowance = false;
+            this.editingAllowanceIndex = null;
+          },
+          error: () => {
+            this.saving = false;
+          }
+        });
+        return;
+      }
+      this.employeeAllowances[this.editingAllowanceIndex] = { ...allowanceData, allowance_name: selectedAllowance ? (selectedAllowance.name || selectedAllowance.allowance_name) : '' };
+      this.allowanceForm.patchValue(allowanceData);
+      this.editingAllowanceIndex = null;
+    } else {
+      this.employeeAllowances.push({ ...allowanceData, allowance_name: selectedAllowance ? (selectedAllowance.name || selectedAllowance.allowance_name) : '' });
+      this.allowanceForm.patchValue(allowanceData);
+    }
+    this.closeAddAllowanceModal();
+    this.submittedAllowance = false;
+  }
+
+  openAddAllowanceModal() {
+    this.allowanceForm.reset();
+    this.addAllowanceModalRef = this.modalService.show(this.addAllowanceModal);
+  }
+
+  closeAddAllowanceModal() {
+    if (this.addAllowanceModalRef) {
+      this.addAllowanceModalRef.hide();
+    }
+  }
+
+  editAllowance(index: number) {
+    const allowance = this.employeeAllowances[index];
+    this.allowanceForm.patchValue({
+      name: allowance.name || '',
+      amount: allowance.amount || '',
+      type: allowance.type || '',
+      allowance_id: allowance.allowance_id || '',
+      description: allowance.description || ''
+    });
+    this.editingAllowanceIndex = index;
+    this.openAddAllowanceModal();
+  }
+
+  onEmergencyContactSubmit() {
+    const contact = {
+      name: this.emergencyContactForm.value.name,
+      gender: this.emergencyContactForm.value.gender,
+      relationship: this.emergencyContactForm.value.relationship,
+      phone: this.emergencyContactForm.value.phone,
+      email: this.emergencyContactForm.value.email
+    };
+    // If all fields are empty or null, do not call the API
+    const allEmpty = Object.values(contact).every(v => v === null || v === undefined || v === '');
+    if (allEmpty) {
+      return;
+    }
+    this.submittedEmergencyContact = true;
+    if (this.emergencyContactForm.invalid || !this.employeeId) {
+      return;
+    }
+    console.log('Submitting emergency contact:', contact);
+    this.saving = true;
+    this.employeeEmergencyContactService.createEmployeeEmergencyContact(this.employeeId, contact).subscribe({
+      next: (res) => {
+        this.saving = false;
+        // Optionally go to next section or show success
+        if (this.cdkStepper) {
+          this.cdkStepper.next();
+        }
+      },
+      error: (err) => {
+        this.saving = false;
+        // Error interceptor will handle errors
+      }
+    });
   }
 }
