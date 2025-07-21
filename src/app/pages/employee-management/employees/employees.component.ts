@@ -40,6 +40,7 @@ import { EmployeeDocumentService } from 'src/app/core/services/employee-document
 import { EmployeeDocument } from 'src/app/core/models/employee-document.model';
 import Swal from 'sweetalert2';
 import { Router, ActivatedRoute } from '@angular/router';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-employees',
@@ -169,6 +170,7 @@ export class EmployeesComponent implements OnInit {
     private employeeDocumentService: EmployeeDocumentService,
     private router: Router,
     private route: ActivatedRoute,
+    private toastr: ToastrService
   ) { }
 
   ngOnInit() {
@@ -631,7 +633,20 @@ export class EmployeesComponent implements OnInit {
       },
       error: (err) => {
         this.savingNext = false;
-        // Optionally show error feedback
+        let errorMsg = 'Failed to submit employee information';
+        if (typeof err === 'string') {
+          errorMsg = err;
+        } else if (err && typeof err === 'object') {
+          if (err.personal_email) {
+            errorMsg = err.personal_email;
+          } else if (err.message) {
+            errorMsg = err.message;
+          } else if (err.errors) {
+            // Laravel validation errors
+            errorMsg = Object.values(err.errors).flat().join(' ');
+          }
+        }
+        this.toastr.error(errorMsg, 'Error');
         console.error('Failed to submit employee information', err);
       }
     });
