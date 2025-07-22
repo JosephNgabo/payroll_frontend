@@ -792,15 +792,7 @@ export class EmployeesComponent implements OnInit {
   onDeductionsSubmit() {
     this.submittedDeductions = true;
 
-    // Validate that we have an employee ID
-    if (!this.employeeId) {
-      Swal.fire({
-        icon: 'error',
-        title: 'Validation Error',
-        text: 'Employee ID is required. Please complete previous steps first.',
-      });
-      return;
-    }
+    // Removed employeeId validation block
 
     this.savingNext = true;
 
