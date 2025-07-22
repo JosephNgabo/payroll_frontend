@@ -43,12 +43,12 @@
                             <span *ngIf="basicInfo.lastName.errors.required">Last name is required.</span>
                           </div>
                         </div>
+                        <!--
                         <div class="col-lg-4 mb-3">
                           <label>Name of Spouse</label>
                           <input type="text" class="form-control" formControlName="spouseName" placeholder="Enter Name of Spouse">
                         </div>
-                      </div>
-                      <div class="row">
+                        -->
                         <div class="col-lg-4 mb-3">
                           <label>Gender</label>
                           <ng-select [items]="genders"
@@ -62,14 +62,30 @@
                             <span *ngIf="basicInfo.gender.errors.required">Gender is required.</span>
                           </div>
                         </div>
-                        <div class="col-lg-4 mb-3">
+                      </div>
+                      <div class="row">
+                        <!-- <div class="col-lg-4 mb-3">
+                          <label>Gender</label>
+                          <ng-select [items]="genders"
+                                     bindLabel="label"
+                                     bindValue="value"
+                                     formControlName="gender"
+                                     placeholder="Select Gender"
+                                     [ngClass]="{'is-invalid': submittedBasicInfo && basicInfo.gender.errors, 'is-valid': submittedBasicInfo && basicInfo.gender.valid}">
+                          </ng-select>
+                          <div class="invalid-feedback d-block" *ngIf="submittedBasicInfo && basicInfo.gender.errors">
+                            <span *ngIf="basicInfo.gender.errors.required">Gender is required.</span>
+                          </div>
+                        </div> -->
+                        <!-- <div class="col-lg-4 mb-3">
                           <label>Date of Birth</label>
                           <input type="date" class="form-control" formControlName="dateOfBirth"
                                  [ngClass]="{'is-invalid': submittedBasicInfo && basicInfo.dateOfBirth.errors, 'is-valid': submittedBasicInfo && basicInfo.dateOfBirth.valid}">
                           <div class="invalid-feedback" *ngIf="submittedBasicInfo && basicInfo.dateOfBirth.errors">
                             <span *ngIf="basicInfo.dateOfBirth.errors.required">Date of birth is required.</span>
                           </div>
-                        </div>
+                        </div> -->
+                        <!--
                         <div class="col-lg-4 mb-3">
                           <label>Number of Children</label>
                           <input type="number" class="form-control" formControlName="numberOfChildren" min="0" placeholder="Enter Number of Children"
@@ -78,8 +94,17 @@
                             <span *ngIf="basicInfo.numberOfChildren.errors.min">Value must be 0 or greater.</span>
                           </div>
                         </div>
+                        -->
                       </div>
                       <div class="row">
+                        <div class="col-lg-4 mb-3">
+                          <label>Date of Birth</label>
+                          <input type="date" class="form-control" formControlName="dateOfBirth"
+                                 [ngClass]="{'is-invalid': submittedBasicInfo && basicInfo.dateOfBirth.errors, 'is-valid': submittedBasicInfo && basicInfo.dateOfBirth.valid}">
+                          <div class="invalid-feedback" *ngIf="submittedBasicInfo && basicInfo.dateOfBirth.errors">
+                            <span *ngIf="basicInfo.dateOfBirth.errors.required">Date of birth is required.</span>
+                          </div>
+                        </div>
                         <div class="col-lg-4 mb-3">
                           <label>Nationality</label>
                           <ng-select *ngIf="countries && countries.length"
@@ -136,12 +161,14 @@
                             <span *ngIf="basicInfo.personalEmail.errors.email">Please enter a valid email address.</span>
                           </div>
                         </div>
+                        <!--
                         <div class="col-lg-4 mb-3">
                           <label>Home Phone</label>
                           <input type="text" class="form-control" formControlName="homePhone" placeholder="Enter Home Phone"
                                  [ngClass]="{'is-invalid': submittedBasicInfo && basicInfo.homePhone.errors, 'is-valid': submittedBasicInfo && basicInfo.homePhone.valid}">
                           <div class="invalid-feedback" *ngIf="submittedBasicInfo && basicInfo.homePhone.errors"></div>
                         </div>
+                        -->
                       </div>
                       <ul class="list-inline wizard d-flex justify-content-end mb-0">
                         <li class="list-inline-item">
@@ -767,18 +794,20 @@
                   </ng-template>
                   <section *ngIf="cdkStepper.selectedIndex === 5">
                     <form [formGroup]="employeeAddressForm" novalidate>
-                      <div class="row">
-                        <div class="col-lg-4 mb-3">
-                          <label>Type <span class="text-danger">*</span></label>
-                          <ng-select [items]="['current', 'permanent']"
-                                     formControlName="type"
-                                     placeholder="Select Address Type"
-                                     [ngClass]="{'is-invalid': submittedEmployeeAddress && employeeAddress.type.errors, 'is-valid': submittedEmployeeAddress && employeeAddress.type.valid}">
-                          </ng-select>
-                          <div class="invalid-feedback d-block" *ngIf="submittedEmployeeAddress && employeeAddress.type.errors">
-                            <span *ngIf="employeeAddress.type.errors.required">Type is required.</span>
-                          </div>
+                      <!--
+                      <div class="col-lg-4 mb-3">
+                        <label>Type <span class="text-danger">*</span></label>
+                        <ng-select [items]="['current', 'permanent']"
+                                   formControlName="type"
+                                   placeholder="Select Address Type"
+                                   [ngClass]="{'is-invalid': submittedEmployeeAddress && employeeAddress.type.errors, 'is-valid': submittedEmployeeAddress && employeeAddress.type.valid}">
+                        </ng-select>
+                        <div class="invalid-feedback d-block" *ngIf="submittedEmployeeAddress && employeeAddress.type.errors">
+                          <span *ngIf="employeeAddress.type.errors.required">Type is required.</span>
                         </div>
+                      </div>
+                      -->
+                      <div class="row">
                         <div class="col-lg-4 mb-3">
                           <label>Country <span class="text-danger">*</span></label>
                           <ng-select [items]="countries"
@@ -806,8 +835,6 @@
                             <span *ngIf="employeeAddress.province.errors.required">Province is required.</span>
                           </div>
                         </div>
-                      </div>
-                      <div class="row">
                         <div class="col-lg-4 mb-3">
                           <label>District <span class="text-danger">*</span></label>
                           <ng-select [items]="districts"
@@ -822,6 +849,8 @@
                             <span *ngIf="employeeAddress.district.errors.required">District is required.</span>
                           </div>
                         </div>
+                      </div>
+                      <div class="row">
                         <div class="col-lg-4 mb-3">
                           <label>Sector <span class="text-danger">*</span></label>
                           <ng-select [items]="sectors"
@@ -850,8 +879,6 @@
                             <span *ngIf="employeeAddress.cell.errors.required">Cell is required.</span>
                           </div>
                         </div>
-                      </div>
-                      <div class="row">
                         <div class="col-lg-4 mb-3">
                           <label>Village <span class="text-danger">*</span></label>
                           <ng-select [items]="villages"
@@ -865,24 +892,33 @@
                             <span *ngIf="employeeAddress.village.errors.required">Village is required.</span>
                           </div>
                         </div>
+                      </div>
+                      <div class="row">
+                       
+                        <!--
                         <div class="col-lg-4 mb-3">
                           <label>City</label>
                           <input type="text" class="form-control" formControlName="city" placeholder="Enter City (optional)">
                         </div>
+                        -->
+                        <!--
                         <div class="col-lg-4 mb-3">
                           <label>Additional Address</label>
                           <input type="text" class="form-control" formControlName="additional_address" placeholder="Enter Additional Address (optional)">
                         </div>
-                      </div>
-                      <div class="row">
+                        -->
+                        <!--
                         <div class="col-lg-4 mb-3">
                           <label>Postal Code</label>
                           <input type="text" class="form-control" formControlName="postal_code" placeholder="Enter Postal Code (optional)">
                         </div>
+                        -->
+                        <!--
                         <div class="col-lg-4 mb-3">
                           <label>Street Address</label>
                           <input type="text" class="form-control" formControlName="street_address" placeholder="Enter Street Address (optional)">
                         </div>
+                        -->
                       </div>
                       <ul class="list-inline wizard d-flex justify-content-end mb-0">
                         <li class="previous list-inline-item" aria-disabled="true">

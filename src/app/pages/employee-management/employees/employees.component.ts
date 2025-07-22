@@ -217,11 +217,11 @@ export class EmployeesComponent implements OnInit {
       nationality: ['', Validators.required],
       countryOfBirth: ['', Validators.required],
       maritalStatus: ['', Validators.required],
-      spouseName: [''],
-      numberOfChildren: ['', [Validators.min(0)]],
+      spouseName: ['NA'],
+      numberOfChildren: 0,
       personalMobile: ['', Validators.required],
       personalEmail: ['', [Validators.required, Validators.email]],
-      homePhone: ['']
+      homePhone: ['NA']
     });
 
     this.legalContactsInfoForm = this.formBuilder.group({
@@ -281,17 +281,17 @@ export class EmployeesComponent implements OnInit {
     });
 
     this.employeeAddressForm = this.formBuilder.group({
-      type: ['', Validators.required],
-      city: [''],
-      additional_address: [''],
+      type: ['NA'],
+      city: ['NA'],
+      additional_address: ['NA'],
       country: ['', Validators.required],
       province: ['', Validators.required],
       district: ['', Validators.required],
       sector: ['', Validators.required],
       cell: ['', Validators.required],
       village: ['', Validators.required],
-      postal_code: [''],
-      street_address: ['']
+      postal_code: ['NA'],
+      street_address: ['NA']
     });
 
     this.documentsForm = this.formBuilder.group({
@@ -606,8 +606,8 @@ export class EmployeesComponent implements OnInit {
       nationality: basic.nationality,
       country_of_birth: basic.countryOfBirth,
       marital_status: basic.maritalStatus,
-      name_of_spouse: basic.spouseName || null,
-      number_of_children: basic.numberOfChildren,
+      name_of_spouse: basic.spouseName || 'NA',
+      number_of_children: Number.isInteger(basic.numberOfChildren) ? basic.numberOfChildren : 0,
       document_type: legal.documentType,
       document_number: legal.documentNumber,
       document_issue_date: legal.documentIssueDate,
@@ -616,7 +616,6 @@ export class EmployeesComponent implements OnInit {
       highest_education: legal.highestEducation,
       personal_mobile: basic.personalMobile,
       personal_email: basic.personalEmail
-      // home_phone: basic.homePhone // Removed to fix linter error
     };
     this.employeeInformationService.createEmployeeInformation(payload).subscribe({
       next: (res: any) => {
@@ -701,7 +700,7 @@ export class EmployeesComponent implements OnInit {
 
   onAllowanceSubmit() {
     this.submittedAllowance = true;
-    if (this.allowanceForm.invalid || !this.employeeId) {
+    if (!this.employeeId) {
       return;
     }
     this.savingNext = true;
@@ -792,7 +791,7 @@ export class EmployeesComponent implements OnInit {
 
   onDeductionsSubmit() {
     this.submittedDeductions = true;
-    
+
     // Validate that we have an employee ID
     if (!this.employeeId) {
       Swal.fire({
@@ -802,29 +801,9 @@ export class EmployeesComponent implements OnInit {
       });
       return;
     }
-    
-    // Validate that at least one RSSB deduction is added
-    if (this.employeeRssbDeductions.length === 0) {
-      Swal.fire({
-        icon: 'warning',
-        title: 'No Deductions Added',
-        text: 'Please add at least one RSSB deduction before proceeding.',
-      });
-      return;
-    }
-    
-    // Validate that at least one other deduction is added
-    if (this.employeeOtherDeductions.length === 0) {
-      Swal.fire({
-        icon: 'warning',
-        title: 'No Other Deductions Added',
-        text: 'Please add at least one other deduction before proceeding.',
-      });
-      return;
-    }
-    
+
     this.savingNext = true;
-    
+
     // Create RSSB deductions
     const rssbRequests = this.employeeRssbDeductions.map(deduction => {
       return this.employeeRssbContributionService.createRssbContribution(this.employeeId, {
@@ -833,7 +812,7 @@ export class EmployeesComponent implements OnInit {
         rssb_deduction_id: deduction.id
       });
     });
-    
+
     // Create other deductions
     const otherRequests = this.employeeOtherDeductions.map(deduction => {
       return this.employeeDeductionService.createEmployeeDeduction(this.employeeId, {
@@ -842,10 +821,18 @@ export class EmployeesComponent implements OnInit {
         deduction_id: deduction.deduction_id
       });
     });
-    
+
     // Combine all requests
     const allRequests = [...rssbRequests, ...otherRequests];
-    
+
+    if (allRequests.length === 0) {
+      this.savingNext = false;
+      if (this.cdkStepper) {
+        this.cdkStepper.next();
+      }
+      return;
+    }
+
     forkJoin(allRequests).subscribe({
       next: (results) => {
         this.savingNext = false;
@@ -916,17 +903,17 @@ export class EmployeesComponent implements OnInit {
     }
     this.savingNext = true;
     const address: EmployeeAddress = {
-      type: this.employeeAddressForm.value.type,
+      type: this.employeeAddressForm.value.type || 'NA',
       country: this.employeeAddressForm.value.country,
       province: this.employeeAddressForm.value.province,
       district: this.employeeAddressForm.value.district,
       sector: this.employeeAddressForm.value.sector,
       cell: this.employeeAddressForm.value.cell,
       village: this.employeeAddressForm.value.village,
-      city: this.employeeAddressForm.value.city,
-      additional_address: this.employeeAddressForm.value.additional_address,
-      postal_code: this.employeeAddressForm.value.postal_code,
-      street_address: this.employeeAddressForm.value.street_address
+      city: this.employeeAddressForm.value.city || 'NA',
+      additional_address: this.employeeAddressForm.value.additional_address || 'NA',
+      postal_code: this.employeeAddressForm.value.postal_code || 'NA',
+      street_address: this.employeeAddressForm.value.street_address || 'NA'
     };
     this.employeeAddressService.createEmployeeAddress(this.employeeId, address).subscribe({
       next: (res) => {
@@ -1043,6 +1030,17 @@ export class EmployeesComponent implements OnInit {
     if (this.cdkStepper) {
       this.cdkStepper.next();
     }
+  }
+
+  onSkipDocuments() {
+    this.savingNext = true;
+    this.documentsForm.reset();
+    setTimeout(() => {
+      this.savingNext = false;
+      if (this.cdkStepper) {
+        this.cdkStepper.next();
+      }
+    }, 500);
   }
 
   get f() { return this.contractInfo.controls; }

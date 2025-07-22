@@ -31,25 +31,25 @@
                         <input type="text" class="form-control" formControlName="lastName" readonly>
                       </div>
                       <div class="col-lg-4 mb-3">
-                        <label>Name of Spouse</label>
-                        <input type="text" class="form-control" formControlName="spouseName" readonly>
-                      </div>
-                    </div>
-                    <div class="row">
-                      <div class="col-lg-4 mb-3">
                         <label>Gender</label>
                         <input type="text" class="form-control" formControlName="gender" readonly>
                       </div>
+                      <!--
+                      <div class="col-lg-4 mb-3">
+                        <label>Name of Spouse</label>
+                        <input type="text" class="form-control" formControlName="spouseName" readonly>
+                      </div>
+                      -->
+                    </div>
+                    <div class="row">
+                      <!-- <div class="col-lg-4 mb-3">
+                        <label>Gender</label>
+                        <input type="text" class="form-control" formControlName="gender" readonly>
+                      </div> -->
                       <div class="col-lg-4 mb-3">
                         <label>Date of Birth</label>
                         <input type="text" class="form-control" formControlName="dateOfBirth" readonly>
                       </div>
-                      <div class="col-lg-4 mb-3">
-                        <label>Number of Children</label>
-                        <input type="text" class="form-control" formControlName="numberOfChildren" readonly>
-                      </div>
-                    </div>
-                    <div class="row">
                       <div class="col-lg-4 mb-3">
                         <label>Nationality</label>
                         <input type="text" class="form-control" [value]="getCountryName(basicInfoForm.value.nationality?.id || basicInfoForm.value.nationality)" readonly>
@@ -58,12 +58,26 @@
                         <label>Country of Birth</label>
                         <input type="text" class="form-control" [value]="getCountryName(basicInfoForm.value.countryOfBirth?.id || basicInfoForm.value.countryOfBirth)" readonly>
                       </div>
+                      <!--
+                      <div class="col-lg-4 mb-3">
+                        <label>Number of Children</label>
+                        <input type="text" class="form-control" formControlName="numberOfChildren" readonly>
+                      </div>
+                      -->
+                    </div>
+                    <div class="row">
+                      <!-- <div class="col-lg-4 mb-3">
+                        <label>Nationality</label>
+                        <input type="text" class="form-control" [value]="getCountryName(basicInfoForm.value.nationality?.id || basicInfoForm.value.nationality)" readonly>
+                      </div>
+                      <div class="col-lg-4 mb-3">
+                        <label>Country of Birth</label>
+                        <input type="text" class="form-control" [value]="getCountryName(basicInfoForm.value.countryOfBirth?.id || basicInfoForm.value.countryOfBirth)" readonly>
+                      </div> -->
                       <div class="col-lg-4 mb-3">
                         <label>Marital Status</label>
                         <input type="text" class="form-control" formControlName="maritalStatus" readonly>
                       </div>
-                    </div>
-                    <div class="row">
                       <div class="col-lg-4 mb-3">
                         <label>Personal Mobile</label>
                         <input type="text" class="form-control" formControlName="personalMobile" readonly>
@@ -72,10 +86,22 @@
                         <label>Personal Email</label>
                         <input type="text" class="form-control" formControlName="personalEmail" readonly>
                       </div>
+                    </div>
+                    <div class="row">
+                      <!-- <div class="col-lg-4 mb-3">
+                        <label>Personal Mobile</label>
+                        <input type="text" class="form-control" formControlName="personalMobile" readonly>
+                      </div>
+                      <div class="col-lg-4 mb-3">
+                        <label>Personal Email</label>
+                        <input type="text" class="form-control" formControlName="personalEmail" readonly>
+                      </div> -->
+                      <!--
                       <div class="col-lg-4 mb-3">
                         <label>Home Phone</label>
                         <input type="text" class="form-control" formControlName="homePhone" readonly>
                       </div>
+                      -->
                     </div>
                   </form>
                 </section>
@@ -300,54 +326,30 @@
                 <section>
                   <div class="row">
                     <div class="col-lg-4 mb-3">
-                      <label>Type</label>
-                      <input type="text" class="form-control" [value]="employeeAddress?.type || ''" readonly>
-                    </div>
-                    <div class="col-lg-4 mb-3">
                       <label>Country</label>
                       <input type="text" class="form-control" [value]="getCountryName(employeeAddress?.country)" readonly>
                     </div>
                     <div class="col-lg-4 mb-3">
                       <label>Province</label>
-                      <input type="text" class="form-control" [value]="getProvinceName(employeeAddress?.province)" readonly>
+                      <input type="text" class="form-control" [value]="getProvinceName(employeeAddress?.province?.id || employeeAddress?.province)" readonly>
+                    </div>
+                    <div class="col-lg-4 mb-3">
+                      <label>District</label>
+                      <input type="text" class="form-control" [value]="getDistrictName(employeeAddress?.district?.id || employeeAddress?.district)" readonly>
                     </div>
                   </div>
                   <div class="row">
                     <div class="col-lg-4 mb-3">
-                      <label>District</label>
-                      <input type="text" class="form-control" [value]="getDistrictName(employeeAddress?.district)" readonly>
-                    </div>
-                    <div class="col-lg-4 mb-3">
                       <label>Sector</label>
-                      <input type="text" class="form-control" [value]="getSectorName(employeeAddress?.sector)" readonly>
+                      <input type="text" class="form-control" [value]="getSectorName(employeeAddress?.sector?.id || employeeAddress?.sector)" readonly>
                     </div>
                     <div class="col-lg-4 mb-3">
                       <label>Cell</label>
-                      <input type="text" class="form-control" [value]="getCellName(employeeAddress?.cell)" readonly>
+                      <input type="text" class="form-control" [value]="getCellName(employeeAddress?.cell?.id || employeeAddress?.cell)" readonly>
                     </div>
-                  </div>
-                  <div class="row">
                     <div class="col-lg-4 mb-3">
                       <label>Village</label>
-                      <input type="text" class="form-control" [value]="getVillageName(employeeAddress?.village)" readonly>
-                    </div>
-                    <div class="col-lg-4 mb-3">
-                      <label>City</label>
-                      <input type="text" class="form-control" [value]="employeeAddress?.city || ''" readonly>
-                    </div>
-                    <div class="col-lg-4 mb-3">
-                      <label>Additional Address</label>
-                      <input type="text" class="form-control" [value]="employeeAddress?.additional_address || ''" readonly>
-                    </div>
-                  </div>
-                  <div class="row">
-                    <div class="col-lg-4 mb-3">
-                      <label>Postal Code</label>
-                      <input type="text" class="form-control" [value]="employeeAddress?.postal_code || ''" readonly>
-                    </div>
-                    <div class="col-lg-4 mb-3">
-                      <label>Street Address</label>
-                      <input type="text" class="form-control" [value]="employeeAddress?.street_address || ''" readonly>
+                      <input type="text" class="form-control" [value]="getVillageName(employeeAddress?.village?.id || employeeAddress?.village)" readonly>
                     </div>
                   </div>
                 </section>
