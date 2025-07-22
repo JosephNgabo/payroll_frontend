@@ -183,19 +183,19 @@
       <table class="table table-hover align-middle mb-0 payroll-table">
         <thead class="bg-light">
           <tr>
-            <th class="align-top">Name</th>
-            <th class="align-top">P Mobile</th>
-            <th class="align-top">Payroll Date</th>
-            <th class="align-top">Payslip No</th>
+            <th class="align-top">Full Names</th>
+            <th class="align-top">Phone No</th>
+            <!-- <th class="align-top">Payroll Date</th> -->
+            <!-- <th class="align-top">Payslip No</th> -->
             <th class="align-top">Basic Salary</th>
-            <th class="align-top">T Allowances</th>
-            <th class="align-top">T Gross Salary</th>
-            <th class="align-top">T RSSB Employee Ded</th>
-            <th class="align-top">T RSSB Employer Ded</th>
-            <th class="align-top">T Other Ded</th>
-            <th class="align-top">T PAYE Ded</th>
-            <th class="align-top">T Net Sal</th>
-            <th class="align-top">T Mass Sal</th>
+            <th class="align-top">Total Allowances</th>
+            <th class="align-top">Total Gross Salary</th>
+            <th class="align-top">Total RSSB Employee Deduction</th>
+            <th class="align-top">Total RSSB Employer Deduction</th>
+            <th class="align-top">Total Other Deduction</th>
+            <th class="align-top">Total PAYE Ded</th>
+            <th class="align-top">Total Net Salary</th>
+            <th class="align-top">Total Mass Salary</th>
           </tr>
         </thead>
         <tbody>
@@ -206,16 +206,16 @@
               </span>
             </td>
             <td>{{ employee.employee?.personal_mobile }}</td>
-            <td>
+            <!-- <td>
               <span style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden; max-width: 120px; display: inline-block;">
                 {{ employee.payroll_date | date:'yyyy-MM-dd' }}
               </span>
-            </td>
-            <td>
+            </td> -->
+            <!-- <td>
               <span style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden; max-width: 140px; display: inline-block;">
                 {{ employee.payslip_number }}
               </span>
-            </td>
+            </td> -->
             <td>{{ employee.basic_salary | number:'1.0-2' }}</td>
             <td>{{ employee.total_allowances | number:'1.0-2' }}</td>
             <td>{{ employee.total_gross_salary | number:'1.0-2' }}</td>

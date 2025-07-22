@@ -172,14 +172,16 @@
                       </div>
                       <ul class="list-inline wizard d-flex justify-content-end mb-0">
                         <li class="list-inline-item">
-                          <a class="btn btn-secondary" [routerLink]="['/employees/employees-view']" [class.disabled]="saving" [attr.aria-disabled]="saving ? true : null">
-                            <span *ngIf="saving" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                            <i class="mdi mdi-arrow-left me-1" *ngIf="!saving"></i> Back
-                          </a>
+                          <button class="btn btn-secondary" [routerLink]="['/employees/employees-view']">
+                            <i class="mdi mdi-arrow-left me-1"></i> Back
+                          </button>
                         </li>
                         <li class="next list-inline-item" aria-disabled="false">
                           <button *ngIf="!isEditingStep[0]" class="btn btn-primary" type="button" (click)="onEditStep(0)">Edit</button>
-                          <button *ngIf="isEditingStep[0]" class="btn btn-success me-2" type="button" (click)="onUpdateStep(0)">Update</button>
+                          <button *ngIf="isEditingStep[0]" class="btn btn-success me-2" type="button" (click)="onUpdateStep(0)" [disabled]="saving">
+                            <span *ngIf="saving" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                            Update
+                          </button>
                           <button *ngIf="isEditingStep[0]" class="btn btn-outline-danger" type="button" (click)="onCancelEditStep(0)">Cancel</button>
                         </li>
                       </ul>
@@ -293,14 +295,16 @@
                       </div> -->
                       <ul class="list-inline wizard d-flex justify-content-end mb-0">
                         <li class="previous list-inline-item" aria-disabled="true">
-                          <button class="btn btn-primary" cdkStepperPrevious [disabled]="saving">
-                            <span *ngIf="saving" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                            <i class="mdi mdi-arrow-left me-1" *ngIf="!saving"></i> Previous
+                          <button class="btn btn-secondary" cdkStepperPrevious>
+                            <i class="mdi mdi-arrow-left me-1"></i> Previous
                           </button>
                         </li>
                         <li class="next list-inline-item" aria-disabled="false">
                           <button *ngIf="!isEditingStep[1]" class="btn btn-primary" type="button" (click)="onEditStep(1)">Edit</button>
-                          <button *ngIf="isEditingStep[1]" class="btn btn-success me-2" type="button" (click)="onUpdateStep(1)">Update</button>
+                          <button *ngIf="isEditingStep[1]" class="btn btn-success me-2" type="button" (click)="onUpdateStep(1)" [disabled]="saving">
+                            <span *ngIf="saving" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                            Update
+                          </button>
                           <button *ngIf="isEditingStep[1]" class="btn btn-secondary" type="button" (click)="onCancelEditStep(1)">Cancel</button>
                         </li>
                       </ul>
@@ -403,14 +407,16 @@
                       </div>
                       <ul class="list-inline wizard d-flex justify-content-end mb-0">
                         <li class="previous list-inline-item" aria-disabled="true">
-                          <button class="btn btn-primary" cdkStepperPrevious [disabled]="saving">
-                            <span *ngIf="saving" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                            <i class="mdi mdi-arrow-left me-1" *ngIf="!saving"></i> Previous
+                          <button class="btn btn-secondary" cdkStepperPrevious>
+                            <i class="mdi mdi-arrow-left me-1"></i> Previous
                           </button>
                         </li>
                         <li class="next list-inline-item" aria-disabled="false">
                           <button *ngIf="!isEditingStep[2]" class="btn btn-primary" type="button" (click)="onEditStep(2)">Edit</button>
-                          <button *ngIf="isEditingStep[2]" class="btn btn-success me-2" type="button" (click)="onUpdateStep(2)">Update</button>
+                          <button *ngIf="isEditingStep[2]" class="btn btn-success me-2" type="button" (click)="onUpdateStep(2)" [disabled]="saving">
+                            <span *ngIf="saving" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                            Update
+                          </button>
                           <button *ngIf="isEditingStep[2]" class="btn btn-outline-danger" type="button" (click)="onCancelEditStep(2)">Cancel</button>
                         </li>
                       </ul>
@@ -709,14 +715,16 @@
                         <hr/>
                         <ul class="list-inline wizard d-flex justify-content-end mb-0">
                           <li class="previous list-inline-item" aria-disabled="true">
-                            <button class="btn btn-primary" cdkStepperPrevious [disabled]="saving" type="button">
-                              <span *ngIf="saving" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                              <i class="mdi mdi-arrow-left me-1" *ngIf="!saving"></i> Previous
+                            <button class="btn btn-secondary" cdkStepperPrevious>
+                              <i class="mdi mdi-arrow-left me-1"></i> Previous
                             </button>
                           </li>
                           <li class="next list-inline-item" aria-disabled="false">
                             <button *ngIf="!isEditingStep[3]" class="btn btn-primary" type="button" (click)="onEditStep(3)">Edit</button>
-                            <button *ngIf="isEditingStep[3]" class="btn btn-success me-2" type="button" (click)="onUpdateStep(3)">Update</button>
+                            <button *ngIf="isEditingStep[3]" class="btn btn-success me-2" type="button" (click)="onUpdateStep(3)" [disabled]="saving">
+                              <span *ngIf="saving" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                              Update
+                            </button>
                             <button *ngIf="isEditingStep[3]" class="btn btn-outline-danger me-2" type="button" (click)="onCancelEditStep(3)">Cancel</button>
                           </li>
                         </ul>
@@ -771,14 +779,16 @@
                       </div>
                       <ul class="list-inline wizard d-flex justify-content-end mb-0">
                         <li class="previous list-inline-item" aria-disabled="true">
-                          <button class="btn btn-primary" cdkStepperPrevious [disabled]="saving" type="button">
-                            <span *ngIf="saving" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                            <i class="mdi mdi-arrow-left me-1" *ngIf="!saving"></i> Previous
+                          <button class="btn btn-secondary" cdkStepperPrevious>
+                            <i class="mdi mdi-arrow-left me-1"></i> Previous
                           </button>
                         </li>
                         <li class="next list-inline-item" aria-disabled="false">
                           <button *ngIf="!isEditingStep[4]" class="btn btn-primary" type="button" (click)="onEditStep(4)">Edit</button>
-                          <button *ngIf="isEditingStep[4]" class="btn btn-success me-2" type="button" (click)="onUpdateStep(4)">Update</button>
+                          <button *ngIf="isEditingStep[4]" class="btn btn-success me-2" type="button" (click)="onUpdateStep(4)" [disabled]="saving">
+                            <span *ngIf="saving" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                            Update
+                          </button>
                           <button *ngIf="isEditingStep[4]" class="btn btn-outline-danger" type="button" (click)="onCancelEditStep(4)">Cancel</button>
                         </li>
                       </ul>
@@ -922,14 +932,16 @@
                       </div>
                       <ul class="list-inline wizard d-flex justify-content-end mb-0">
                         <li class="previous list-inline-item" aria-disabled="true">
-                          <button class="btn btn-primary" cdkStepperPrevious [disabled]="saving" type="button">
-                            <span *ngIf="saving" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                            <i class="mdi mdi-arrow-left me-1" *ngIf="!saving"></i> Previous
+                          <button class="btn btn-secondary" cdkStepperPrevious>
+                            <i class="mdi mdi-arrow-left me-1"></i> Previous
                           </button>
                         </li>
                         <li class="next list-inline-item" aria-disabled="false">
                           <button *ngIf="!isEditingStep[5]" class="btn btn-primary" type="button" (click)="onEditStep(5)">Edit</button>
-                          <button *ngIf="isEditingStep[5]" class="btn btn-success me-2" type="button" (click)="onUpdateStep(5)">Update</button>
+                          <button *ngIf="isEditingStep[5]" class="btn btn-success me-2" type="button" (click)="onUpdateStep(5)" [disabled]="saving">
+                            <span *ngIf="saving" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                            Update
+                          </button>
                           <button *ngIf="isEditingStep[5]" class="btn btn-outline-danger" type="button" (click)="onCancelEditStep(5)">Cancel</button>
                         </li>
                       </ul>
@@ -980,14 +992,16 @@
                       </div>
                       <ul class="list-inline wizard d-flex justify-content-end mb-0">
                         <li class="previous list-inline-item" aria-disabled="true">
-                          <button class="btn btn-primary" cdkStepperPrevious [disabled]="saving" type="button">
-                            <span *ngIf="saving" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                            <i class="mdi mdi-arrow-left me-1" *ngIf="!saving"></i> Previous
+                          <button class="btn btn-secondary" cdkStepperPrevious>
+                            <i class="mdi mdi-arrow-left me-1"></i> Previous
                           </button>
                         </li>
                         <li class="next list-inline-item" aria-disabled="false">
                           <button *ngIf="!isEditingStep[6]" class="btn btn-primary" type="button" (click)="onEditStep(6)">Edit</button>
-                          <button *ngIf="isEditingStep[6]" class="btn btn-success me-2" type="button" (click)="onUpdateStep(6)">Update</button>
+                          <button *ngIf="isEditingStep[6]" class="btn btn-success me-2" type="button" (click)="onUpdateStep(6)" [disabled]="saving">
+                            <span *ngIf="saving" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                            Update
+                          </button>
                           <button *ngIf="isEditingStep[6]" class="btn btn-outline-danger" type="button" (click)="onCancelEditStep(6)">Cancel</button>
                         </li>
                       </ul>
@@ -1037,14 +1051,16 @@
                       </div>
                       <ul class="list-inline wizard d-flex justify-content-end mb-0">
                         <li class="previous list-inline-item" aria-disabled="true">
-                          <button class="btn btn-primary" cdkStepperPrevious [disabled]="saving" type="button">
-                            <span *ngIf="saving" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                            <i class="mdi mdi-arrow-left me-1" *ngIf="!saving"></i> Previous
+                          <button class="btn btn-secondary" cdkStepperPrevious>
+                            <i class="mdi mdi-arrow-left me-1"></i> Previous
                           </button>
                         </li>
                         <li class="next list-inline-item" aria-disabled="false">
                           <button *ngIf="!isEditingStep[7]" class="btn btn-primary" type="button" (click)="onEditStep(7)">Edit</button>
-                          <button *ngIf="isEditingStep[7]" class="btn btn-success me-2" type="button" (click)="onUpdateStep(7)">Update</button>
+                          <button *ngIf="isEditingStep[7]" class="btn btn-success me-2" type="button" (click)="onUpdateStep(7)" [disabled]="saving">
+                            <span *ngIf="saving" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                            Update
+                          </button>
                           <button *ngIf="isEditingStep[7]" class="btn btn-outline-danger" type="button" (click)="onCancelEditStep(7)">Cancel</button>
                         </li>
                       </ul>
