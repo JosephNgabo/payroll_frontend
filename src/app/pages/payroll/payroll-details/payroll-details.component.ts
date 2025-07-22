@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, Input, SimpleChanges, OnChanges } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { PayrollService } from 'src/app/core/services/payroll.service';
 import Swal from 'sweetalert2';
@@ -8,7 +8,7 @@ import Swal from 'sweetalert2';
   templateUrl: './payroll-details.component.html',
   styleUrls: ['./payroll-details.component.scss']
 })
-export class PayrollDetailsComponent implements OnInit {
+export class PayrollDetailsComponent implements OnInit, OnChanges {
   payrollId: string = '';
   details: any = null;
   payrollEmployees: any[] = [];
@@ -18,6 +18,9 @@ export class PayrollDetailsComponent implements OnInit {
   rssbDetails: any[] = [];
   allowanceDetails: any[] = [];
   otherDeductionDetails: any[] = [];
+
+  searchTerm: string = '';
+  filteredPayrollEmployees: any[] = [];
 
   monthNames = [
     '', 'January', 'February', 'March', 'April', 'May', 'June',
@@ -35,6 +38,21 @@ export class PayrollDetailsComponent implements OnInit {
     });
   }
 
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['payrollEmployees']) {
+      this.updateFilteredEmployees();
+    }
+  }
+
+  // Call this after payrollEmployees is loaded/updated
+  updateFilteredEmployees() {
+    if (!this.searchTerm) {
+      this.filteredPayrollEmployees = this.payrollEmployees;
+    } else {
+      this.onSearch();
+    }
+  }
+
   fetchDetails() {
     this.loading = true;
     this.error = '';
@@ -49,6 +67,7 @@ export class PayrollDetailsComponent implements OnInit {
         } else {
           this.payrollEmployees = [];
         }
+        this.updateFilteredEmployees();
         this.loading = false;
       },
       error: (err) => {
@@ -109,6 +128,19 @@ export class PayrollDetailsComponent implements OnInit {
           }
         });
       }
+    });
+  }
+
+  onSearch() {
+    const term = this.searchTerm.toLowerCase();
+    if (!term) {
+      this.filteredPayrollEmployees = this.payrollEmployees;
+      return;
+    }
+    this.filteredPayrollEmployees = this.payrollEmployees.filter(emp => {
+      const name = (emp.employee?.first_name + ' ' + emp.employee?.last_name).toLowerCase();
+      const mobile = (emp.employee?.personal_mobile || '').toLowerCase();
+      return name.includes(term) || mobile.includes(term);
     });
   }
 

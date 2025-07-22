@@ -174,42 +174,65 @@
 <div class="card">
   <div class="card-body p-0">
     <div class="table-responsive" style="overflow-x: auto;">
+      <div class="mb-3 d-flex justify-content-start">
+        <div class="input-group" style="max-width: 300px;">
+          <span class="input-group-text bg-white border-end-0"><i class="bx bx-search"></i></span>
+          <input type="text" class="form-control border-start-0" placeholder="Search by name or mobile" [(ngModel)]="searchTerm" (input)="onSearch()">
+        </div>
+      </div>
       <table class="table table-hover align-middle mb-0 payroll-table">
         <thead class="bg-light">
           <tr>
-            <th>Name</th>
-            <th>Personal Mobile</th>
-            <th>Payroll Date</th>
-            <th>Payslip Number</th>
-            <th>Basic Salary</th>
-            <th>Total Allowances</th>
-            <th>Total Gross Salary</th>
-            <th>Total RSSB Employee Deductions</th>
-            <th>Total RSSB Employer Deductions</th>
-            <th>Total Other Deductions</th>
-            <th>Total PAYE Deductions</th>
-            <th>Total Net Salary</th>
-            <th>Total Mass Salary</th>
+            <th class="align-top">Name</th>
+            <th class="align-top">P Mobile</th>
+            <th class="align-top">Payroll Date</th>
+            <th class="align-top">Payslip No</th>
+            <th class="align-top">Basic Salary</th>
+            <th class="align-top">T Allowances</th>
+            <th class="align-top">T Gross Salary</th>
+            <th class="align-top">T RSSB Employee Ded</th>
+            <th class="align-top">T RSSB Employer Ded</th>
+            <th class="align-top">T Other Ded</th>
+            <th class="align-top">T PAYE Ded</th>
+            <th class="align-top">T Net Sal</th>
+            <th class="align-top">T Mass Sal</th>
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let employee of payrollEmployees">
-            <td>{{ employee.employee?.first_name }} {{ employee.employee?.last_name }}</td>
+          <tr *ngFor="let employee of filteredPayrollEmployees">
+            <td>
+              <span style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden; max-width: 180px; display: inline-block;">
+                {{ employee.employee?.first_name }} {{ employee.employee?.last_name }}
+              </span>
+            </td>
             <td>{{ employee.employee?.personal_mobile }}</td>
-            <td>{{ employee.payroll_date | date:'yyyy-MM-dd' }}</td>
-            <td>{{ employee.payslip_number }}</td>
-            <td>{{ employee.basic_salary | currency:'RWF':'symbol':'1.0-0' }}</td>
-            <td>{{ employee.total_allowances | currency:'RWF':'symbol':'1.0-0' }}</td>
-            <td>{{ employee.total_gross_salary | currency:'RWF':'symbol':'1.0-0' }}</td>
-            <td>{{ employee.total_rssb_employee_deductions | currency:'RWF':'symbol':'1.0-0' }}</td>
-            <td>{{ employee.total_rssb_employer_deductions | currency:'RWF':'symbol':'1.0-0' }}</td>
-            <td>{{ employee.total_other_deductions | currency:'RWF':'symbol':'1.0-0' }}</td>
-            <td>{{ employee.total_paye_deductions | currency:'RWF':'symbol':'1.0-0' }}</td>
-            <td><span class="fw-bold text-success">{{ employee.total_net_salary | currency:'RWF':'symbol':'1.0-0' }}</span></td>
-            <td>{{ employee.total_mass_salary | currency:'RWF':'symbol':'1.0-0' }}</td>
+            <td>
+              <span style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden; max-width: 120px; display: inline-block;">
+                {{ employee.payroll_date | date:'yyyy-MM-dd' }}
+              </span>
+            </td>
+            <td>
+              <span style="white-space: nowrap; text-overflow: ellipsis; overflow: hidden; max-width: 140px; display: inline-block;">
+                {{ employee.payslip_number }}
+              </span>
+            </td>
+            <td>{{ employee.basic_salary | number:'1.0-2' }}</td>
+            <td>{{ employee.total_allowances | number:'1.0-2' }}</td>
+            <td>{{ employee.total_gross_salary | number:'1.0-2' }}</td>
+            <td>{{ employee.total_rssb_employee_deductions | number:'1.0-2' }}</td>
+            <td>{{ employee.total_rssb_employer_deductions | number:'1.0-2' }}</td>
+            <td>{{ employee.total_other_deductions | number:'1.0-2' }}</td>
+            <td>{{ employee.total_paye_deductions | number:'1.0-2' }}</td>
+            <td><span class="fw-bold text-success">{{ employee.total_net_salary | number:'1.0-2' }}</span></td>
+            <td>{{ employee.total_mass_salary | number:'1.0-2' }}</td>
           </tr>
         </tbody>
       </table>
     </div>
   </div>
+</div>
+<div class="text-end mt-3">
+  <a class="btn btn-secondary" [routerLink]="['/payroll/list']">
+    <i class="mdi mdi-arrow-left me-1"></i> BACK
+  </a>
 </div>
