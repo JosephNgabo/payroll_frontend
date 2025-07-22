@@ -169,4 +169,13 @@ export class SidebarComponent implements OnInit, AfterViewInit, OnChanges {
       document.body.classList.remove('vertical-collpsed');
     }
   }
+
+  /**
+   * Handle menu item click (placeholder to prevent errors)
+   */
+  onMenuItemClick(item: any) {
+    // You can add logic here if needed, e.g., navigation, analytics, etc.
+    // For now, just log the item
+    // console.log('Menu item clicked:', item);
+  }
 }
