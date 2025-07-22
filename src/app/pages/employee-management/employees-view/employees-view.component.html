@@ -36,7 +36,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr *ngFor="let emp of employeeList; let i = index">
+              <tr *ngFor="let emp of employeeList | employeeSearch:term; let i = index">
                 <!-- <td>{{ emp.id }}</td> -->
                 <td>{{ emp.first_name }}</td>
                 <td>{{ emp.last_name }}</td>
@@ -54,6 +54,9 @@
                     </button>
                     <button type="button" class="btn btn-warning btn-sm btn-rounded ms-1" (click)="onView(emp)">
                       <i class="mdi mdi-eye font-size-16"></i>
+                    </button>
+                    <button type="button" class="btn btn-sm btn-rounded ms-1" (click)="openStatusModal(emp)">
+                      <span [ngClass]="getStatusBadgeClass(emp.status) + ' status-badge-lg'">{{ getStatusLabel(emp.status) }}</span>
                     </button>
                   </div>
                 </td>
@@ -86,3 +89,29 @@
     </div>
   </div>
 </div>
+
+<!-- Status Change Modal -->
+<ng-template #statusModal let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title">Change Employee Status</h5>
+    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
+  </div>
+  <div class="modal-body">
+    <label for="statusSelect">Select New Status:</label>
+    <ng-select
+      [items]="statusOptions"
+      bindLabel="label"
+      bindValue="value"
+      [(ngModel)]="selectedStatus"
+      placeholder="Select status"
+      id="statusSelect">
+    </ng-select>
+    <div class="mt-2">
+      <strong>Current Status:</strong> {{ getStatusLabel(selectedStatus) }}
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="modal.dismiss()">Cancel</button>
+    <button type="button" class="btn btn-primary" (click)="saveStatus(); modal.close()">Save</button>
+  </div>
+</ng-template>

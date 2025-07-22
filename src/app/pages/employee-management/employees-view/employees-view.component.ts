@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { EmployeeInformationService } from 'src/app/core/services/employee-information.service';
 import { EmployeeInformation } from 'src/app/core/models/employee-information.model';
 import Swal from 'sweetalert2';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'app-employees-view',
@@ -17,7 +18,27 @@ export class EmployeesViewComponent implements OnInit {
   totalItems: number = 0;
   lastPage: number = 0;
 
-  constructor(private employeeInformationService: EmployeeInformationService) {}
+  @ViewChild('statusModal') statusModal: any;
+  selectedEmployee: any = null;
+  selectedStatus: number | null = null;
+  showStatusModal = false;
+
+  statusOptions = [
+    { value: 1, label: 'Active' },
+    { value: 2, label: 'Inactive' },
+    { value: 3, label: 'Terminated' },
+    { value: 4, label: 'Resigned' },
+    { value: 5, label: 'Retired' },
+    { value: 6, label: 'Probation' },
+    { value: 7, label: 'On Leave' },
+    { value: 8, label: 'Suspended' },
+    { value: 9, label: 'Pending Activation' }
+  ];
+
+  constructor(
+    private employeeInformationService: EmployeeInformationService,
+    private modalService: NgbModal
+  ) {}
 
   ngOnInit() {
     this.fetchEmployees(1);
@@ -74,5 +95,66 @@ export class EmployeesViewComponent implements OnInit {
         });
       }
     });
+  }
+
+  openStatusModal(emp: any) {
+    this.selectedEmployee = emp;
+    this.selectedStatus = emp.status || null;
+    this.modalService.open(this.statusModal, { centered: true });
+  }
+
+  closeStatusModal() {
+    this.showStatusModal = false;
+  }
+
+  saveStatus() {
+    if (!this.selectedEmployee || !this.selectedEmployee.id || !this.selectedStatus) {
+      Swal.fire('Error', 'Invalid employee or status.', 'error');
+      return;
+    }
+    this.employeeInformationService.updateEmployeeStatus(this.selectedEmployee.id, this.selectedStatus).subscribe({
+      next: (res) => {
+        // Update the status in the local list
+        const idx = this.employeeList.findIndex(e => e.id === this.selectedEmployee.id);
+        if (idx !== -1) {
+          (this.employeeList[idx] as any).status = this.selectedStatus;
+        }
+        Swal.fire('Success', 'Employee status updated successfully.', 'success');
+        this.modalService.dismissAll();
+      },
+      error: (err) => {
+        Swal.fire('Error', err || 'Failed to update employee status.', 'error');
+      }
+    });
+  }
+
+  getStatusLabel(status: number | null | undefined): string {
+    switch (status) {
+      case 1: return 'Active';
+      case 2: return 'Inactive';
+      case 3: return 'Terminated';
+      case 4: return 'Resigned';
+      case 5: return 'Retired';
+      case 6: return 'Probation';
+      case 7: return 'On Leave';
+      case 8: return 'Suspended';
+      case 9: return 'Pending Activation';
+      default: return 'Unknown';
+    }
+  }
+
+  getStatusBadgeClass(status: number | null | undefined): string {
+    switch (status) {
+      case 1: return 'badge bg-success'; // Active - green
+      case 2: return 'badge bg-secondary'; // Inactive - gray
+      case 3: return 'badge bg-danger'; // Terminated - red
+      case 4: return 'badge bg-warning text-dark'; // Resigned - yellow
+      case 5: return 'badge bg-info text-dark'; // Retired - light blue
+      case 6: return 'badge bg-primary'; // Probation - blue
+      case 7: return 'badge bg-warning text-dark'; // On Leave - yellow
+      case 8: return 'badge bg-danger'; // Suspended - red
+      case 9: return 'badge bg-secondary'; // Pending Activation - gray
+      default: return 'badge bg-light text-dark';
+    }
   }
 }
