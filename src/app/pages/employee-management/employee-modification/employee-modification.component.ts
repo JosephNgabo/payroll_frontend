@@ -458,6 +458,10 @@ export class EmployeeModificationComponent implements OnInit {
         // Load existing deductions
         if (employee.employee_rssb_contribution) {
           this.employeeRssbDeductions = [...employee.employee_rssb_contribution];
+          this.employeeRssbDeductions.forEach(deduction => {
+            deduction.rssb_name = deduction.rssb_deductions?.rssb_name;
+          });
+          this.employeeRssbDeductions = [...employee.employee_rssb_contribution];
           this.originalRssbDeductions = [...employee.employee_rssb_contribution];
         }
         if (employee.employee_other_deductions) {

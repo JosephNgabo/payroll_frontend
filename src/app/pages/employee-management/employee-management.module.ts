@@ -28,7 +28,7 @@ import { CdkStepperModule } from '@angular/cdk/stepper';
 import { NgStepperModule } from 'angular-ng-stepper';
 import { EmployeesViewComponent } from './employees-view/employees-view.component';
 import { EmployeeModificationComponent } from './employee-modification/employee-modification.component';
-
+import { EmployeeSearchPipe } from './employees-view/employee-search.pipe';
 
 
 const DEFAULT_DROPZONE_CONFIG: DropzoneConfigInterface = {
@@ -39,7 +39,7 @@ const DEFAULT_DROPZONE_CONFIG: DropzoneConfigInterface = {
 };
 
 @NgModule({
-  declarations: [ EmployeesComponent, EmployeesViewComponent, EmployeeModificationComponent],
+  declarations: [ EmployeesComponent, EmployeesViewComponent, EmployeeModificationComponent, EmployeeSearchPipe],
   imports: [
     CommonModule,
     EmployeeManagementRoutingModule,

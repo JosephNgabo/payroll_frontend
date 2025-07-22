@@ -43,6 +43,14 @@ export class EmployeeInformationService {
   }
 
   /**
+   * Update employee status
+   */
+  updateEmployeeStatus(employeeId: string, status: number): Observable<any> {
+    return this.http.put(`${this.API_URL}/employee-information/status/${employeeId}`, { status })
+      .pipe(catchError(this.handleError));
+  }
+
+  /**
    * Handle HTTP errors and extract backend validation messages
    */
   private handleError(error: any) {

@@ -518,7 +518,7 @@
                           </thead>
                           <tbody>
                             <tr *ngFor="let deduction of employeeRssbDeductions; let i = index">
-                              <td>{{ deduction.rssb_name }}</td>
+                              <td>{{ deduction.rssb_deductions?.rssb_name }}</td>
                               <td>{{ deduction.rssb_employee_contribution }}</td>
                               <td>{{ deduction.rssb_employer_contribution }}</td>
                               <td>
