@@ -174,17 +174,22 @@
                           <span *ngIf="basicInfo.personalEmail.errors.email">Please enter a valid email address.</span>
                         </div>
                       </div>
+                      <!-- Commented out Home Phone field -->
+                      <!--
                       <div class="col-lg-4 mb-3">
                         <label>Home Phone</label>
                         <input type="text" class="form-control" formControlName="homePhone" placeholder="Enter Home Phone"
                                [ngClass]="{'is-invalid': submittedBasicInfo && basicInfo.homePhone.errors, 'is-valid': submittedBasicInfo && basicInfo.homePhone.valid}">
                         <div class="invalid-feedback" *ngIf="submittedBasicInfo && basicInfo.homePhone.errors"></div>
                       </div>
+                      -->
                     </div>
 
                     <!-- Family Information Section -->
-                    <h6 class="mb-3 mt-4">Family Information</h6>
+                    <!-- <h6 class="mb-3 mt-4">Family Information</h6> -->
                     <div class="row">
+                      <!-- Commented out Name of Spouse and Number of Children fields -->
+                      <!--
                       <div class="col-lg-6 mb-3">
                         <label>Name of Spouse</label>
                         <input type="text" class="form-control" formControlName="spouseName" placeholder="Enter Name of Spouse">
@@ -197,6 +202,7 @@
                           <span *ngIf="basicInfo.numberOfChildren.errors.min">Value must be 0 or greater.</span>
                         </div>
                       </div>
+                      -->
                     </div>
                     </div>
                     <ul class="list-inline wizard d-flex justify-content-end mb-0">
@@ -484,10 +490,10 @@
                     <div class="modal-body">
                       <form [formGroup]="allowanceForm" (ngSubmit)="onAllowanceSubmit()" novalidate>
                         <div class="row">
-                          <div class="col-lg-4 mb-3">
+                          <!-- <div class="col-lg-4 mb-3">
                             <label>Name</label>
                             <input type="text" class="form-control" formControlName="name" placeholder="Enter Allowance Name (optional)">
-                          </div>
+                          </div> -->
                           <div class="col-lg-4 mb-3">
                             <label>Amount <span class="text-danger">*</span></label>
                             <input type="number" class="form-control" formControlName="amount" min="0" step="0.01" placeholder="Enter Amount"
@@ -684,16 +690,21 @@
                         </ng-template>
                         <hr/>
                         <ul class="list-inline wizard d-flex justify-content-end mb-0">
+                          <!-- <li class="skip list-inline-item" aria-disabled="false">
+                            <button class="btn btn-secondary" type="button" (click)="onSkipDocuments()" [disabled]="savingNext">
+                              Skip
+                            </button>
+                          </li> -->
                           <li class="previous list-inline-item" aria-disabled="true">
-                            <button class="btn btn-primary" cdkStepperPrevious [disabled]="savingPrevious" type="button" (click)="onPreviousStep()">
+                            <button class="btn btn-primary" cdkStepperPrevious [disabled]="savingPrevious" (click)="onPreviousStep()">
                               <span *ngIf="savingPrevious" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
                               <i class="mdi mdi-arrow-left me-1" *ngIf="!savingPrevious"></i> Previous
                             </button>
                           </li>
                           <li class="next list-inline-item" aria-disabled="false">
-                            <button class="btn btn-primary" type="submit" [disabled]="savingNext || employeeRssbDeductions.length === 0 || employeeOtherDeductions.length === 0">
+                            <button class="btn btn-primary" type="submit" [disabled]="savingNext">
                               <span *ngIf="savingNext" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                              <i class="mdi mdi-arrow-right me-1" *ngIf="!savingNext"></i> {{ savingNext ? 'Saving...' : 'Save & Continue' }}
+                              <i class="mdi mdi-arrow-right me-1" *ngIf="!savingNext"></i> {{ savingNext ? 'Saving...' : 'Next' }}
                             </button>
                           </li>
                         </ul>
@@ -774,6 +785,8 @@
                 <section *ngIf="cdkStepper.selectedIndex === 5">
                   <form [formGroup]="employeeAddressForm" (ngSubmit)="onEmployeeAddressSubmit()" novalidate>
                     <div class="row">
+                      <!-- Commented out Address fields: Type, City, Additional Address, Postal Code, Street Address -->
+                      <!--
                       <div class="col-lg-4 mb-3">
                         <label>Type <span class="text-danger">*</span></label>
                         <ng-select [items]="['current', 'permanent']"
@@ -785,6 +798,23 @@
                           <span *ngIf="employeeAddress.type.errors.required">Type is required.</span>
                         </div>
                       </div>
+                      <div class="col-lg-4 mb-3">
+                        <label>City</label>
+                        <input type="text" class="form-control" formControlName="city" placeholder="Enter City (optional)">
+                      </div>
+                      <div class="col-lg-4 mb-3">
+                        <label>Additional Address</label>
+                        <input type="text" class="form-control" formControlName="additional_address" placeholder="Enter Additional Address (optional)">
+                      </div>
+                      <div class="col-lg-4 mb-3">
+                        <label>Postal Code</label>
+                        <input type="text" class="form-control" formControlName="postal_code" placeholder="Enter Postal Code (optional)">
+                      </div>
+                      <div class="col-lg-4 mb-3">
+                        <label>Street Address</label>
+                        <input type="text" class="form-control" formControlName="street_address" placeholder="Enter Street Address (optional)">
+                      </div>
+                      -->
                       <div class="col-lg-4 mb-3">
                         <label>Country <span class="text-danger">*</span></label>
                         <ng-select [items]="countries"
@@ -812,8 +842,6 @@
                           <span *ngIf="employeeAddress.province.errors.required">Province is required.</span>
                         </div>
                       </div>
-                    </div>
-                    <div class="row">
                       <div class="col-lg-4 mb-3">
                         <label>District <span class="text-danger">*</span></label>
                         <ng-select [items]="districts"
@@ -828,6 +856,22 @@
                           <span *ngIf="employeeAddress.district.errors.required">District is required.</span>
                         </div>
                       </div>
+                    </div>
+                    <div class="row">
+                      <!-- <div class="col-lg-4 mb-3">
+                        <label>District <span class="text-danger">*</span></label>
+                        <ng-select [items]="districts"
+                                   bindLabel="libelle_localisation"
+                                   bindValue="id"
+                                   formControlName="district"
+                                   (change)="onDistrictChange($event?.id)"
+                                   placeholder="Select District"
+                                   [ngClass]="{'is-invalid': submittedEmployeeAddress && employeeAddress.district.errors, 'is-valid': submittedEmployeeAddress && employeeAddress.district.valid}">
+                        </ng-select>
+                        <div class="invalid-feedback d-block" *ngIf="submittedEmployeeAddress && employeeAddress.district.errors">
+                          <span *ngIf="employeeAddress.district.errors.required">District is required.</span>
+                        </div>
+                      </div> -->
                       <div class="col-lg-4 mb-3">
                         <label>Sector <span class="text-danger">*</span></label>
                         <ng-select [items]="sectors"
@@ -856,8 +900,6 @@
                           <span *ngIf="employeeAddress.cell.errors.required">Cell is required.</span>
                         </div>
                       </div>
-                    </div>
-                    <div class="row">
                       <div class="col-lg-4 mb-3">
                         <label>Village <span class="text-danger">*</span></label>
                         <ng-select [items]="villages"
@@ -871,24 +913,39 @@
                           <span *ngIf="employeeAddress.village.errors.required">Village is required.</span>
                         </div>
                       </div>
+                    </div>
+                    <div class="row">
+                     
+                      <!-- Commented out City field -->
+                      <!--
                       <div class="col-lg-4 mb-3">
                         <label>City</label>
                         <input type="text" class="form-control" formControlName="city" placeholder="Enter City (optional)">
                       </div>
+                      -->
+                      <!-- Commented out Additional Address field -->
+                      <!--
                       <div class="col-lg-4 mb-3">
                         <label>Additional Address</label>
                         <input type="text" class="form-control" formControlName="additional_address" placeholder="Enter Additional Address (optional)">
                       </div>
+                      -->
                     </div>
                     <div class="row">
+                      <!-- Commented out Postal Code field -->
+                      <!--
                       <div class="col-lg-4 mb-3">
                         <label>Postal Code</label>
                         <input type="text" class="form-control" formControlName="postal_code" placeholder="Enter Postal Code (optional)">
                       </div>
+                      -->
+                      <!-- Commented out Street Address field -->
+                      <!--
                       <div class="col-lg-4 mb-3">
                         <label>Street Address</label>
                         <input type="text" class="form-control" formControlName="street_address" placeholder="Enter Street Address (optional)">
                       </div>
+                      -->
                     </div>
                     <ul class="list-inline wizard d-flex justify-content-end mb-0">
                       <li class="list-inline-item">
@@ -1017,6 +1074,11 @@
                       </div>
                     </div>
                     <ul class="list-inline wizard d-flex justify-content-end mb-0">
+                      <li class="skip list-inline-item" aria-disabled="false">
+                        <button class="btn btn-secondary" type="button" (click)="onSkipDocuments()" [disabled]="savingNext">
+                          Skip
+                        </button>
+                      </li>
                       <li class="previous list-inline-item" aria-disabled="true">
                         <button class="btn btn-primary" cdkStepperPrevious [disabled]="savingPrevious" (click)="onPreviousStep()">
                           <span *ngIf="savingPrevious" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
@@ -1059,8 +1121,14 @@
                             <li>Nationality: {{ getCountryName(basicInfoForm.value.nationality) }}</li>
                             <li>Country of Birth: {{ getCountryName(basicInfoForm.value.countryOfBirth) }}</li>
                             <li>Marital Status: {{ basicInfoForm.value.maritalStatus }}</li>
+                            <!-- Commented out Name of Spouse field -->
+                            <!--
                             <li>Name of Spouse: {{ basicInfoForm.value.spouseName }}</li>
+                            -->
+                            <!-- Commented out Number of Children field -->
+                            <!--
                             <li>Number of Children: {{ basicInfoForm.value.numberOfChildren }}</li>
+                            -->
                           </ul>
                         </div>
                       </div>
@@ -1180,17 +1248,32 @@
                             <button class="btn btn-link btn-sm p-0" (click)="cdkStepper.selectedIndex = 6">Edit</button>
                           </div>
                           <ul class="mb-0">
+                            <!-- Commented out Type field -->
+                            <!--
                             <li>Type: {{ employeeAddressForm.value.type }}</li>
+                            -->
                             <li>Country: {{ getCountryName(employeeAddressForm.value.country) }}</li>
                             <li>Province: {{ getProvinceName(employeeAddressForm.value.province) }}</li>
                             <li>District: {{ getDistrictName(employeeAddressForm.value.district) }}</li>
                             <li>Sector: {{ getSectorName(employeeAddressForm.value.sector) }}</li>
                             <li>Cell: {{ getCellName(employeeAddressForm.value.cell) }}</li>
                             <li>Village: {{ getVillageName(employeeAddressForm.value.village) }}</li>
+                            <!-- Commented out City field -->
+                            <!--
                             <li>City: {{ employeeAddressForm.value.city }}</li>
+                            -->
+                            <!-- Commented out Additional Address field -->
+                            <!--
                             <li>Additional Address: {{ employeeAddressForm.value.additional_address }}</li>
+                            -->
+                            <!-- Commented out Postal Code field -->
+                            <!--
                             <li>Postal Code: {{ employeeAddressForm.value.postal_code }}</li>
+                            -->
+                            <!-- Commented out Street Address field -->
+                            <!--
                             <li>Street Address: {{ employeeAddressForm.value.street_address }}</li>
+                            -->
                           </ul>
                         </div>
                       </div>

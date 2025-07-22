@@ -265,11 +265,11 @@ export class EmployeeModificationComponent implements OnInit {
       nationality: ['', Validators.required],
       countryOfBirth: ['', Validators.required],
       maritalStatus: ['', Validators.required],
-      spouseName: [''],
-      numberOfChildren: ['', [Validators.min(0)]],
+      spouseName: ['NA'],
+      numberOfChildren: 0,
       personalMobile: [''],
       personalEmail: ['', [Validators.email]],
-      homePhone: ['']
+      homePhone: ['NA']
     });
 
     this.legalContactsInfoForm = this.formBuilder.group({
@@ -332,7 +332,7 @@ export class EmployeeModificationComponent implements OnInit {
     });
 
     this.employeeAddressForm = this.formBuilder.group({
-      type: ['', Validators.required],
+      type: ['current', Validators.required],
       city: [''],
       additional_address: [''],
       country: ['', Validators.required],
@@ -1364,11 +1364,11 @@ export class EmployeeModificationComponent implements OnInit {
       nationality: basic.nationality, // ID only
       country_of_birth: basic.countryOfBirth, // ID only
       marital_status: basic.maritalStatus,
-      name_of_spouse: basic.spouseName,
-      number_of_children: basic.numberOfChildren,
+      name_of_spouse: basic.spouseName || 'NA',
+      number_of_children: Number.isInteger(basic.numberOfChildren) ? basic.numberOfChildren : 0,
       personal_mobile: basic.personalMobile,
       personal_email: basic.personalEmail,
-      home_phone: basic.homePhone,
+      home_phone: basic.homePhone || 'NA',
       document_type: legal.documentType,
       document_number: legal.documentNumber,
       document_issue_date: legal.documentIssueDate,
@@ -1426,18 +1426,17 @@ export class EmployeeModificationComponent implements OnInit {
   private buildAddressPayload(): any {
     const address = this.employeeAddressForm.value;
     return {
-      employee_id: this.employeeId,
-      type: address.type,
+      type: address.type || 'current',
       country: address.country,
       province: address.province,
       district: address.district,
       sector: address.sector,
       cell: address.cell,
       village: address.village,
-      city: address.city,
-      additional_address: address.additional_address,
-      postal_code: address.postal_code,
-      street_address: address.street_address
+      city: address.city || 'NA',
+      additional_address: address.additional_address || 'NA',
+      postal_code: address.postal_code || 'NA',
+      street_address: address.street_address || 'NA',
     };
   }
 

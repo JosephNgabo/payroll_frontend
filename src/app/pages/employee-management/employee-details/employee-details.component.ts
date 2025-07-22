@@ -149,13 +149,48 @@ export class EmployeeDetailsComponent implements OnInit {
         }
       }
     });
-    this.employeeAddressService.getEmployeeAddresses(this.employeeId).subscribe({
-      next: (response: any) => {
-        if (response && response.data && response.data.length > 0) {
-          this.employeeAddress = response.data[0];
+    // Fetch address and load full localization hierarchy
+    if (this.employee && this.employee.address) {
+      this.employeeAddress = this.employee.address;
+      // Load provinces (top level)
+      this.localizationService.getLocalizations(0).subscribe({
+        next: (provData: any) => {
+          this.provinces = provData.data || [];
+          const provinceId = typeof this.employee.address.province === 'object' ? this.employee.address.province.id : this.employee.address.province;
+          if (provinceId) {
+            this.localizationService.getLocalizations(provinceId).subscribe({
+              next: (districtData: any) => {
+                this.districts = districtData.data || [];
+                const districtId = typeof this.employee.address.district === 'object' ? this.employee.address.district.id : this.employee.address.district;
+                if (districtId) {
+                  this.localizationService.getLocalizations(districtId).subscribe({
+                    next: (sectorData: any) => {
+                      this.sectors = sectorData.data || [];
+                      const sectorId = typeof this.employee.address.sector === 'object' ? this.employee.address.sector.id : this.employee.address.sector;
+                      if (sectorId) {
+                        this.localizationService.getLocalizations(sectorId).subscribe({
+                          next: (cellData: any) => {
+                            this.cells = cellData.data || [];
+                            const cellId = typeof this.employee.address.cell === 'object' ? this.employee.address.cell.id : this.employee.address.cell;
+                            if (cellId) {
+                              this.localizationService.getLocalizations(cellId).subscribe({
+                                next: (villageData: any) => {
+                                  this.villages = villageData.data || [];
+                                }
+                              });
+                            }
+                          }
+                        });
+                      }
+                    }
+                  });
+                }
+              }
+            });
+          }
         }
-      }
-    });
+      });
+    }
     this.employeeEmergencyContactService.getEmployeeEmergencyContacts(this.employeeId).subscribe({
       next: (response: any) => {
         if (response && response.data && response.data.length > 0) {
