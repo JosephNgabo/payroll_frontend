@@ -15,4 +15,13 @@ export class EmployeeRssbContributionService {
   createRssbContribution(employeeId: string, contribution: EmployeeRssbContribution): Observable<any> {
     return this.http.post(`${this.apiUrl}/employee-rssb-contribution/${employeeId}`, contribution);
   }
+
+  getEmployeeRssbContributions(employeeId: string): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/employee-rssb-
+      /${employeeId}`);
+  }
+
+  updateEmployeeRssbContribution(contributionId: string, contribution: any): Observable<any> {
+    return this.http.put(`${this.apiUrl}/employee-rssb-contribution/${contributionId}`, contribution);
+  }
 } 

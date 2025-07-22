@@ -411,17 +411,17 @@
                               <th>Name</th>
                               <th>Amount</th>
                               <th>Type</th>
-                              <th>Allowance</th>
-                              <th>Description</th>
-                              <th>Action</th>
+                              <!-- <th>Allowance</th> -->
+                              <!-- <th>Description</th> -->
+                              <!-- <th>Action</th> -->
                             </tr>
                           </thead>
                           <tbody>
                             <tr *ngFor="let allowance of employeeAllowances; let i = index">
-                              <td>{{ allowance.name }}</td>
+                              <td>{{ allowance.allowance_name }}</td>
                               <td>{{ allowance.amount }}</td>
                               <td>{{ allowance.type }}</td>
-                              <td>{{ allowance.allowance_name }}</td>
+                              <!-- <td>{{ allowance.allowance_name }}</td> -->
                               <td>{{ allowance.description }}</td>
                               <td>
                                 <button class="btn btn-danger btn-sm" (click)="removeAllowance(i)" type="button" [disabled]="!isEditingStep[3]">Remove</button>
@@ -571,19 +571,20 @@
                         <table class="table table-bordered">
                           <thead>
                             <tr>
-                              <th>Description</th>
+                              <th>Deduction Name</th>
                               <th>Amount</th>
                               <th>Type</th>
-                              <th>Deduction Name</th>
+                              <th>Description</th>
                               <th>Action</th>
                             </tr>
                           </thead>
                           <tbody>
                             <tr *ngFor="let deduction of employeeOtherDeductions; let i = index">
-                              <td>{{ deduction.description }}</td>
+                              <!-- <td>{{ deduction.description }}</td> -->
+                              <td>{{ getDeductionName(deduction.deduction_id) }}</td>
                               <td>{{ deduction.amount }}</td>
                               <td>{{ deduction.type }}</td>
-                              <td>{{ getDeductionName(deduction.deduction_id) }}</td>
+                              <td>{{ deduction.description }}</td>
                               <td>
                                 <button class="btn btn-warning btn-sm me-1" (click)="openEditOtherDeductionModal(deduction, i)" type="button" [disabled]="!isEditingStep[3]">Modify</button>
                                 <button class="btn btn-danger btn-sm" (click)="removeOtherDeduction(i)" type="button" [disabled]="!isEditingStep[3]">Remove</button>
