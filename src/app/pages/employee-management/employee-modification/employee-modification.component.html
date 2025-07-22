@@ -367,16 +367,24 @@
                           <label>End Date</label>
                           <input type="date" class="form-control" formControlName="end_date">
                         </div>
+                        <!-- Salary Basis: show ng-select when editing, input when not editing -->
                         <div class="col-lg-4 mb-3">
                           <label>Salary Basis <span class="text-danger">*</span></label>
-                          <ng-select [items]="['net', 'gross', 'mass']"
-                                     formControlName="salary_basis"
-                                     placeholder="Select Salary Basis"
-                                     [ngClass]="{'is-invalid': submittedContractInfo && contractInfo.salary_basis.errors, 'is-valid': submittedContractInfo && contractInfo.salary_basis.valid}">
-                          </ng-select>
-                          <div class="invalid-feedback d-block" *ngIf="submittedContractInfo && contractInfo.salary_basis.errors">
-                            <span *ngIf="contractInfo.salary_basis.errors.required">Salary basis is required.</span>
-                          </div>
+                          <ng-container *ngIf="isEditingStep[2]; else salaryBasisReadOnly">
+                            <ng-select [items]="salaryBasisOptions"
+                                       bindLabel="label"
+                                       bindValue="value"
+                                       formControlName="salary_basis"
+                                       placeholder="Select Salary Basis"
+                                       [ngClass]="{'is-invalid': submittedContractInfo && contractInfo.salary_basis.errors, 'is-valid': submittedContractInfo && contractInfo.salary_basis.valid}">
+                            </ng-select>
+                            <div class="invalid-feedback d-block" *ngIf="submittedContractInfo && contractInfo.salary_basis.errors">
+                              <span *ngIf="contractInfo.salary_basis.errors.required">Salary basis is required.</span>
+                            </div>
+                          </ng-container>
+                          <ng-template #salaryBasisReadOnly>
+                            <input type="text" class="form-control" [value]="getSalaryBasisLabel(contractInfoForm.value.salary_basis)" readonly>
+                          </ng-template>
                         </div>
                       </div>
                       <div class="row">

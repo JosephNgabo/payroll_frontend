@@ -384,7 +384,9 @@
                       </div>
                       <div class="col-lg-4 mb-3">
                         <label>Salary Basis <span class="text-danger">*</span></label>
-                        <ng-select [items]="['net', 'gross', 'mass']"
+                        <ng-select [items]="salaryBasisOptions"
+                                   bindLabel="label"
+                                   bindValue="value"
                                    formControlName="salary_basis"
                                    placeholder="Select Salary Basis"
                                    [ngClass]="{'is-invalid': submittedContractInfo && contractInfo.salary_basis.errors, 'is-valid': submittedContractInfo && contractInfo.salary_basis.valid}">

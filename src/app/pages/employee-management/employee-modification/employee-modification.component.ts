@@ -145,6 +145,11 @@ export class EmployeeModificationComponent implements OnInit {
   @ViewChild('addAllowanceModal') addAllowanceModal: any;
   employeeAllowances: any[] = [];
   editingAllowanceIndex: number | null = null;
+  salaryBasisOptions = [
+    { label: 'Net Salary', value: 'net' },
+    { label: 'Gross Salary', value: 'gross' },
+    { label: 'Mass Salary', value: 'mass' }
+  ];
 
   constructor(
     private modalService: BsModalService,
@@ -1766,6 +1771,15 @@ export class EmployeeModificationComponent implements OnInit {
     if (!documentTypeId) return '';
     const documentType = this.documentTypes.find(d => d.value === documentTypeId);
     return documentType ? documentType.label : documentTypeId;
+  }
+
+  getSalaryBasisLabel(value: string): string {
+    switch (value) {
+      case 'net': return 'Net Salary';
+      case 'gross': return 'Gross Salary';
+      case 'mass': return 'Mass Salary';
+      default: return value;
+    }
   }
 
   onAllowanceSubmit() {

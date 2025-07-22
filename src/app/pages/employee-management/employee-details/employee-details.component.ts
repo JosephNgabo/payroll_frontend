@@ -339,4 +339,13 @@ export class EmployeeDetailsComponent implements OnInit {
     const docType = this.documentTypes.find(d => d.value === documentTypeId);
     return docType ? docType.label : documentTypeId;
   }
+
+  getSalaryBasisLabel(value: string): string {
+    switch (value) {
+      case 'net': return 'Net Salary';
+      case 'gross': return 'Gross Salary';
+      case 'mass': return 'Mass Salary';
+      default: return value;
+    }
+  }
 } 
