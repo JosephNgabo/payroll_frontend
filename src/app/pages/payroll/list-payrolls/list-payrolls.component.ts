@@ -37,6 +37,9 @@ export class ListPayrollsComponent implements OnInit {
     { label: 'November', value: 11 },
     { label: 'December', value: 12 }
   ];
+  yearOptions: { label: string, value: number }[] = [];
+  selectedMonth: number | null = null;
+  selectedYear: number | null = null;
   selectedRegenerateMonth: number | null = null;
   selectedRegeneratePayroll: any = null;
   @ViewChild('regenerateModal') regenerateModal: any;
@@ -45,6 +48,14 @@ export class ListPayrollsComponent implements OnInit {
 
   ngOnInit(): void {
     this.fetchPayrolls(1);
+    // Populate year options (current year ±5 years)
+    const currentYear = new Date().getFullYear();
+    this.yearOptions = [];
+    for (let y = currentYear - 5; y <= currentYear + 5; y++) {
+      this.yearOptions.push({ label: y.toString(), value: y });
+    }
+    this.selectedYear = currentYear;
+    this.selectedMonth = new Date().getMonth() + 1;
   }
 
   fetchPayrolls(page: number) {
@@ -148,6 +159,40 @@ export class ListPayrollsComponent implements OnInit {
             Swal.fire('Error', 'Failed to delete payroll.', 'error');
           }
         });
+      }
+    });
+  }
+
+  onGeneratePayrollClick() {
+    this.generatePayroll();
+  }
+
+  generatePayroll() {
+    if (!this.selectedMonth || !this.selectedYear) return;
+    this.loading = true;
+    const payload = {
+      payroll_month: this.selectedMonth.toString(),
+      payroll_year: this.selectedYear.toString()
+    };
+    this.payrollService.generatePayroll(payload).subscribe({
+      next: (response: any) => {
+        this.loading = false;
+        Swal.fire({ icon: 'success', text: 'Payroll generated successfully.' });
+        this.fetchPayrolls(1);
+      },
+      error: (err) => {
+        this.loading = false;
+        let errorMsg = 'Failed to generate payroll.';
+        if (typeof err === 'string') {
+          errorMsg = err;
+        } else if (err && typeof err === 'object') {
+          if (err.message) {
+            errorMsg = err.message;
+          } else if (err.errors) {
+            errorMsg = Object.values(err.errors).flat().join(' ');
+          }
+        }
+        Swal.fire({ icon: 'error', text: errorMsg });
       }
     });
   }
