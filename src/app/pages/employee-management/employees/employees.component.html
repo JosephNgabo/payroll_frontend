@@ -452,17 +452,16 @@
                             <th>Name</th>
                             <th>Amount</th>
                             <th>Type</th>
-                            <th>Allowance</th>
+                            <!-- <th>Allowance</th> -->
                             <th>Description</th>
                             <th>Action</th>
                           </tr>
                         </thead>
                         <tbody>
                           <tr *ngFor="let allowance of employeeAllowances; let i = index">
-                            <td>{{ allowance.name }}</td>
+                            <td>{{ getAllowanceName(allowance.allowance_id) }}</td>
                             <td>{{ allowance.amount }}</td>
                             <td>{{ allowance.type }}</td>
-                            <td>{{ getAllowanceName(allowance.allowance_id) }}</td>
                             <td>{{ allowance.description }}</td>
                             <td>
                               <button class="btn btn-danger btn-sm" (click)="removeAllowance(i)" type="button">Remove</button>
