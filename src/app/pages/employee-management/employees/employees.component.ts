@@ -40,7 +40,6 @@ import { EmployeeDocumentService } from 'src/app/core/services/employee-document
 import { EmployeeDocument } from 'src/app/core/models/employee-document.model';
 import Swal from 'sweetalert2';
 import { Router, ActivatedRoute } from '@angular/router';
-import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-employees',
@@ -170,7 +169,6 @@ export class EmployeesComponent implements OnInit {
     private employeeDocumentService: EmployeeDocumentService,
     private router: Router,
     private route: ActivatedRoute,
-    private toastr: ToastrService
   ) { }
 
   ngOnInit() {
@@ -211,7 +209,7 @@ export class EmployeesComponent implements OnInit {
     });
 
     this.basicInfoForm = this.formBuilder.group({
-      salutation: ['', Validators.required],
+      salutation: ['mr'],
       firstName: ['', [Validators.required]],
       lastName: ['', Validators.required],
       gender: ['', Validators.required],
@@ -600,7 +598,7 @@ export class EmployeesComponent implements OnInit {
     const basic = this.basicInfoForm.value;
     const legal = this.legalContactsInfoForm.value;
     const payload: EmployeeInformation = {
-      salutation: basic.salutation,
+      salutation: basic.salutation || 'mr',
       first_name: basic.firstName,
       last_name: basic.lastName,
       gender: basic.gender,
@@ -634,19 +632,29 @@ export class EmployeesComponent implements OnInit {
       error: (err) => {
         this.savingNext = false;
         let errorMsg = 'Failed to submit employee information';
+        let errorList: string[] = [];
         if (typeof err === 'string') {
           errorMsg = err;
         } else if (err && typeof err === 'object') {
-          if (err.personal_email) {
-            errorMsg = err.personal_email;
-          } else if (err.message) {
+          if (err.message) {
             errorMsg = err.message;
-          } else if (err.errors) {
-            // Laravel validation errors
-            errorMsg = Object.values(err.errors).flat().join(' ');
+          }
+          if (err.errors) {
+            // Laravel validation errors: collect all messages as strings
+            errorList = Object.values(err.errors).flatMap((v: any) => v.map((msg: any) => String(msg)));
           }
         }
-        this.toastr.error(errorMsg, 'Error');
+        // Remove redundant summary if error list is present
+        if (errorList.length > 0) {
+          const summary = errorMsg.replace(/\s*\(and \d+ more error[s]?\)/, '');
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            html: `<div style='text-align:left'><div>${summary}</div><ul style='margin:0;padding-left:1.2em'>${errorList.map(e => `<li>${e}</li>`).join('')}</ul></div>`
+          });
+        } else {
+          Swal.fire({ icon: 'error', title: 'Error', text: errorMsg });
+        }
         console.error('Failed to submit employee information', err);
       }
     });
@@ -1029,6 +1037,12 @@ export class EmployeesComponent implements OnInit {
         this.cdkStepper.next();
       }
     }, 500);
+  }
+
+  onSkipAddress() {
+    if (this.cdkStepper) {
+      this.cdkStepper.next();
+    }
   }
 
   get f() { return this.contractInfo.controls; }

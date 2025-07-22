@@ -1337,7 +1337,7 @@ export class EmployeeModificationComponent implements OnInit {
     const legal = this.legalContactsInfoForm.value;
     return {
       id: this.employeeId,
-      salutation: basic.salutation,
+      salutation: basic.salutation || 'mr',
       first_name: basic.firstName,
       last_name: basic.lastName,
       gender: basic.gender,

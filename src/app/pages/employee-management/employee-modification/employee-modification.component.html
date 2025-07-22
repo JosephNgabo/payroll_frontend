@@ -28,19 +28,6 @@
                     <form [formGroup]="basicInfoForm" novalidate>
                       <div class="row">
                         <div class="col-lg-4 mb-3">
-                          <label>Salutation</label>
-                          <ng-select [items]="salutations"
-                                     bindLabel="label"
-                                     bindValue="value"
-                                     formControlName="salutation"
-                                     placeholder="Select Salutation"
-                                     [ngClass]="{'is-invalid': submittedBasicInfo && basicInfo.salutation.errors, 'is-valid': submittedBasicInfo && basicInfo.salutation.valid}">
-                          </ng-select>
-                          <div class="invalid-feedback d-block" *ngIf="submittedBasicInfo && basicInfo.salutation.errors">
-                            <span *ngIf="basicInfo.salutation.errors.required">Salutation is required.</span>
-                          </div>
-                        </div>
-                        <div class="col-lg-4 mb-3">
                           <label>First Name</label>
                           <input type="text" class="form-control" formControlName="firstName" placeholder="Enter First Name"
                                  [ngClass]="{'is-invalid': submittedBasicInfo && basicInfo.firstName.errors, 'is-valid': submittedBasicInfo && basicInfo.firstName.valid}">
@@ -55,6 +42,10 @@
                           <div class="invalid-feedback" *ngIf="submittedBasicInfo && basicInfo.lastName.errors">
                             <span *ngIf="basicInfo.lastName.errors.required">Last name is required.</span>
                           </div>
+                        </div>
+                        <div class="col-lg-4 mb-3">
+                          <label>Name of Spouse</label>
+                          <input type="text" class="form-control" formControlName="spouseName" placeholder="Enter Name of Spouse">
                         </div>
                       </div>
                       <div class="row">
@@ -80,6 +71,16 @@
                           </div>
                         </div>
                         <div class="col-lg-4 mb-3">
+                          <label>Number of Children</label>
+                          <input type="number" class="form-control" formControlName="numberOfChildren" min="0" placeholder="Enter Number of Children"
+                                 [ngClass]="{'is-invalid': submittedBasicInfo && basicInfo.numberOfChildren.errors, 'is-valid': submittedBasicInfo && basicInfo.numberOfChildren.valid}">
+                          <div class="invalid-feedback" *ngIf="submittedBasicInfo && basicInfo.numberOfChildren.errors">
+                            <span *ngIf="basicInfo.numberOfChildren.errors.min">Value must be 0 or greater.</span>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="row">
+                        <div class="col-lg-4 mb-3">
                           <label>Nationality</label>
                           <ng-select *ngIf="countries && countries.length"
                                      [items]="countries"
@@ -93,8 +94,6 @@
                             <span *ngIf="basicInfo.nationality.errors.required">Nationality is required.</span>
                           </div>
                         </div>
-                      </div>
-                      <div class="row">
                         <div class="col-lg-4 mb-3">
                           <label>Country of Birth</label>
                           <ng-select *ngIf="countries && countries.length"
@@ -118,20 +117,6 @@
                           </ng-select>
                           <div class="invalid-feedback d-block" *ngIf="submittedBasicInfo && basicInfo.maritalStatus.errors">
                             <span *ngIf="basicInfo.maritalStatus.errors.required">Marital status is required.</span>
-                          </div>
-                        </div>
-                        <div class="col-lg-4 mb-3">
-                          <label>Name of Spouse</label>
-                          <input type="text" class="form-control" formControlName="spouseName" placeholder="Enter Name of Spouse">
-                        </div>
-                      </div>
-                      <div class="row">
-                        <div class="col-lg-4 mb-3">
-                          <label>Number of Children</label>
-                          <input type="number" class="form-control" formControlName="numberOfChildren" min="0" placeholder="Enter Number of Children"
-                                 [ngClass]="{'is-invalid': submittedBasicInfo && basicInfo.numberOfChildren.errors, 'is-valid': submittedBasicInfo && basicInfo.numberOfChildren.valid}">
-                          <div class="invalid-feedback" *ngIf="submittedBasicInfo && basicInfo.numberOfChildren.errors">
-                            <span *ngIf="basicInfo.numberOfChildren.errors.min">Value must be 0 or greater.</span>
                           </div>
                         </div>
                       </div>
