@@ -513,14 +513,16 @@
                               <th>Deduction Name</th>
                               <th>Employee Contribution</th>
                               <th>Employer Contribution</th>
+                              <th>Description</th>
                               <th>Action</th>
                             </tr>
                           </thead>
                           <tbody>
                             <tr *ngFor="let deduction of employeeRssbDeductions; let i = index">
-                              <td>{{ deduction.rssb_deductions?.rssb_name }}</td>
+                              <td>{{ deduction.rssb_name }}</td>
                               <td>{{ deduction.rssb_employee_contribution }}</td>
                               <td>{{ deduction.rssb_employer_contribution }}</td>
+                              <td>{{ deduction.rssb_description }}</td>
                               <td>
                                 <button class="btn btn-danger btn-sm" (click)="removeRssbDeduction(i)" type="button" [disabled]="!isEditingStep[3]">Remove</button>
                               </td>

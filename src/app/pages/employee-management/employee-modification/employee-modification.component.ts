@@ -31,6 +31,7 @@ import { EmployeeAddress } from 'src/app/core/models/employee-address.model';
 import { EmployeeEmergencyContactService } from 'src/app/core/services/employee-emergency-contact.service';
 import { EmployeeEmergencyContact } from 'src/app/core/models/employee-emergency-contact.model';
 import { environment } from 'src/environments/environment';
+import { EmployeeRssbContributionService } from 'src/app/core/services/employee-rssb-contribution.service';
 
 @Component({
   selector: 'app-employee-modification',
@@ -163,7 +164,8 @@ export class EmployeeModificationComponent implements OnInit {
     private employeeBankInfoService: EmployeeBankInfoService,
     private localizationService: LocalizationService,
     private employeeAddressService: EmployeeAddressService,
-    private employeeEmergencyContactService: EmployeeEmergencyContactService
+    private employeeEmergencyContactService: EmployeeEmergencyContactService,
+    private employeeRssbContributionService: EmployeeRssbContributionService
   ) { }
 
   ngOnInit() {
@@ -389,6 +391,7 @@ export class EmployeeModificationComponent implements OnInit {
   fetchEmployeeInfo() {
     if (!this.employeeId) return;
     this.employeeInformationService.getEmployeeById(this.employeeId).subscribe((employee: any) => {
+      console.log('Raw employee object:', employee);
       if (employee) {
         this.fullEmployeeData = { ...employee }; // Store the full object
         this.basicInfoForm.patchValue({
@@ -457,12 +460,12 @@ export class EmployeeModificationComponent implements OnInit {
         // this.employeeAllowanceId = allowanceData[0].id || '';
         // Load existing deductions
         if (employee.employee_rssb_contribution) {
-          this.employeeRssbDeductions = [...employee.employee_rssb_contribution];
-          this.employeeRssbDeductions.forEach(deduction => {
-            deduction.rssb_name = deduction.rssb_deductions?.rssb_name;
-          });
-          this.employeeRssbDeductions = [...employee.employee_rssb_contribution];
-          this.originalRssbDeductions = [...employee.employee_rssb_contribution];
+          this.employeeRssbDeductions = employee.employee_rssb_contribution.map((ded: any) => ({
+            ...ded,
+            rssb_name: ded.rssb_deductions?.rssb_name || ded.rssb_name || ''
+          }));
+          console.log('employeeRssbDeductions:', this.employeeRssbDeductions);
+          this.originalRssbDeductions = [...this.employeeRssbDeductions];
         }
         if (employee.employee_other_deductions) {
           this.employeeOtherDeductions = [...employee.employee_other_deductions];
@@ -480,6 +483,18 @@ export class EmployeeModificationComponent implements OnInit {
         
         // Load documents information
         this.loadEmployeeDocuments();
+
+        // Fetch RSSB deductions with nested names
+        this.employeeRssbContributionService.getEmployeeRssbContributions(this.employeeId).subscribe({
+          next: (response: any) => {
+            this.employeeRssbDeductions = (response.data || []).map((ded: any) => ({
+              ...ded,
+              rssb_name: ded.rssb_deductions?.rssb_name || '',
+              rssb_description: ded.rssb_deductions?.rssb_description || ''
+            }));
+            this.originalRssbDeductions = [...this.employeeRssbDeductions];
+          }
+        });
       }
     });
   }
@@ -1442,6 +1457,7 @@ export class EmployeeModificationComponent implements OnInit {
   loadAllowances() {
     this.allowanceService.getAllowances().subscribe({
       next: (response: any) => {
+        console.log('All allowances:', response);
         if (response && response.data) {
           this.allowances = response.data;
           if (this.employeeId) {
@@ -1484,6 +1500,7 @@ export class EmployeeModificationComponent implements OnInit {
   loadEmployeeAllowances() {
     this.employeeAllowanceService.getEmployeeAllowances(this.employeeId).subscribe({
       next: (response: any) => {
+        console.log('Employee allowances:', response);
         const data = response && response.data ? response.data : [];
         this.employeeAllowances = data.map((a: any) => {
           const found = this.allowances.find(alw => String(alw.id) === String(a.allowance_id));
@@ -1492,6 +1509,7 @@ export class EmployeeModificationComponent implements OnInit {
             allowance_name: found ? (found.name || found.allowance_name) : a.allowance_id
           };
         });
+        console.log('Mapped employeeAllowances:', this.employeeAllowances);
       },
       error: (error) => {
         console.error('Error loading employee allowances:', error);
