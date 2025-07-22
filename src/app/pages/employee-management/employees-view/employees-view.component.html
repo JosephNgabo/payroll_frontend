@@ -57,6 +57,7 @@
                     </button>
                     <ul class="dropdown-menu">
                       <li><a class="dropdown-item" [routerLink]="['/employees/employee-modification', emp.id]">Edit</a></li>
+                      <li><a class="dropdown-item" [routerLink]="['/employees/employee-details', emp.id]">View Details</a></li>
                       <li><button class="dropdown-item text-danger fw-bold" type="button" (click)="onDelete(emp)">Delete</button></li>
                       <li><button class="dropdown-item" type="button" (click)="openStatusModal(emp)">Change Status</button></li>
                     </ul>

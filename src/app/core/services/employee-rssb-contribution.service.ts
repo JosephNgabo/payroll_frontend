@@ -17,8 +17,7 @@ export class EmployeeRssbContributionService {
   }
 
   getEmployeeRssbContributions(employeeId: string): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/employee-rssb-
-      /${employeeId}`);
+    return this.http.get<any[]>(`${this.apiUrl}/employee-rssb-contribution/${employeeId}`);
   }
 
   updateEmployeeRssbContribution(contributionId: string, contribution: any): Observable<any> {
