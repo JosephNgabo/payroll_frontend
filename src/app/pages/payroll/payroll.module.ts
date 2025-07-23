@@ -5,7 +5,8 @@ import { HttpClientModule } from '@angular/common/http';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { ScrollingModule } from '@angular/cdk/scrolling';
-
+import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
+import { ModalModule } from 'ngx-bootstrap/modal';
 import { PayrollRoutingModule } from './payroll-routing.module';
 import { PayrollComponent } from './payroll.component';
 import { ListPayrollsComponent } from './list-payrolls/list-payrolls.component';
@@ -24,7 +25,9 @@ import { PayrollDetailsComponent } from './payroll-details/payroll-details.compo
     NgbModule,
     NgSelectModule,
     PayrollRoutingModule,
-    ScrollingModule
+    ScrollingModule,
+    BsDropdownModule.forRoot(),
+    ModalModule.forRoot(),
   ],
   exports: [
     PayrollComponent,

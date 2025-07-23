@@ -17,7 +17,7 @@
               <cdk-step [optional]="false">
                 <ng-template cdkStepLabel>
                   <span class="number">1.</span>
-                  <span>Personal Info</span>
+                  <span>Personal</span>
                 </ng-template>
                 <section>
                   <form [formGroup]="basicInfoForm" novalidate>
@@ -110,7 +110,7 @@
               <cdk-step [optional]="true">
                 <ng-template cdkStepLabel>
                   <span class="number">2.</span>
-                  <span>Legal & Contacts</span>
+                  <span>Legal</span>
                 </ng-template>
                 <section>
                   <div class="row">
@@ -181,7 +181,7 @@
                     </div>
                     <div class="col-lg-4 mb-3">
                       <label>Salary Basis</label>
-                      <input type="text" class="form-control" [value]="employee.employee_contracts?.salary_basis" readonly>
+                      <input type="text" class="form-control" [value]="getSalaryBasisLabel(employee.employee_contracts?.salary_basis)" readonly>
                     </div>
                   </div>
                   <div class="row">
@@ -204,7 +204,7 @@
               <cdk-step [optional]="true">
                 <ng-template cdkStepLabel>
                   <span class="number">4.</span>
-                  <span>Allowance & Deductions</span>
+                  <span>Salary Items</span>
                 </ng-template>
                 <section>
                   <div class="card mb-4">
@@ -288,7 +288,7 @@
               <cdk-step [optional]="true">
                 <ng-template cdkStepLabel>
                   <span class="number">5.</span>
-                  <span>Bank Info</span>
+                  <span>Bank</span>
                 </ng-template>
                 <section>
                   <div class="row">

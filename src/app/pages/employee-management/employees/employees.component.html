@@ -149,15 +149,27 @@
                           <span *ngIf="basicInfo.maritalStatus.errors.required">Marital status is required.</span>
                         </div>
                       </div>
+                      <div class="col-lg-4 mb-3">
+                        <label>Personal Mobile <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" formControlName="personalMobile" placeholder="Enter Personal Mobile"
+                               [ngClass]="{'is-invalid': submittedBasicInfo && basicInfo.personalMobile.errors, 'is-valid': submittedBasicInfo && basicInfo.personalMobile.valid}">
+                        <div class="invalid-feedback" *ngIf="submittedBasicInfo && basicInfo.personalMobile.errors">
+                          <span *ngIf="basicInfo.personalMobile.errors.required">Personal mobile is required.</span>
+                        </div>
+                      </div>
+                      <div class="col-lg-4 mb-3">
+                        <label>Personal Email</label>
+                        <input type="email" class="form-control" formControlName="personalEmail" placeholder="Enter Personal Email">
+                      </div>
                     
 
 
 
 
                     <!-- Contact Information Section -->
-                    <h6 class="mb-3 mt-4">Contact Information</h6>
-                    <div class="row">
-                      <div class="col-lg-4 mb-3">
+                    <!-- <h6 class="mb-3 mt-4">Contact Information</h6> -->
+                    <!-- <div class="row"> -->
+                      <!-- <div class="col-lg-4 mb-3">
                         <label>Personal Mobile <span class="text-danger">*</span></label>
                         <input type="text" class="form-control" formControlName="personalMobile" placeholder="Enter Personal Mobile"
                                [ngClass]="{'is-invalid': submittedBasicInfo && basicInfo.personalMobile.errors, 'is-valid': submittedBasicInfo && basicInfo.personalMobile.valid}">
@@ -173,7 +185,7 @@
                           <span *ngIf="basicInfo.personalEmail.errors.required">Personal email is required.</span>
                           <span *ngIf="basicInfo.personalEmail.errors.email">Please enter a valid email address.</span>
                         </div>
-                      </div>
+                      </div> -->
                       <!-- Commented out Home Phone field -->
                       <!--
                       <div class="col-lg-4 mb-3">
@@ -183,11 +195,11 @@
                         <div class="invalid-feedback" *ngIf="submittedBasicInfo && basicInfo.homePhone.errors"></div>
                       </div>
                       -->
-                    </div>
+                    <!-- </div> -->
 
                     <!-- Family Information Section -->
                     <!-- <h6 class="mb-3 mt-4">Family Information</h6> -->
-                    <div class="row">
+                    <!-- <div class="row"> -->
                       <!-- Commented out Name of Spouse and Number of Children fields -->
                       <!--
                       <div class="col-lg-6 mb-3">
@@ -203,7 +215,7 @@
                         </div>
                       </div>
                       -->
-                    </div>
+                    <!-- </div> -->
                     </div>
                     <ul class="list-inline wizard d-flex justify-content-end mb-0">
                       <li class="list-inline-item">
@@ -227,7 +239,7 @@
               <cdk-step [optional]="true">
                 <ng-template cdkStepLabel>
                   <span class="number">2.</span>
-                  <span>Legal & Contacts</span>
+                  <span>Legal</span>
                 </ng-template>
                 <section *ngIf="cdkStepper.selectedIndex === 1">
                   <form [formGroup]="legalContactsInfoForm" (ngSubmit)="onLegalContactsInfoSubmit()" novalidate>
@@ -295,16 +307,12 @@
                     </div>
                     <div class="row">
                       <div class="col-lg-4 mb-3">
-                        <label>Highest Education <span class="text-danger">*</span></label>
+                        <label>Highest Education</label>
                         <ng-select [items]="['Secondary', 'Bachelor', 'Master', 'PhD', 'Other']"
                                    formControlName="highestEducation"
-                                   placeholder="Select Highest Education"
-                                   [ngClass]="{'is-invalid': submittedLegalContactsInfo && legalContactsInfo.highestEducation.errors, 'is-valid': submittedLegalContactsInfo && legalContactsInfo.highestEducation.valid}">
+                                   placeholder="Select Highest Education">
                         </ng-select>
-                        <div class="invalid-feedback d-block" *ngIf="submittedLegalContactsInfo && legalContactsInfo.highestEducation.errors">
-                          <span *ngIf="legalContactsInfo.highestEducation.errors.required">Highest education is required.</span>
-                        </div>
-                        <div class="valid-feedback d-block" *ngIf="submittedLegalContactsInfo && legalContactsInfo.highestEducation.valid"></div>
+                        <!-- Removed validation feedback -->
                       </div>
                     </div>
                     <hr/>
@@ -384,7 +392,9 @@
                       </div>
                       <div class="col-lg-4 mb-3">
                         <label>Salary Basis <span class="text-danger">*</span></label>
-                        <ng-select [items]="['net', 'gross', 'mass']"
+                        <ng-select [items]="salaryBasisOptions"
+                                   bindLabel="label"
+                                   bindValue="value"
                                    formControlName="salary_basis"
                                    placeholder="Select Salary Basis"
                                    [ngClass]="{'is-invalid': submittedContractInfo && contractInfo.salary_basis.errors, 'is-valid': submittedContractInfo && contractInfo.salary_basis.valid}">
@@ -438,11 +448,11 @@
                 </section>
               </cdk-step>
 
-              <!-- Step 4: Allowance & Deductions (merged) -->
+              <!-- Step 4: Allowance & Deductioase ubundi font size wayigabanyans (merged) -->
               <cdk-step [optional]="true">
                 <ng-template cdkStepLabel>
                   <span class="number">4.</span>
-                  <span>Allowance & Deductions</span>
+                  <span>Salary Items</span>
                 </ng-template>
                 <section *ngIf="cdkStepper.selectedIndex === 3">
                   <!-- Allowance Section -->
@@ -718,7 +728,7 @@
               <cdk-step [optional]="true">
                 <ng-template cdkStepLabel>
                   <span class="number">5.</span>
-                  <span>Bank Info</span>
+                  <span>Bank</span>
                 </ng-template>
                 <section *ngIf="cdkStepper.selectedIndex === 4">
                   <form [formGroup]="bankInfoForm" (ngSubmit)="onBankInfoSubmit()" novalidate>
@@ -1073,260 +1083,18 @@
                         <input type="date" class="form-control" formControlName="expiration_date">
                       </div>
                     </div>
-                    <ul class="list-inline wizard d-flex justify-content-end mb-0">
+                    <ul class="list-inline wizard d-flex justify-content-end mb-0 mt-3">
                       <li class="skip list-inline-item" aria-disabled="false">
-                        <button class="btn btn-secondary" type="button" (click)="onSkipDocuments()" [disabled]="savingNext">
-                          Skip
-                        </button>
-                      </li>
-                      <li class="previous list-inline-item" aria-disabled="true">
-                        <button class="btn btn-primary" cdkStepperPrevious [disabled]="savingPrevious" (click)="onPreviousStep()">
-                          <span *ngIf="savingPrevious" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                          <i class="mdi mdi-arrow-left me-1" *ngIf="!savingPrevious"></i> Previous
-                        </button>
+                        <button class="btn btn-secondary" type="button" (click)="onFinalSubmit()">Skip & Submit</button>
                       </li>
                       <li class="next list-inline-item" aria-disabled="false">
-                        <button class="btn btn-primary" type="submit" [disabled]="savingNext">
+                        <button class="btn btn-success" type="button" (click)="onFinalSubmit()">
                           <span *ngIf="savingNext" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                          <i class="mdi mdi-arrow-right me-1" *ngIf="!savingNext"></i> {{ savingNext ? 'Saving...' : 'Next' }}
+                          <i class="mdi mdi-check me-1" *ngIf="!savingNext"></i> Submit
                         </button>
                       </li>
                     </ul>
                   </form>
-                </section>
-              </cdk-step>
-
-              <!-- Step 9: Review & Submit -->
-              <cdk-step [optional]="true">
-                <ng-template cdkStepLabel>
-                  <span class="number">9.</span>
-                  <span>Review & Submit</span>
-                </ng-template>
-                <section *ngIf="cdkStepper.selectedIndex === 8">
-                  <div class="row" style="max-height: 500px; overflow-y: auto;">
-                    <!-- First Row: Personal Info & Legal & Contacts -->
-                    <div class="col-md-6 mb-3">
-                      <div class="card h-100">
-                        <div class="card-body">
-                          <div class="d-flex justify-content-between align-items-center mb-2">
-                            <h5 class="mb-0">Personal Info</h5>
-                            <button class="btn btn-link btn-sm p-0" (click)="cdkStepper.selectedIndex = 0">Edit</button>
-                          </div>
-                          <ul class="mb-0">
-                            <li>Salutation: {{ getSalutationLabel(basicInfoForm.value.salutation) }}</li>
-                            <li>First Name: {{ basicInfoForm.value.firstName }}</li>
-                            <li>Last Name: {{ basicInfoForm.value.lastName }}</li>
-                            <li>Gender: {{ getGenderLabel(basicInfoForm.value.gender) }}</li>
-                            <li>Date of Birth: {{ basicInfoForm.value.dateOfBirth }}</li>
-                            <li>Nationality: {{ getCountryName(basicInfoForm.value.nationality) }}</li>
-                            <li>Country of Birth: {{ getCountryName(basicInfoForm.value.countryOfBirth) }}</li>
-                            <li>Marital Status: {{ basicInfoForm.value.maritalStatus }}</li>
-                            <!-- Commented out Name of Spouse field -->
-                            <!--
-                            <li>Name of Spouse: {{ basicInfoForm.value.spouseName }}</li>
-                            -->
-                            <!-- Commented out Number of Children field -->
-                            <!--
-                            <li>Number of Children: {{ basicInfoForm.value.numberOfChildren }}</li>
-                            -->
-                          </ul>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                      <div class="card h-100">
-                        <div class="card-body">
-                          <div class="d-flex justify-content-between align-items-center mb-2">
-                            <h5 class="mb-0">Legal & Contacts</h5>
-                            <button class="btn btn-link btn-sm p-0" (click)="cdkStepper.selectedIndex = 1">Edit</button>
-                          </div>
-                          <ul class="mb-0">
-                            <li>Document Type: {{ getDocumentTypeName(legalContactsInfoForm.value.documentType) }}</li>
-                            <li>Document Number: {{ legalContactsInfoForm.value.documentNumber }}</li>
-                            <li>Document Issue Date: {{ legalContactsInfoForm.value.documentIssueDate }}</li>
-                            <li>Document Expiry Date: {{ legalContactsInfoForm.value.documentExpiryDate }}</li>
-                            <li>Place of Issue: {{ legalContactsInfoForm.value.placeOfIssue }}</li>
-                            <li>RSSB Number: {{ legalContactsInfoForm.value.rssbNumber }}</li>
-                            <li>Highest Education: {{ legalContactsInfoForm.value.highestEducation }}</li>
-                          </ul>
-                        </div>
-                      </div>
-                    </div>
-
-                    <!-- Second Row: Contract Info & Allowance -->
-                    <div class="col-md-6 mb-3">
-                      <div class="card h-100">
-                        <div class="card-body">
-                          <div class="d-flex justify-content-between align-items-center mb-2">
-                            <h5 class="mb-0">Contract Info</h5>
-                            <button class="btn btn-link btn-sm p-0" (click)="cdkStepper.selectedIndex = 2">Edit</button>
-                          </div>
-                          <ul class="mb-0">
-                            <li>Department: {{ getDepartmentName(contractInfoForm.value.department) }}</li>
-                            <li>Job Title: {{ contractInfoForm.value.job_title }}</li>
-                            <li>Employment Type: {{ contractInfoForm.value.employment_type }}</li>
-                            <li>Hire Date: {{ contractInfoForm.value.hire_date }}</li>
-                            <li>End Date: {{ contractInfoForm.value.end_date }}</li>
-                            <li>Salary Basis: {{ contractInfoForm.value.salary_basis }}</li>
-                            <li>Salary Amount: {{ contractInfoForm.value.salary_amount }}</li>
-                            <li>Salary Frequency: {{ contractInfoForm.value.salary_frequency }}</li>
-                            <li>TIN Number: {{ contractInfoForm.value.tin_number }}</li>
-                          </ul>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                      <div class="card h-100">
-                        <div class="card-body">
-                          <div class="d-flex justify-content-between align-items-center mb-2">
-                            <h5 class="mb-0">Allowance</h5>
-                            <button class="btn btn-link btn-sm p-0" (click)="cdkStepper.selectedIndex = 3">Edit</button>
-                          </div>
-                          <ul class="mb-0">
-                            <li *ngFor="let a of employeeAllowances">
-                              {{ a.name }}: {{ a.amount }} ({{ a.type }}) - {{ a.description }}
-                            </li>
-                          </ul>
-                        </div>
-                      </div>
-                    </div>
-
-                    <!-- Continue for other sections... -->
-                    <div class="col-md-6 mb-3">
-                      <div class="card h-100">
-                        <div class="card-body">
-                          <div class="d-flex justify-content-between align-items-center mb-2">
-                            <h5 class="mb-0">RSSB Deductions</h5>
-                            <button class="btn btn-link btn-sm p-0" (click)="cdkStepper.selectedIndex = 4">Edit</button>
-                          </div>
-                          <ul class="mb-0">
-                            <li *ngFor="let d of employeeRssbDeductions">
-                              {{ d.rssb_name }}: Employee {{ d.rssb_employee_contribution }}, Employer {{ d.rssb_employer_contribution }}
-                            </li>
-                          </ul>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                      <div class="card h-100">
-                        <div class="card-body">
-                          <div class="d-flex justify-content-between align-items-center mb-2">
-                            <h5 class="mb-0">Other Deductions</h5>
-                            <button class="btn btn-link btn-sm p-0" (click)="cdkStepper.selectedIndex = 4">Edit</button>
-                          </div>
-                          <ul class="mb-0">
-                            <li *ngFor="let d of employeeOtherDeductions">
-                              {{ getDeductionName(d.deduction_id) }}: {{ d.amount }} ({{ d.type }}) - {{ d.description }}
-                            </li>
-                          </ul>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div class="col-md-6 mb-3">
-                      <div class="card h-100">
-                        <div class="card-body">
-                          <div class="d-flex justify-content-between align-items-center mb-2">
-                            <h5 class="mb-0">Bank Info</h5>
-                            <button class="btn btn-link btn-sm p-0" (click)="cdkStepper.selectedIndex = 5">Edit</button>
-                          </div>
-                          <ul class="mb-0">
-                            <li>Bank Name: {{ bankInfoForm.value.bank_name }}</li>
-                            <li>Account Number: {{ bankInfoForm.value.account_number }}</li>
-                            <li>Account Name: {{ bankInfoForm.value.account_name }}</li>
-                            <li>IBAN: {{ bankInfoForm.value.iban }}</li>
-                            <li>SWIFT Code: {{ bankInfoForm.value.swift_code }}</li>
-                          </ul>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                      <div class="card h-100">
-                        <div class="card-body">
-                          <div class="d-flex justify-content-between align-items-center mb-2">
-                            <h5 class="mb-0">Address</h5>
-                            <button class="btn btn-link btn-sm p-0" (click)="cdkStepper.selectedIndex = 6">Edit</button>
-                          </div>
-                          <ul class="mb-0">
-                            <!-- Commented out Type field -->
-                            <!--
-                            <li>Type: {{ employeeAddressForm.value.type }}</li>
-                            -->
-                            <li>Country: {{ getCountryName(employeeAddressForm.value.country) }}</li>
-                            <li>Province: {{ getProvinceName(employeeAddressForm.value.province) }}</li>
-                            <li>District: {{ getDistrictName(employeeAddressForm.value.district) }}</li>
-                            <li>Sector: {{ getSectorName(employeeAddressForm.value.sector) }}</li>
-                            <li>Cell: {{ getCellName(employeeAddressForm.value.cell) }}</li>
-                            <li>Village: {{ getVillageName(employeeAddressForm.value.village) }}</li>
-                            <!-- Commented out City field -->
-                            <!--
-                            <li>City: {{ employeeAddressForm.value.city }}</li>
-                            -->
-                            <!-- Commented out Additional Address field -->
-                            <!--
-                            <li>Additional Address: {{ employeeAddressForm.value.additional_address }}</li>
-                            -->
-                            <!-- Commented out Postal Code field -->
-                            <!--
-                            <li>Postal Code: {{ employeeAddressForm.value.postal_code }}</li>
-                            -->
-                            <!-- Commented out Street Address field -->
-                            <!--
-                            <li>Street Address: {{ employeeAddressForm.value.street_address }}</li>
-                            -->
-                          </ul>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div class="col-md-6 mb-3">
-                      <div class="card h-100">
-                        <div class="card-body">
-                          <div class="d-flex justify-content-between align-items-center mb-2">
-                            <h5 class="mb-0">Emergency Contact</h5>
-                            <button class="btn btn-link btn-sm p-0" (click)="cdkStepper.selectedIndex = 7">Edit</button>
-                          </div>
-                          <ul class="mb-0">
-                            <li>Name: {{ emergencyContactForm.value.name }}</li>
-                            <li>Gender: {{ getGenderLabel(emergencyContactForm.value.gender) }}</li>
-                            <li>Relationship: {{ emergencyContactForm.value.relationship }}</li>
-                            <li>Phone: {{ emergencyContactForm.value.phone }}</li>
-                            <li>Email: {{ emergencyContactForm.value.email }}</li>
-                          </ul>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                      <div class="card h-100">
-                        <div class="card-body">
-                          <div class="d-flex justify-content-between align-items-center mb-2">
-                            <h5 class="mb-0">Documents</h5>
-                            <button class="btn btn-link btn-sm p-0" (click)="cdkStepper.selectedIndex = 8">Edit</button>
-                          </div>
-                          <ul class="mb-0">
-                            <li>Document Type: {{ getDocumentTypeName(documentsForm.value.document_type_id) }}</li>
-                            <li>File: {{ documentsForm.value.document }}</li>
-                            <li>Description: {{ documentsForm.value.description }}</li>
-                            <li>Expiration Date: {{ documentsForm.value.expiration_date }}</li>
-                          </ul>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <ul class="list-inline wizard d-flex justify-content-end mt-3">
-                    <li class="previous list-inline-item" aria-disabled="true">
-                      <button class="btn btn-primary" cdkStepperPrevious [disabled]="savingPrevious" (click)="onPreviousStep()">
-                        <span *ngIf="savingPrevious" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                        <i class="mdi mdi-arrow-left me-1" *ngIf="!savingPrevious"></i> Previous
-                      </button>
-                    </li>
-                    <li class="next list-inline-item" aria-disabled="false">
-                      <button class="btn btn-success" (click)="onFinalSubmit()" [disabled]="savingNext">
-                        <span *ngIf="savingNext" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                        <i class="mdi mdi-check me-1" *ngIf="!savingNext"></i> Submit
-                      </button>
-                    </li>
-                  </ul>
                 </section>
               </cdk-step>
 
