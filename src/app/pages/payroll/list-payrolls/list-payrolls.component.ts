@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { PayrollService } from 'src/app/core/services/payroll.service';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal, NgbDateStruct } from '@ng-bootstrap/ng-bootstrap';
 import Swal from 'sweetalert2';
 import { timer } from 'rxjs';
 
@@ -19,43 +19,26 @@ export class ListPayrollsComponent implements OnInit {
   total = 0;
   links: any[] = [];
 
-  monthNames = [
-    '', 'January', 'February', 'March', 'April', 'May', 'June',
-    'July', 'August', 'September', 'October', 'November', 'December'
-  ];
-  monthOptions = [
-    { label: 'January', value: 1 },
-    { label: 'February', value: 2 },
-    { label: 'March', value: 3 },
-    { label: 'April', value: 4 },
-    { label: 'May', value: 5 },
-    { label: 'June', value: 6 },
-    { label: 'July', value: 7 },
-    { label: 'August', value: 8 },
-    { label: 'September', value: 9 },
-    { label: 'October', value: 10 },
-    { label: 'November', value: 11 },
-    { label: 'December', value: 12 }
-  ];
-  yearOptions: { label: string, value: number }[] = [];
-  selectedMonth: number | null = null;
-  selectedYear: number | null = null;
+  selectedDate: string | Date | null = null;
+  flatpickrOptions: any = {
+    enableTime: true,
+    dateFormat: 'Y-m-d H:i',
+    altInput: true,
+    altFormat: 'F j, Y H:i',
+    allowInput: true
+  };
   selectedRegenerateMonth: number | null = null;
   selectedRegeneratePayroll: any = null;
+  selectedPayrollDate: NgbDateStruct | null = null;
   @ViewChild('regenerateModal') regenerateModal: any;
 
   constructor(private payrollService: PayrollService, private modalService: NgbModal) {}
 
   ngOnInit(): void {
     this.fetchPayrolls(1);
-    // Populate year options (current year ±5 years)
-    const currentYear = new Date().getFullYear();
-    this.yearOptions = [];
-    for (let y = currentYear - 5; y <= currentYear + 5; y++) {
-      this.yearOptions.push({ label: y.toString(), value: y });
-    }
-    this.selectedYear = currentYear;
-    this.selectedMonth = new Date().getMonth() + 1;
+    // Set default selectedPayrollDate to today
+    const today = new Date();
+    this.selectedPayrollDate = { year: today.getFullYear(), month: today.getMonth() + 1, day: today.getDate() };
   }
 
   fetchPayrolls(page: number) {
@@ -79,7 +62,11 @@ export class ListPayrollsComponent implements OnInit {
   }
 
   getMonthName(month: number): string {
-    return this.monthNames[month] || '';
+    const monthNames = [
+      '', 'January', 'February', 'March', 'April', 'May', 'June',
+      'July', 'August', 'September', 'October', 'November', 'December'
+    ];
+    return monthNames[month] || '';
   }
 
   getStatusText(status: number): string {
@@ -168,11 +155,12 @@ export class ListPayrollsComponent implements OnInit {
   }
 
   generatePayroll() {
-    if (!this.selectedMonth || !this.selectedYear) return;
+    if (!this.selectedPayrollDate) return;
     this.loading = true;
     const payload = {
-      payroll_month: this.selectedMonth.toString(),
-      payroll_year: this.selectedYear.toString()
+      payroll_month: this.selectedPayrollDate.month.toString(),
+      payroll_year: this.selectedPayrollDate.year.toString(),
+      payroll_day: this.selectedPayrollDate.day.toString()
     };
     this.payrollService.generatePayroll(payload).subscribe({
       next: (response: any) => {
@@ -195,5 +183,10 @@ export class ListPayrollsComponent implements OnInit {
         Swal.fire({ icon: 'error', text: errorMsg });
       }
     });
+  }
+
+  onPayrollDateChange(date: NgbDateStruct) {
+    this.selectedPayrollDate = date;
+    // Optionally, filter or fetch payrolls for the selected date here
   }
 } 

@@ -1,185 +1,44 @@
-<!-- <div class="container-fluid payroll-details-page">
-  <div class="d-flex justify-content-between align-items-center mb-3">
-    <h2 class="fw-bold mb-0">Payroll Details</h2>
-    <div>
-      <button class="btn btn-danger" (click)="deletePayslip()">
-        <i class="bx bx-trash"></i> Delete Payslip
-      </button>
-    </div>
+<div class="mb-3 d-flex align-items-center" style="gap: 0.75rem;">
+  <div class="input-group" style="max-width: 300px;">
+    <span class="input-group-text bg-white border-end-0"><i class="bx bx-search"></i></span>
+    <input type="text" class="form-control border-start-0" placeholder="Search by name or mobile" [(ngModel)]="searchTerm" (input)="onSearch()">
   </div>
-  <button class="btn btn-link mb-3" routerLink="/payroll/list">&larr; Back to List</button>
-
-  <div *ngIf="loading" class="text-center py-5">
-    <div class="spinner-border text-primary" role="status">
-      <span class="visually-hidden">Loading...</span>
-    </div>
-    <p class="mt-2">Loading payroll details...</p>
+  <!-- <div class="input-group" style="max-width: 220px; margin-left: 1rem;">
+    <span class="input-group-text bg-white border-end-0"><i class="bi bi-calendar"></i></span>
+    <input
+      class="form-control border-start-0"
+      placeholder="Select Payroll Date"
+      name="payrollDate"
+      [(ngModel)]="selectedPayrollDate"
+      ngbDatepicker
+      #payrollDatePicker="ngbDatepicker"
+      (dateSelect)="onPayrollDateChange($event)"
+      autocomplete="off"
+    />
+    <button class="btn btn-outline-secondary" (click)="payrollDatePicker.toggle()" type="button" tabindex="-1">
+      <i class="bi bi-calendar-event"></i>
+    </button>
+  </div> -->
+  <div *ngIf="payrollDate" class="d-flex align-items-center">
+    <span class="me-2 text-muted">
+      <i class="bi bi-calendar-event" style="font-size: 1em;"></i>
+    </span>
+    <span class="fw-semibold">Payroll Date:</span>
+    <span class="badge bg-light text-primary border ms-2" style="font-size: 0.95em; padding: 0.25em 0.75em;">
+      {{ payrollDate | date:'yyyy-MM-dd' }}
+    </span>
   </div>
-
-  <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
-
-  <div *ngIf="!loading && !error && details">
-    <div class="card mb-4 shadow-sm">
-      <div class="card-header bg-primary text-white fw-bold">Payroll Summary</div>
-      <div class="card-body p-0">
-        <div class="table-responsive">
-          <table class="table table-bordered mb-0">
-            <thead class="table-light">
-              <tr>
-                <th>Payslip Number</th>
-                <th>Payroll Date</th>
-                <th>Payroll Month</th>
-                <th>Payroll Year</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>{{ details.payslip_number }}</td>
-                <td>{{ details.payroll_date | date:'mediumDate' }}</td>
-                <td>{{ getMonthName(details.payroll_month) }}</td>
-                <td>{{ details.payroll_year }}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-
-    <div class="card mb-4" *ngIf="details">
-      <div class="card-body p-0">
-        <div class="table-responsive" style="overflow-x: auto;">
-          <table class="table table-hover align-middle mb-0 payroll-table">
-            <thead class="bg-light">
-              <tr>
-                <th>Name</th>
-                <th>Personal Mobile</th>
-                <th>Payroll Date</th>
-                <th>Payslip Number</th>
-                <th>Basic Salary</th>
-                <th>Total Allowances</th>
-                <th>Total Gross Salary</th>
-                <th>Total RSSB Employee Deductions</th>
-                <th>Total RSSB Employer Deductions</th>
-                <th>Total Other Deductions</th>
-                <th>Total PAYE Deductions</th>
-                <th>Total Net Salary</th>
-                <th>Total Mass Salary</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>{{ details.employee?.first_name }} {{ details.employee?.last_name }}</td>
-                <td>{{ details.employee?.personal_mobile }}</td>
-                <td>{{ details.payroll_date | date:'yyyy-MM-dd' }}</td>
-                <td>{{ details.payslip_number }}</td>
-                <td>{{ details.basic_salary | currency:'RWF':'symbol':'1.0-0' }}</td>
-                <td>{{ details.total_allowances | currency:'RWF':'symbol':'1.0-0' }}</td>
-                <td>{{ details.total_gross_salary | currency:'RWF':'symbol':'1.0-0' }}</td>
-                <td>{{ details.total_rssb_employee_deductions | currency:'RWF':'symbol':'1.0-0' }}</td>
-                <td>{{ details.total_rssb_employer_deductions | currency:'RWF':'symbol':'1.0-0' }}</td>
-                <td>{{ details.total_other_deductions | currency:'RWF':'symbol':'1.0-0' }}</td>
-                <td>{{ details.total_paye_deductions | currency:'RWF':'symbol':'1.0-0' }}</td>
-                <td><span class="fw-bold text-success">{{ details.total_net_salary | currency:'RWF':'symbol':'1.0-0' }}</span></td>
-                <td>{{ details.total_mass_salary | currency:'RWF':'symbol':'1.0-0' }}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-
-    <div *ngIf="rssbDetails.length" class="card mb-4 shadow-sm">
-      <div class="card-header bg-info text-white fw-bold">RSSB Details</div>
-      <div class="card-body p-0">
-        <div class="table-responsive">
-          <table class="table table-bordered mb-0">
-            <thead class="table-light">
-              <tr>
-                <th>Name</th>
-                <th>Base</th>
-                <th>Employee Rate</th>
-                <th>Employer Rate</th>
-                <th>Employee Amount</th>
-                <th>Employer Amount</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let d of rssbDetails">
-                <td>{{ d.name }}</td>
-                <td>{{ d.base }}</td>
-                <td>{{ d.employee_contribution_rate }}</td>
-                <td>{{ d.employer_contribution_rate }}</td>
-                <td>{{ d.employee_contribution_amount }}</td>
-                <td>{{ d.employer_contribution_amount }}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-
-    <div *ngIf="allowanceDetails.length" class="card mb-4 shadow-sm">
-      <div class="card-header bg-success text-white fw-bold">Allowance Details</div>
-      <div class="card-body p-0">
-        <div class="table-responsive">
-          <table class="table table-bordered mb-0">
-            <thead class="table-light">
-              <tr>
-                <th>Name</th>
-                <th>Type</th>
-                <th>Rate/Amount</th>
-                <th>Calculated Amount</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let d of allowanceDetails">
-                <td>{{ d.name }}</td>
-                <td>{{ d.type }}</td>
-                <td>{{ d.rate_or_amount }}</td>
-                <td>{{ d.calculated_amount }}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-
-    <div *ngIf="otherDeductionDetails.length" class="card mb-4 shadow-sm">
-      <div class="card-header bg-warning text-dark fw-bold">Other Deduction Details</div>
-      <div class="card-body p-0">
-        <div class="table-responsive">
-          <table class="table table-bordered mb-0">
-            <thead class="table-light">
-              <tr>
-                <th>Name</th>
-                <th>Type</th>
-                <th>Rate/Amount</th>
-                <th>Calculated Amount</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let d of otherDeductionDetails">
-                <td>{{ d.name }}</td>
-                <td>{{ d.type }}</td>
-                <td>{{ d.rate_or_amount }}</td>
-                <td>{{ d.calculated_amount }}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>  -->
+</div>
 <div class="card">
+
   <div class="card-body p-0">
     <div class="table-responsive" style="overflow-x: auto;">
-      <div class="mb-3 d-flex justify-content-start">
+      <!-- <div class="mb-3 d-flex justify-content-start">
         <div class="input-group" style="max-width: 300px;">
           <span class="input-group-text bg-white border-end-0"><i class="bx bx-search"></i></span>
           <input type="text" class="form-control border-start-0" placeholder="Search by name or mobile" [(ngModel)]="searchTerm" (input)="onSearch()">
         </div>
-      </div>
+      </div> -->
       <table class="table table-hover align-middle mb-0 payroll-table">
         <thead class="bg-light">
           <tr>
@@ -187,15 +46,16 @@
             <th class="align-top">Phone No</th>
             <!-- <th class="align-top">Payroll Date</th> -->
             <!-- <th class="align-top">Payslip No</th> -->
-            <th class="align-top">Basic Salary</th>
+            <th class="align-top">B Salary</th>
             <th class="align-top">Total Allowances</th>
             <th class="align-top">Total Gross Salary</th>
-            <th class="align-top">Total RSSB Employee Deduction</th>
-            <th class="align-top">Total RSSB Employer Deduction</th>
+            <th class="align-top">Total RSSB EE</th>
+            <th class="align-top">Total RSSB ER</th>
             <th class="align-top">Total Other Deduction</th>
-            <th class="align-top">Total PAYE Ded</th>
+            <th class="align-top">Total PAYE</th>
             <th class="align-top">Total Net Salary</th>
             <th class="align-top">Total Mass Salary</th>
+            <th class="align-top">Action</th>
           </tr>
         </thead>
         <tbody>
@@ -225,6 +85,17 @@
             <td>{{ employee.total_paye_deductions | number:'1.0-2' }}</td>
             <td><span class="fw-bold text-success">{{ employee.total_net_salary | number:'1.0-2' }}</span></td>
             <td>{{ employee.total_mass_salary | number:'1.0-2' }}</td>
+            <td>
+              <div class="dropdown">
+                <button class="btn btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                  <i class="bi bi-three-dots"></i>
+                </button>
+                <ul class="dropdown-menu">
+                  <li><a class="dropdown-item" href="javascript:void(0);" (click)="openEmployeeDetailsModal(employeeDetailsModal, employee)"><i class="bi bi-eye me-2"></i> View Details</a></li>
+                  <li><a class="dropdown-item text-danger" href="javascript:void(0);" (click)="deletePayslipById(employee)"><i class="bi bi-trash me-2"></i> Delete Payslip</a></li>
+                </ul>
+              </div>
+            </td>
           </tr>
         </tbody>
       </table>
@@ -236,3 +107,175 @@
     <i class="mdi mdi-arrow-left me-1"></i> BACK
   </a>
 </div>
+
+<!-- Employee Details Modal -->
+<ng-template #employeeDetailsModal>
+  <div class="modal-header bg-primary text-white">
+    <h5 class="modal-title"><i class="bi bi-person-badge me-2"></i>Employee Payslip Details</h5>
+    <button type="button" class="btn-close btn-close-white" aria-label="Close" (click)="closeModal()"></button>
+  </div>
+  <div class="modal-body" *ngIf="selectedEmployee">
+    <div class="row g-3">
+      <div class="col-md-6">
+        <div class="card border-0 shadow-sm mb-3">
+          <div class="card-body p-3">
+            <h6 class="fw-bold mb-2 text-primary"><i class="bi bi-person me-1"></i> Personal Info</h6>
+            <div class="mb-1"><i class="bi bi-person-circle me-1"></i><strong>Full Name:</strong> {{ selectedEmployee.employee?.first_name }} {{ selectedEmployee.employee?.last_name }}</div>
+            <div class="mb-1"><i class="bi bi-telephone me-1"></i><strong>Phone No:</strong> {{ selectedEmployee.employee?.personal_mobile }}</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="card border-0 shadow-sm mb-3">
+          <div class="card-body p-3">
+            <h6 class="fw-bold mb-2 text-primary"><i class="bi bi-calendar-event me-1"></i> Payroll Info</h6>
+            <div class="mb-1"><i class="bi bi-calendar3 me-1"></i><strong>Payroll Date:</strong> {{ selectedEmployee.payroll_date | date:'yyyy-MM-dd' }}</div>
+            <div class="mb-1"><i class="bi bi-receipt me-1"></i><strong>Payslip No:</strong> {{ selectedEmployee.payslip_number || '-' }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="table-responsive mb-3">
+      <table class="table table-bordered align-middle mb-0">
+        <tbody>
+          <tr>
+            <th class="bg-light"><i class="bi bi-cash-coin me-1" data-bs-toggle="tooltip" title="Employee's base salary"></i> Basic Salary</th>
+            <td class="fw-bold text-primary">{{ selectedEmployee.basic_salary | number:'1.0-2' }}</td>
+          </tr>
+          <tr>
+            <th class="bg-light"><i class="bi bi-gift me-1" data-bs-toggle="tooltip" title="Total of all allowances"></i> Total Allowances</th>
+            <td class="fw-bold text-info">{{ selectedEmployee.total_allowances | number:'1.0-2' }}</td>
+          </tr>
+          <tr>
+            <th class="bg-light"><i class="bi bi-graph-up-arrow me-1" data-bs-toggle="tooltip" title="Gross salary before deductions"></i> Total Gross Salary</th>
+            <td class="fw-bold text-success fs-5">{{ selectedEmployee.total_gross_salary | number:'1.0-2' }}</td>
+          </tr>
+          <tr>
+            <th class="bg-light"><i class="bi bi-person-dash me-1" data-bs-toggle="tooltip" title="Employee's RSSB deduction"></i> Total RSSB EE</th>
+            <td class="fw-bold text-warning">{{ selectedEmployee.total_rssb_employee_deductions | number:'1.0-2' }}</td>
+          </tr>
+          <tr>
+            <th class="bg-light"><i class="bi bi-building me-1" data-bs-toggle="tooltip" title="Employer's RSSB contribution"></i> Total RSSB ER</th>
+            <td class="fw-bold text-warning">{{ selectedEmployee.total_rssb_employer_deductions | number:'1.0-2' }}</td>
+          </tr>
+          <tr>
+            <th class="bg-light"><i class="bi bi-dash-circle me-1" data-bs-toggle="tooltip" title="Other deductions (e.g. loans, penalties)"></i> Total Other Deduction</th>
+            <td class="fw-bold text-danger">{{ selectedEmployee.total_other_deductions | number:'1.0-2' }}</td>
+          </tr>
+          <tr>
+            <th class="bg-light"><i class="bi bi-percent me-1" data-bs-toggle="tooltip" title="PAYE (tax) deduction"></i> Total PAYE</th>
+            <td class="fw-bold text-danger">{{ selectedEmployee.total_paye_deductions | number:'1.0-2' }}</td>
+          </tr>
+          <tr>
+            <th class="bg-light"><i class="bi bi-wallet2 me-1" data-bs-toggle="tooltip" title="Net salary after all deductions"></i> Total Net Salary</th>
+            <td class="fw-bold text-success fs-5">{{ selectedEmployee.total_net_salary | number:'1.0-2' }}</td>
+          </tr>
+          <tr>
+            <th class="bg-light"><i class="bi bi-cash-stack me-1" data-bs-toggle="tooltip" title="Total mass salary (if applicable)"></i> Total Mass Salary</th>
+            <td class="fw-bold text-dark">{{ selectedEmployee.total_mass_salary | number:'1.0-2' }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <!-- RSSB Details Table -->
+    <div *ngIf="selectedEmployee.rssb_details">
+      <div class="mb-2 mt-3 fw-bold text-primary bg-light p-2 rounded"><i class="bi bi-bank me-1"></i> RSSB Details</div>
+      <div class="table-responsive mb-3">
+        <table class="table table-bordered align-middle mb-0">
+          <thead class="table-primary">
+            <tr>
+              <th>Name</th>
+              <th>Base</th>
+              <th>Employee Rate</th>
+              <th>Employer Rate</th>
+              <th>Employee Amount</th>
+              <th>Employer Amount</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let rssb of selectedEmployee.rssb_details">
+              <td>{{ rssb.name }}</td>
+              <td>{{ rssb.base | number:'1.0-2' }}</td>
+              <td>{{ rssb.employee_contribution_rate | percent:'1.0-2' }}</td>
+              <td>{{ rssb.employer_contribution_rate | percent:'1.0-2' }}</td>
+              <td class="text-success fw-bold">{{ rssb.employee_contribution_amount | number:'1.0-2' }}</td>
+              <td class="text-info fw-bold">{{ rssb.employer_contribution_amount | number:'1.0-2' }}</td>
+            </tr>
+            <tr *ngIf="selectedEmployee.rssb_details.length">
+              <th class="text-end" colspan="4">Total</th>
+              <th class="text-success fw-bold">
+                {{ getRssbEmployeeTotal() | number:'1.0-2' }}
+              </th>
+              <th class="text-info fw-bold">
+                {{ getRssbEmployerTotal() | number:'1.0-2' }}
+              </th>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <!-- Allowances Details Table -->
+    <div *ngIf="selectedEmployee.allowance_details">
+      <div class="mb-2 mt-3 fw-bold text-info bg-info-subtle p-2 rounded"><i class="bi bi-gift me-1"></i> Allowances Details</div>
+      <div class="table-responsive mb-3">
+        <table class="table table-bordered align-middle mb-0">
+          <thead class="table-info">
+            <tr>
+              <th>Name</th>
+              <th>Type</th>
+              <th>Rate/Amount</th>
+              <th>Calculated Amount</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let allowance of selectedEmployee.allowance_details">
+              <td>{{ allowance.name }}</td>
+              <td>{{ allowance.type }}</td>
+              <td>{{ allowance.rate_or_amount | number:'1.0-2' }}</td>
+              <td class="text-success fw-bold">{{ allowance.calculated_amount | number:'1.0-2' }}</td>
+            </tr>
+            <tr *ngIf="selectedEmployee.allowance_details.length">
+              <th class="text-end" colspan="3">Total</th>
+              <th class="text-success fw-bold">
+                {{ getAllowanceTotal() | number:'1.0-2' }}
+              </th>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <!-- Other Deductions Details Table -->
+    <div *ngIf="selectedEmployee.other_deduction_details">
+      <div class="mb-2 fw-bold text-danger bg-danger-subtle p-2 rounded"><i class="bi bi-dash-circle me-1"></i> Other Deductions Details</div>
+      <div class="table-responsive mb-3">
+        <table class="table table-bordered align-middle mb-0">
+          <thead class="table-danger">
+            <tr>
+              <th>Name</th>
+              <th>Type</th>
+              <th>Rate/Amount</th>
+              <th>Calculated Amount</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let deduction of selectedEmployee.other_deduction_details">
+              <td>{{ deduction.name }}</td>
+              <td>{{ deduction.type }}</td>
+              <td>{{ deduction.rate_or_amount | number:'1.0-2' }}</td>
+              <td class="text-danger fw-bold">{{ deduction.calculated_amount | number:'1.0-2' }}</td>
+            </tr>
+            <tr *ngIf="selectedEmployee.other_deduction_details.length">
+              <th class="text-end" colspan="3">Total</th>
+              <th class="text-danger fw-bold">
+                {{ getOtherDeductionTotal() | number:'1.0-2' }}
+              </th>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="closeModal()">Close</button>
+  </div>
+</ng-template>

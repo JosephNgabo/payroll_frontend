@@ -2,6 +2,8 @@ import { Component, OnInit, ViewChild, Input, SimpleChanges, OnChanges } from '@
 import { ActivatedRoute, Router } from '@angular/router';
 import { PayrollService } from 'src/app/core/services/payroll.service';
 import Swal from 'sweetalert2';
+import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
+import { NgbDateStruct } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'app-payroll-details',
@@ -14,6 +16,7 @@ export class PayrollDetailsComponent implements OnInit, OnChanges {
   payrollEmployees: any[] = [];
   loading = false;
   error: string = '';
+  payrollDate: string | null = null;
 
   rssbDetails: any[] = [];
   allowanceDetails: any[] = [];
@@ -22,12 +25,21 @@ export class PayrollDetailsComponent implements OnInit, OnChanges {
   searchTerm: string = '';
   filteredPayrollEmployees: any[] = [];
 
+  selectedEmployee: any = null;
+  modalRef?: BsModalRef;
+  selectedPayrollDate: NgbDateStruct | null = null;
+
   monthNames = [
     '', 'January', 'February', 'March', 'April', 'May', 'June',
     'July', 'August', 'September', 'October', 'November', 'December'
   ];
 
-  constructor(private route: ActivatedRoute, private payrollService: PayrollService, private router: Router) {}
+  constructor(
+    private route: ActivatedRoute,
+    private payrollService: PayrollService,
+    private router: Router,
+    private modalService: BsModalService
+  ) {}
 
   ngOnInit(): void {
     this.route.paramMap.subscribe(params => {
@@ -68,6 +80,11 @@ export class PayrollDetailsComponent implements OnInit, OnChanges {
           this.payrollEmployees = [];
         }
         this.updateFilteredEmployees();
+        if (this.filteredPayrollEmployees && this.filteredPayrollEmployees.length > 0) {
+          this.payrollDate = this.filteredPayrollEmployees[0].payroll_date;
+        } else {
+          this.payrollDate = null;
+        }
         this.loading = false;
       },
       error: (err) => {
@@ -135,6 +152,11 @@ export class PayrollDetailsComponent implements OnInit, OnChanges {
     const term = this.searchTerm.toLowerCase();
     if (!term) {
       this.filteredPayrollEmployees = this.payrollEmployees;
+      if (this.filteredPayrollEmployees && this.filteredPayrollEmployees.length > 0) {
+        this.payrollDate = this.filteredPayrollEmployees[0].payroll_date;
+      } else {
+        this.payrollDate = null;
+      }
       return;
     }
     this.filteredPayrollEmployees = this.payrollEmployees.filter(emp => {
@@ -142,6 +164,32 @@ export class PayrollDetailsComponent implements OnInit, OnChanges {
       const mobile = (emp.employee?.personal_mobile || '').toLowerCase();
       return name.includes(term) || mobile.includes(term);
     });
+    if (this.filteredPayrollEmployees && this.filteredPayrollEmployees.length > 0) {
+      this.payrollDate = this.filteredPayrollEmployees[0].payroll_date;
+    } else {
+      this.payrollDate = null;
+    }
+  }
+
+  openEmployeeDetailsModal(template: any, employee: any) {
+    this.selectedEmployee = {
+      ...employee,
+      rssb_details: employee.rssb_details ? JSON.parse(employee.rssb_details) : [],
+      allowance_details: employee.allowance_details ? JSON.parse(employee.allowance_details) : [],
+      other_deduction_details: employee.other_deduction_details ? JSON.parse(employee.other_deduction_details) : [],
+    };
+    this.modalRef = this.modalService.show(template, { class: 'modal-lg' });
+  }
+
+  closeModal() {
+    if (this.modalRef) {
+      this.modalRef.hide();
+    }
+  }
+
+  deletePayslipById(employee: any) {
+    // Placeholder for delete API integration
+    alert('Delete payslip for employee ID: ' + (employee?.id || employee?.employee?.id));
   }
 
   getMonthName(month: number): string {
@@ -154,5 +202,23 @@ export class PayrollDetailsComponent implements OnInit, OnChanges {
       case 0: return 'Inactive';
       default: return 'Unknown';
     }
+  }
+
+  onPayrollDateChange(date: NgbDateStruct) {
+    this.selectedPayrollDate = date;
+    // Optionally, filter or fetch payroll data for the selected date here
+  }
+
+  getRssbEmployeeTotal(): number {
+    return (this.selectedEmployee?.rssb_details || []).reduce((sum, r) => sum + (r.employee_contribution_amount || 0), 0);
+  }
+  getRssbEmployerTotal(): number {
+    return (this.selectedEmployee?.rssb_details || []).reduce((sum, r) => sum + (r.employer_contribution_amount || 0), 0);
+  }
+  getAllowanceTotal(): number {
+    return (this.selectedEmployee?.allowance_details || []).reduce((sum, a) => sum + (a.calculated_amount || 0), 0);
+  }
+  getOtherDeductionTotal(): number {
+    return (this.selectedEmployee?.other_deduction_details || []).reduce((sum, d) => sum + (d.calculated_amount || 0), 0);
   }
 } 

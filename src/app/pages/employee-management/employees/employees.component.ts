@@ -225,7 +225,7 @@ export class EmployeesComponent implements OnInit {
       spouseName: ['NA'],
       numberOfChildren: 0,
       personalMobile: ['', Validators.required],
-      personalEmail: ['', [Validators.required, Validators.email]],
+      personalEmail: null,
       homePhone: ['NA']
     });
 
@@ -236,7 +236,7 @@ export class EmployeesComponent implements OnInit {
       documentExpiryDate: [''],
       placeOfIssue: [''],
       rssbNumber: ['', Validators.required],
-      highestEducation: ['', Validators.required]
+      highestEducation: ['']
     });
 
     this.contractInfoForm = this.formBuilder.group({
@@ -618,9 +618,9 @@ export class EmployeesComponent implements OnInit {
       document_issue_date: legal.documentIssueDate,
       document_place_of_issue: (legal.placeOfIssue ?? '').toString(),
       rssb_number: legal.rssbNumber,
-      highest_education: legal.highestEducation,
+      highest_education: legal.highestEducation || 'NA',
       personal_mobile: basic.personalMobile,
-      personal_email: basic.personalEmail
+      personal_email: basic.personalEmail && basic.personalEmail.trim() !== '' ? basic.personalEmail : null
     };
     this.employeeInformationService.createEmployeeInformation(payload).subscribe({
       next: (res: any) => {

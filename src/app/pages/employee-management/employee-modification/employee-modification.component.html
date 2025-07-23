@@ -193,7 +193,7 @@
                 <cdk-step [optional]="true">
                   <ng-template cdkStepLabel>
                     <span class="number">2.</span>
-                    <span>Legal & Contacts</span>
+                    <span>Legal Info</span>
                   </ng-template>
                   <section *ngIf="cdkStepper.selectedIndex === 1">
                     <form *ngIf="legalContactsInfoForm" [formGroup]="legalContactsInfoForm" (ngSubmit)="onLegalContactsInfoSubmit()" novalidate>
@@ -436,7 +436,7 @@
                 <cdk-step [optional]="true">
                   <ng-template cdkStepLabel>
                     <span class="number">4.</span>
-                    <span>Allowance & Deductions</span>
+                    <span>Salary Items</span>
                   </ng-template>
                   <section *ngIf="cdkStepper.selectedIndex === 3">
                     <!-- Allowance Section -->
