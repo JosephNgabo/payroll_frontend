@@ -10,6 +10,10 @@ import { timer } from 'rxjs';
   styleUrls: ['./list-payrolls.component.scss']
 })
 export class ListPayrollsComponent implements OnInit {
+  breadCrumbItems: Array<any> = [
+    { label: 'Payroll', url: '/payroll/list' },
+    { label: 'List Payrolls', active: true }
+  ];
   payrolls: any[] = [];
   loading = false;
   error: string = '';

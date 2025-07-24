@@ -457,7 +457,7 @@
                 <section *ngIf="cdkStepper.selectedIndex === 3">
                   <!-- Allowance Section -->
                   <div class="card mb-4">
-                    <div class="card-header bg-success text-white fw-bold d-flex justify-content-between align-items-center">
+                    <div class="card-header bg-light  fw-bold d-flex justify-content-between align-items-center">
                       <span>Allowances</span>
                       <button class="btn btn-primary btn-sm" (click)="openAddAllowanceModal()" type="button">+ Add Allowance</button>
                     </div>
@@ -500,17 +500,17 @@
                     <div class="modal-body">
                       <form [formGroup]="allowanceForm" (ngSubmit)="onAllowanceSubmit()" novalidate>
                         <div class="row">
-                          <!-- <div class="col-lg-4 mb-3">
-                            <label>Name</label>
-                            <input type="text" class="form-control" formControlName="name" placeholder="Enter Allowance Name (optional)">
-                          </div> -->
                           <div class="col-lg-4 mb-3">
-                            <label>Amount <span class="text-danger">*</span></label>
-                            <input type="number" class="form-control" formControlName="amount" min="0" step="0.01" placeholder="Enter Amount"
-                                   [ngClass]="{'is-invalid': submittedAllowance && allowance.amount.errors, 'is-valid': submittedAllowance && allowance.amount.valid}">
-                            <div class="invalid-feedback" *ngIf="submittedAllowance && allowance.amount.errors">
-                              <span *ngIf="allowance.amount.errors.required">Amount is required.</span>
-                              <span *ngIf="allowance.amount.errors.min">Value must be 0 or greater.</span>
+                            <label>Allowance <span class="text-danger">*</span></label>
+                            <ng-select [items]="allowances"
+                                       bindLabel="name"
+                                       bindValue="id"
+                                       formControlName="allowance_id"
+                                       placeholder="Select Allowance"
+                                       [ngClass]="{'is-invalid': submittedAllowance && allowance.allowance_id.errors, 'is-valid': submittedAllowance && allowance.allowance_id.valid}">
+                            </ng-select>
+                            <div class="invalid-feedback d-block" *ngIf="submittedAllowance && allowance.allowance_id.errors">
+                              <span *ngIf="allowance.allowance_id.errors.required">Allowance is required.</span>
                             </div>
                           </div>
                           <div class="col-lg-4 mb-3">
@@ -525,16 +525,12 @@
                             </div>
                           </div>
                           <div class="col-lg-4 mb-3">
-                            <label>Allowance <span class="text-danger">*</span></label>
-                            <ng-select [items]="allowances"
-                                       bindLabel="name"
-                                       bindValue="id"
-                                       formControlName="allowance_id"
-                                       placeholder="Select Allowance"
-                                       [ngClass]="{'is-invalid': submittedAllowance && allowance.allowance_id.errors, 'is-valid': submittedAllowance && allowance.allowance_id.valid}">
-                            </ng-select>
-                            <div class="invalid-feedback d-block" *ngIf="submittedAllowance && allowance.allowance_id.errors">
-                              <span *ngIf="allowance.allowance_id.errors.required">Allowance is required.</span>
+                            <label>Amount <span class="text-danger">*</span></label>
+                            <input type="number" class="form-control" formControlName="amount" min="0" step="0.01" placeholder="Enter Amount"
+                                   [ngClass]="{'is-invalid': submittedAllowance && allowance.amount.errors, 'is-valid': submittedAllowance && allowance.amount.valid}">
+                            <div class="invalid-feedback" *ngIf="submittedAllowance && allowance.amount.errors">
+                              <span *ngIf="allowance.amount.errors.required">Amount is required.</span>
+                              <span *ngIf="allowance.amount.errors.min">Value must be 0 or greater.</span>
                             </div>
                           </div>
                         </div>
@@ -557,7 +553,7 @@
 
                   <!-- Deductions Section -->
                   <div class="card mb-4">
-                    <div class="card-header bg-warning text-dark fw-bold">Deductions</div>
+                    <div class="card-header bg-light text-dark fw-bold">Deductions</div>
                     <div class="card-body">
                       <form [formGroup]="deductionsFormGroup" (ngSubmit)="onDeductionsSubmit()" novalidate>
                         <div class="d-flex justify-content-between align-items-center mb-2">
