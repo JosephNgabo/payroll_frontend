@@ -197,6 +197,10 @@ export class EmployeesComponent implements OnInit {
         this.countries = [];
       }
     });
+    const rwanda = this.countries.find((c: any) => c.country === 'Rwanda');
+    if (rwanda && this.employeeAddressForm && !this.employeeAddressForm.get('country')?.value) {
+      this.employeeAddressForm.get('country')?.setValue(rwanda.id);
+    }
     setTimeout(() => {
       this.isLoading = false;
     }, 1500); // Simulate loading delay
@@ -298,6 +302,15 @@ export class EmployeesComponent implements OnInit {
       postal_code: ['NA'],
       street_address: ['NA']
     });
+
+    // After initializing employeeAddressForm, and after loading countries:
+    // Set Rwanda as default if present
+    if (this.countries && this.employeeAddressForm) {
+      const rwanda = this.countries.find((c: any) => c.country === 'Rwanda');
+      if (rwanda) {
+        this.employeeAddressForm.get('country')?.setValue(rwanda.id);
+      }
+    }
 
     this.documentsForm = this.formBuilder.group({
       document_type_id: ['', Validators.required],
