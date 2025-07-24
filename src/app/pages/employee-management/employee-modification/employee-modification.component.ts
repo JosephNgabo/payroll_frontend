@@ -202,6 +202,11 @@ export class EmployeeModificationComponent implements OnInit {
       }
     });
 
+    const rwanda = this.countries.find((c: any) => c.country === 'Rwanda');
+    if (rwanda && this.employeeAddressForm && !this.employeeAddressForm.get('country')?.value) {
+      this.employeeAddressForm.get('country')?.setValue(rwanda.id);
+    }
+
     // Fetch departments
     this.departmentService.getDepartments().subscribe({
       next: (departments) => {

@@ -9,12 +9,43 @@
         </button>
       </div>
     </div>
-    <div class="row mb-2">
-      <div class="col-sm-4">
-        <div class="search-box me-2 mb-2 d-inline-block">
-          <div class="position-relative">
-            <input type="text" class="form-control" placeholder="Search..." [(ngModel)]="term">
-            <i class="bx bx-search-alt search-icon"></i>
+    <div class="row mb-3">
+      <div class="col-12">
+        <div class="card shadow-sm p-3 mb-2 bg-light border-0">
+          <div class="row g-2 align-items-center">
+            <div class="col-md-3 col-12">
+              <div class="search-box">
+                <div class="position-relative">
+                  <input type="text" class="form-control" placeholder="Search..." [(ngModel)]="term">
+                  <i class="bx bx-search-alt search-icon"></i>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3 col-12">
+              <ng-select
+                [items]="departmentOptions"
+                bindLabel=""
+                bindValue=""
+                [(ngModel)]="selectedDepartment"
+                [clearable]="true"
+                placeholder="All Departments">
+              </ng-select>
+            </div>
+            <div class="col-md-3 col-12">
+              <ng-select
+                [items]="statusOptions"
+                bindLabel="label"
+                bindValue="value"
+                [(ngModel)]="selectedStatusFilter"
+                [clearable]="true"
+                placeholder="All Statuses">
+              </ng-select>
+            </div>
+            <div class="col-md-3 col-12 text-end">
+              <button class="btn btn-outline-secondary" (click)="clearAllFilters()">
+                <i class="bi bi-x-circle me-1"></i> Clear All
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -30,42 +61,65 @@
                 <th>Last Name</th>
                 <th>Email</th>
                 <!-- <th>Department</th> -->
-                <th>Highest Education</th>
+                <th>Department</th>
                 <th>Personal Mobile</th>
                 <th>Status</th>
                 <th><span style="margin-left: 3.5em;"></span>Action</th>
               </tr>
             </thead>
             <tbody>
-              <tr *ngFor="let emp of employeeList | employeeSearch:term; let i = index">
-                <!-- <td>{{ emp.id }}</td> -->
-                <td>{{ emp.first_name }}</td>
-                <td>{{ emp.last_name }}</td>
-                <td>{{ emp.personal_email }}</td>
-                <!-- <td>{{ emp.department }}</td> -->
-                <td>{{ emp.highest_education }}</td>
-                <td>{{ emp.personal_mobile }}</td>
-                <td>
-                  <span [ngClass]="getStatusBadgeClass(emp.status) + ' status-badge-lg'">
-                    {{ getStatusLabel(emp.status) }}
-                  </span>
-                </td>
-                <td class="text-center">
-                  <div class="dropdown d-flex justify-content-center align-items-center">
-                    <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                      <i class="bi bi-three-dots"></i>
-                    </button>
-                    <ul class="dropdown-menu">
-                      <li><a class="dropdown-item" [routerLink]="['/employees/employee-modification', emp.id]">Edit</a></li>
-                      <li><a class="dropdown-item" [routerLink]="['/employees/employee-details', emp.id]">View Details</a></li>
-                      <li><button class="dropdown-item text-danger fw-bold" type="button" (click)="onDelete(emp)">Delete</button></li>
-                      <li><button class="dropdown-item" type="button" (click)="openStatusModal(emp)">Change Status</button></li>
-                    </ul>
+              <ng-container *ngIf="!isLoading; else skeletonRows">
+                <tr *ngFor="let emp of filteredEmployees | employeeSearch:term; let i = index">
+                  <!-- <td>{{ emp.id }}</td> -->
+                  <td>{{ emp.first_name }}</td>
+                  <td>{{ emp.last_name }}</td>
+                  <td>{{ emp.personal_email }}</td>
+                  <!-- <td>{{ emp.department }}</td> -->
+                  <td>{{ emp['department'] }}</td>
+                  <td>{{ emp.personal_mobile }}</td>
+                  <td>
+                    <span [ngClass]="getStatusBadgeClass(emp.status) + ' status-badge-lg'">
+                      {{ getStatusLabel(emp.status) }}
+                    </span>
+                  </td>
+                  <td class="text-center">
+                    <div class="dropdown d-flex justify-content-center align-items-center">
+                      <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-three-dots"></i>
+                      </button>
+                      <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" [routerLink]="['/employees/employee-modification', emp.id]">Edit</a></li>
+                        <li><a class="dropdown-item" [routerLink]="['/employees/employee-details', emp.id]">View Details</a></li>
+                        <li><button class="dropdown-item text-danger fw-bold" type="button" (click)="onDelete(emp)">Delete</button></li>
+                        <li><button class="dropdown-item" type="button" (click)="openStatusModal(emp)">Change Status</button></li>
+                      </ul>
+                    </div>
+                  </td>
+                </tr>
+              </ng-container>
+              <ng-template #skeletonRows>
+                <tr *ngFor="let _ of [].constructor(8)">
+                  <td colspan="7">
+                    <div class="skeleton-row d-flex">
+                      <div class="skeleton skeleton-text flex-fill me-2" style="width: 10%;"></div>
+                      <div class="skeleton skeleton-text flex-fill me-2" style="width: 10%;"></div>
+                      <div class="skeleton skeleton-text flex-fill me-2" style="width: 18%;"></div>
+                      <div class="skeleton skeleton-text flex-fill me-2" style="width: 15%;"></div>
+                      <div class="skeleton skeleton-text flex-fill me-2" style="width: 15%;"></div>
+                      <div class="skeleton skeleton-badge me-2" style="width: 8%; height: 1.5em;"></div>
+                      <div class="skeleton skeleton-action" style="width: 2.5em; height: 2em;"></div>
+                    </div>
+                  </td>
+                </tr>
+              </ng-template>
+              <tr *ngIf="!isLoading && (filteredEmployees | employeeSearch:term).length === 0">
+                <td colspan="8" class="text-center py-5">
+                  <div class="d-flex flex-column align-items-center justify-content-center">
+                    <i class="bi bi-book display-3 text-secondary mb-2"></i>
+                    <div class="fw-bold fs-5 mb-1">No employees found</div>
+                    <div class="text-muted">Try adjusting your filters or search terms.</div>
                   </div>
                 </td>
-              </tr>
-              <tr *ngIf="employeeList.length === 0">
-                <td colspan="8" class="text-center">No employees found.</td>
               </tr>
             </tbody>
           </table>
@@ -118,3 +172,28 @@
     <button type="button" class="btn btn-primary" (click)="saveStatus(); modal.close()">Save</button>
   </div>
 </ng-template>
+<!-- Fix ng-select dropdown overlay: use fixed position and high z-index -->
+<style>
+  .ng-dropdown-panel {
+    position: fixed !important;
+    z-index: 3000 !important;
+  }
+  .table-responsive, .container-fluid, .row, .col-12 {
+    overflow: visible !important;
+  }
+  .skeleton {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 37%, #f0f0f0 63%);
+    background-size: 400% 100%;
+    animation: skeleton-loading 1.2s ease-in-out infinite;
+    border-radius: 4px;
+    min-height: 1.2em;
+  }
+  .skeleton-text { height: 1.2em; margin-bottom: 0.2em; }
+  .skeleton-badge { height: 1.5em; border-radius: 1em; }
+  .skeleton-action { height: 2em; border-radius: 0.5em; }
+  .skeleton-row { gap: 0.5em; }
+  @keyframes skeleton-loading {
+    0% { background-position: 100% 50%; }
+    100% { background-position: 0 50%; }
+  }
+</style>
