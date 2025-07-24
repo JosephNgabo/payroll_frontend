@@ -188,8 +188,31 @@ export class PayrollDetailsComponent implements OnInit, OnChanges {
   }
 
   deletePayslipById(employee: any) {
-    // Placeholder for delete API integration
-    alert('Delete payslip for employee ID: ' + (employee?.id || employee?.employee?.id));
+    const payslipId = employee?.id;
+    if (!payslipId) return;
+    Swal.fire({
+      title: 'Delete Payslip',
+      text: 'Are you sure you want to delete this payslip? This action cannot be undone.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, delete it',
+      cancelButtonText: 'Cancel'
+    }).then(result => {
+      if (result.isConfirmed) {
+        this.loading = true;
+        this.payrollService.deletePayslip(payslipId).subscribe({
+          next: (res) => {
+            this.loading = false;
+            Swal.fire('Deleted!', 'Payslip has been deleted.', 'success');
+            this.fetchDetails();
+          },
+          error: (err) => {
+            this.loading = false;
+            Swal.fire('Error', 'Failed to delete payslip.', 'error');
+          }
+        });
+      }
+    });
   }
 
   getMonthName(month: number): string {
@@ -213,12 +236,25 @@ export class PayrollDetailsComponent implements OnInit, OnChanges {
     return (this.selectedEmployee?.rssb_details || []).reduce((sum, r) => sum + (r.employee_contribution_amount || 0), 0);
   }
   getRssbEmployerTotal(): number {
-    return (this.selectedEmployee?.rssb_details || []).reduce((sum, r) => sum + (r.employer_contribution_amount || 0), 0);
+    return (this.selectedEmployee?.rssb_details || []).reduce((sum, r) => {
+      const value = typeof r.employer_contribution_amount === 'string' ? parseFloat(r.employer_contribution_amount) : r.employer_contribution_amount;
+      return sum + (isNaN(value) ? 0 : value);
+    }, 0);
   }
   getAllowanceTotal(): number {
-    return (this.selectedEmployee?.allowance_details || []).reduce((sum, a) => sum + (a.calculated_amount || 0), 0);
+    return (this.selectedEmployee?.allowance_details || []).reduce((sum, a) => {
+      // Convert to number if it's a string
+      const value = typeof a.calculated_amount === 'string' ? parseFloat(a.calculated_amount) : a.calculated_amount;
+      return sum + (isNaN(value) ? 0 : value);
+    }, 0);
   }
   getOtherDeductionTotal(): number {
-    return (this.selectedEmployee?.other_deduction_details || []).reduce((sum, d) => sum + (d.calculated_amount || 0), 0);
+    return (this.selectedEmployee?.other_deduction_details || []).reduce((sum, d) => {
+      const value = typeof d.calculated_amount === 'string' ? parseFloat(d.calculated_amount) : d.calculated_amount;
+      return sum + (isNaN(value) ? 0 : value);
+    }, 0);
+  }
+  getTotalPaySlip(): number {
+    return this.getRssbEmployeeTotal() + this.getRssbEmployerTotal() + this.getAllowanceTotal() + this.getOtherDeductionTotal();
   }
 } 

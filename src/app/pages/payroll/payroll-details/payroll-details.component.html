@@ -234,7 +234,7 @@
               <td>{{ allowance.rate_or_amount | number:'1.0-2' }}</td>
               <td class="text-success fw-bold">{{ allowance.calculated_amount | number:'1.0-2' }}</td>
             </tr>
-            <tr *ngIf="selectedEmployee.allowance_details.length">
+            <tr *ngIf="selectedEmployee.allowance_details.length" class="bg-info-subtle">
               <th class="text-end" colspan="3">Total</th>
               <th class="text-success fw-bold">
                 {{ getAllowanceTotal() | number:'1.0-2' }}
@@ -264,7 +264,7 @@
               <td>{{ deduction.rate_or_amount | number:'1.0-2' }}</td>
               <td class="text-danger fw-bold">{{ deduction.calculated_amount | number:'1.0-2' }}</td>
             </tr>
-            <tr *ngIf="selectedEmployee.other_deduction_details.length">
+            <tr *ngIf="selectedEmployee.other_deduction_details.length" class="bg-primary-subtle">
               <th class="text-end" colspan="3">Total</th>
               <th class="text-danger fw-bold">
                 {{ getOtherDeductionTotal() | number:'1.0-2' }}
