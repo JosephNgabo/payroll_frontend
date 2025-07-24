@@ -56,7 +56,7 @@
           <table class="table align-middle table-nowrap table-check">
             <thead>
               <tr>
-                <!-- <th>ID</th> -->
+                <th style="width: 3em; text-align: center;">No. </th>
                 <th>First Name</th>
                 <th>Last Name</th>
                 <th>Email</th>
@@ -70,7 +70,7 @@
             <tbody>
               <ng-container *ngIf="!isLoading; else skeletonRows">
                 <tr *ngFor="let emp of filteredEmployees | employeeSearch:term; let i = index">
-                  <!-- <td>{{ emp.id }}</td> -->
+                  <td>{{ i + 1 }}</td>
                   <td>{{ emp.first_name }}</td>
                   <td>{{ emp.last_name }}</td>
                   <td>{{ emp.personal_email }}</td>
@@ -99,7 +99,7 @@
               </ng-container>
               <ng-template #skeletonRows>
                 <tr *ngFor="let _ of [].constructor(8)">
-                  <td colspan="7">
+                  <td colspan="8">
                     <div class="skeleton-row d-flex">
                       <div class="skeleton skeleton-text flex-fill me-2" style="width: 10%;"></div>
                       <div class="skeleton skeleton-text flex-fill me-2" style="width: 10%;"></div>
