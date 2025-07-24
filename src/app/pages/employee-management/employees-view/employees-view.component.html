@@ -12,6 +12,24 @@
     <div class="row mb-3">
       <div class="col-12">
         <div class="card shadow-sm p-3 mb-2 bg-light border-0">
+          <div class="row g-2 align-items-center mb-2">
+            <div class="col-md-2 col-12">
+              <div class="d-flex align-items-center">
+                <label class="me-2 mb-0">Show</label>
+                <ng-select
+                  [items]="pageSizeOptions"
+                  bindLabel="label"
+                  bindValue="value"
+                  [(ngModel)]="itemsPerPage"
+                  (change)="onPageSizeChange($event)"
+                  [clearable]="false"
+                  class="show-page-size-select"
+                  placeholder="Select">
+                </ng-select>
+                <span class="ms-2">entries</span>
+              </div>
+            </div>
+          </div>
           <div class="row g-2 align-items-center">
             <div class="col-md-3 col-12">
               <div class="search-box">
@@ -69,8 +87,8 @@
             </thead>
             <tbody>
               <ng-container *ngIf="!isLoading; else skeletonRows">
-                <tr *ngFor="let emp of filteredEmployees | employeeSearch:term; let i = index">
-                  <td>{{ i + 1 }}</td>
+                <tr *ngFor="let emp of paginatedEmployees | employeeSearch:term; let i = index">
+                  <td>{{ (currentPage - 1) * itemsPerPage + i + 1 }}</td>
                   <td>{{ emp.first_name }}</td>
                   <td>{{ emp.last_name }}</td>
                   <td>{{ emp.personal_email }}</td>
@@ -124,23 +142,33 @@
             </tbody>
           </table>
         </div>
-        <!-- Pagination Placeholder -->
-        <div class="row justify-content-md-between align-items-md-center mt-3">
-          <div class="col-sm-12 col-md-5">
-            <div class="dataTables_info mb-2" role="status" aria-live="polite">
-              Showing page 1 of 1
-            </div>
-          </div>
-          <div class="col-sm-12 col-md-7">
-            <div class="text-md-end float-md-end pagination-rounded">
+        <div class="row justify-content-between align-items-center mt-3">
+          <!-- <div class="col-md-4 mb-2 mb-md-0"> -->
+            <!-- <div class="d-flex align-items-center">
+              <label class="me-2 mb-0">Show</label>
+              <ng-select
+                [items]="pageSizeOptions"
+                bindLabel="label"
+                bindValue="value"
+                [(ngModel)]="itemsPerPage"
+                (change)="onPageSizeChange($event)"
+                [clearable]="false"
+                class="w-auto"
+                placeholder="Select">
+              </ng-select>
+              <span class="ms-2">entries</span>
+            </div> -->
+          <!-- </div> -->
+          <!-- <div class="col-md-8 text-md-end"> -->
+            <!-- <div class="pagination-rounded">
               <pagination
                 [totalItems]="totalItems"
                 [itemsPerPage]="itemsPerPage"
                 [(ngModel)]="currentPage"
                 (pageChanged)="onPageChange($event)">
               </pagination>
-            </div>
-          </div>
+            </div> -->
+          <!-- </div> -->
         </div>
       </div>
     </div>
@@ -178,6 +206,9 @@
     position: fixed !important;
     z-index: 3000 !important;
   }
+  .ng-dropdown-panel {
+    z-index: 5000 !important;
+  }
   .table-responsive, .container-fluid, .row, .col-12 {
     overflow: visible !important;
   }
@@ -195,5 +226,9 @@
   @keyframes skeleton-loading {
     0% { background-position: 100% 50%; }
     100% { background-position: 0 50%; }
+  }
+  .show-page-size-select {
+    min-width: 60px;
+    max-width: 80px;
   }
 </style>

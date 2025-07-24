@@ -34,6 +34,16 @@ export class EmployeesViewComponent implements OnInit {
 
   isLoading = true;
 
+  pageSizeOptions = [
+    { label: '10', value: 10 },
+    { label: '20', value: 20 },
+    { label: '30', value: 30 },
+    { label: '50', value: 50 },
+    { label: '100', value: 100 },
+    { label: '200', value: 200 },
+    { label: 'All', value: 10000 }
+  ];
+
   get filteredEmployees() {
     return this.employeeList.filter(emp => {
       const matchesDepartment = this.selectedDepartment ? (emp as any).department === this.selectedDepartment : true;
@@ -43,6 +53,13 @@ export class EmployeesViewComponent implements OnInit {
       }
       return matchesDepartment && matchesStatus;
     });
+  }
+
+  get paginatedEmployees() {
+    const filtered = this.filteredEmployees;
+    if (this.itemsPerPage === 0) return filtered; // Show all
+    const start = (this.currentPage - 1) * this.itemsPerPage;
+    return filtered.slice(start, start + this.itemsPerPage);
   }
 
   statusOptions = [
@@ -89,6 +106,15 @@ export class EmployeesViewComponent implements OnInit {
   onPageChange(event: any) {
     const page = event.page || event;
     this.fetchEmployees(page);
+  }
+
+  onPageSizeChange(event: any) {
+    if (event && event.value === 'all') {
+      this.itemsPerPage = this.totalItems;
+    } else if (event && event.value) {
+      this.itemsPerPage = event.value;
+    }
+    this.currentPage = 1;
   }
 
   fetchEmployees(page: number) {
