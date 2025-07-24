@@ -85,7 +85,7 @@
             <td>{{ employee.total_paye_deductions | number:'1.0-2' }}</td>
             <td><span class="fw-bold text-success">{{ employee.total_net_salary | number:'1.0-2' }}</span></td>
             <td>{{ employee.total_mass_salary | number:'1.0-2' }}</td>
-            <td>
+            <td style="position: relative;">
               <div class="dropdown">
                 <button class="btn btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                   <i class="bi bi-three-dots"></i>
@@ -279,3 +279,12 @@
     <button type="button" class="btn btn-secondary" (click)="closeModal()">Close</button>
   </div>
 </ng-template>
+<style>
+  td[style*='position: relative'] .dropdown-menu {
+    z-index: 99999 !important;
+    position: absolute !important;
+  }
+  .table-responsive, .container-fluid, .row, .col-12, body, html {
+    overflow: visible !important;
+  }
+</style>
