@@ -12,6 +12,7 @@ import { PayrollComponent } from './payroll.component';
 import { ListPayrollsComponent } from './list-payrolls/list-payrolls.component';
 import { PayrollDetailsComponent } from './payroll-details/payroll-details.component';
 import { PagetitleComponent } from 'src/app/shared/ui/pagetitle/pagetitle.component';
+import { SharedModule } from '../../shared/shared.module';
 
 @NgModule({
   declarations: [
@@ -29,7 +30,8 @@ import { PagetitleComponent } from 'src/app/shared/ui/pagetitle/pagetitle.compon
     ScrollingModule,
     BsDropdownModule.forRoot(),
     ModalModule.forRoot(),
-    PagetitleComponent
+    PagetitleComponent,
+    SharedModule
   ],
   exports: [
     PayrollComponent,

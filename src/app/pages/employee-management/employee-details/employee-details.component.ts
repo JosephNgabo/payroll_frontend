@@ -14,6 +14,7 @@ import { EmployeeBankInfoService } from 'src/app/core/services/employee-bank-inf
 import { EmployeeAddressService } from 'src/app/core/services/employee-address.service';
 import { EmployeeEmergencyContactService } from 'src/app/core/services/employee-emergency-contact.service';
 import { EmployeeDocumentService } from 'src/app/core/services/employee-document.service';
+import { NgbNavModule } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'app-employee-details',
@@ -36,6 +37,7 @@ export class EmployeeDetailsComponent implements OnInit {
   employeeEmergencyContact: any = null;
   employeeDocument: any = null;
   documentTypes: any[] = [];
+  public activeTab = 1;
 
   // For displaying forms as read-only
   basicInfoForm!: UntypedFormGroup;
@@ -347,5 +349,10 @@ export class EmployeeDetailsComponent implements OnInit {
       case 'mass': return 'Mass Salary';
       default: return value;
     }
+  }
+
+  onImageError(event: any): void {
+    // Set a default avatar if the image fails to load
+    event.target.src = 'assets/images/users/user-dummy-img.jpg';
   }
 } 

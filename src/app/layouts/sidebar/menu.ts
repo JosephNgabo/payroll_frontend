@@ -62,7 +62,7 @@ export const MENU: MenuItem[] = [
                 id: 52,
                 label: 'Other Deductions',
                 link: '/deductions/other-deductions',
-                parentId: 5
+                parentId: 6
             }
         ]
     },
