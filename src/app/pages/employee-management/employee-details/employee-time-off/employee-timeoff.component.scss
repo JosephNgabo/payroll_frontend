@@ -1,0 +1,40 @@
+.summary-card {
+  border-radius: 8px;
+  padding: 20px;
+  background-color: #e7f0fe;
+  text-align: center;
+}
+.summary-card.pending {
+  background-color: #fffde7;
+}
+.summary-card.upcoming {
+  background-color: #e0f2f7;
+}
+.summary-card.extra {
+  background-color: #e6ffe6;
+}
+.icon-circle {
+  width: 40px;
+  height: 40px;
+  background-color: #fff;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto 10px auto;
+}
+.status-badge {
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  display: inline-block;
+}
+.status-badge.approved {
+  background-color: #e6ffe6;
+  color: #28a745;
+}
+.status-badge.sick {
+  background-color: #fff3e0;
+  color: #ff9800;
+} 

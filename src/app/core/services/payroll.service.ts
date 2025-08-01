@@ -66,6 +66,11 @@ export class PayrollService {
       .pipe(catchError(this.handleError));
   }
 
+  getEmployeePayHistory(employeeId: string): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/payroll/employee/${employeeId}/history`)
+      .pipe(catchError(this.handleError));
+  }
+
   /**
    * Handle HTTP errors and extract backend validation messages
    */

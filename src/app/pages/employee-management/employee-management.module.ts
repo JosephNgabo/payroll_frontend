@@ -13,6 +13,7 @@ import { ModalModule } from 'ngx-bootstrap/modal';
 import { PaginationModule } from 'ngx-bootstrap/pagination';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { BsDatepickerModule } from 'ngx-bootstrap/datepicker';
+import { NgbNavModule } from '@ng-bootstrap/ng-bootstrap';
 
 // Swiper Slider
 import { SlickCarouselModule } from 'ngx-slick-carousel';
@@ -30,6 +31,11 @@ import { EmployeesViewComponent } from './employees-view/employees-view.componen
 import { EmployeeModificationComponent } from './employee-modification/employee-modification.component';
 import { EmployeeSearchPipe } from './employees-view/employee-search.pipe';
 import { EmployeeDetailsComponent } from './employee-details/employee-details.component';
+import { EmployeePersonalComponent } from './employee-details/employee-personal/employee-personal.component';
+import { EmployeeJobComponent } from './employee-details/employee-job/employee-job.component';
+import { EmployeeBankInfoComponent } from './employee-details/employee-bank-info/employee-bank-info.component';
+import { EmployeePayHistoryComponent } from './employee-details/employee-pay-history/employee-pay-history.component';
+import { SharedModule } from '../../shared/shared.module';
 
 
 const DEFAULT_DROPZONE_CONFIG: DropzoneConfigInterface = {
@@ -40,7 +46,17 @@ const DEFAULT_DROPZONE_CONFIG: DropzoneConfigInterface = {
 };
 
 @NgModule({
-  declarations: [ EmployeesComponent, EmployeesViewComponent, EmployeeModificationComponent, EmployeeDetailsComponent, EmployeeSearchPipe],
+  declarations: [
+    EmployeesComponent,
+    EmployeesViewComponent,
+    EmployeeModificationComponent,
+    EmployeeDetailsComponent,
+    EmployeePersonalComponent,
+    EmployeeJobComponent,
+    EmployeeBankInfoComponent,
+    EmployeePayHistoryComponent,
+    EmployeeSearchPipe
+  ],
   imports: [
     CommonModule,
     EmployeeManagementRoutingModule,
@@ -58,7 +74,9 @@ const DEFAULT_DROPZONE_CONFIG: DropzoneConfigInterface = {
     TableSkeletonComponent,
     PagetitleComponent,
     CdkStepperModule,
-    NgStepperModule
+    NgStepperModule,
+    NgbNavModule,
+    SharedModule
   ],
   providers: [
     DatePipe,

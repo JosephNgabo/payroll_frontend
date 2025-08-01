@@ -67,15 +67,15 @@
                 </span>
               </td>
               <td>{{ employee.employee?.personal_mobile }}</td>
-              <td>{{ employee.basic_salary | number:'1.0-2' }}</td>
-              <td>{{ employee.total_allowances | number:'1.0-2' }}</td>
-              <td>{{ employee.total_gross_salary | number:'1.0-2' }}</td>
-              <td>{{ employee.total_rssb_employee_deductions | number:'1.0-2' }}</td>
-              <td>{{ employee.total_rssb_employer_deductions | number:'1.0-2' }}</td>
-              <td>{{ employee.total_other_deductions | number:'1.0-2' }}</td>
-              <td>{{ employee.total_paye_deductions | number:'1.0-2' }}</td>
-              <td><span class="fw-bold text-success">{{ employee.total_net_salary | number:'1.0-2' }}</span></td>
-              <td>{{ employee.total_mass_salary | number:'1.0-2' }}</td>
+              <td>{{ employee.basic_salary | numberFormat }}</td>
+              <td>{{ employee.total_allowances | numberFormat }}</td>
+              <td>{{ employee.total_gross_salary | numberFormat }}</td>
+              <td>{{ employee.total_rssb_employee_deductions | numberFormat }}</td>
+              <td>{{ employee.total_rssb_employer_deductions | numberFormat }}</td>
+              <td>{{ employee.total_other_deductions | numberFormat }}</td>
+              <td>{{ employee.total_paye_deductions | numberFormat }}</td>
+              <td><span class="fw-bold text-success">{{ employee.total_net_salary | numberFormat }}</span></td>
+              <td>{{ employee.total_mass_salary | numberFormat }}</td>
               <td style="position: relative;">
                 <div class="dropdown">
                   <button class="btn btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -152,39 +152,39 @@
         <tbody>
           <tr>
             <th class="bg-light"><i class="bi bi-cash-coin me-1" data-bs-toggle="tooltip" title="Employee's base salary"></i> Basic Salary</th>
-            <td class="fw-bold text-primary">{{ selectedEmployee.basic_salary | number:'1.0-2' }}</td>
+            <td class="fw-bold text-primary">{{ selectedEmployee.basic_salary | numberFormat }}</td>
           </tr>
           <tr>
             <th class="bg-light"><i class="bi bi-gift me-1" data-bs-toggle="tooltip" title="Total of all allowances"></i> Total Allowances</th>
-            <td class="fw-bold text-info">{{ selectedEmployee.total_allowances | number:'1.0-2' }}</td>
+            <td class="fw-bold text-info">{{ selectedEmployee.total_allowances | numberFormat }}</td>
           </tr>
           <tr>
             <th class="bg-light"><i class="bi bi-graph-up-arrow me-1" data-bs-toggle="tooltip" title="Gross salary before deductions"></i> Total Gross Salary</th>
-            <td class="fw-bold text-success fs-5">{{ selectedEmployee.total_gross_salary | number:'1.0-2' }}</td>
+            <td class="fw-bold text-success fs-5">{{ selectedEmployee.total_gross_salary | numberFormat }}</td>
           </tr>
           <tr>
             <th class="bg-light"><i class="bi bi-person-dash me-1" data-bs-toggle="tooltip" title="Employee's RSSB deduction"></i> Total RSSB EE</th>
-            <td class="fw-bold text-warning">{{ selectedEmployee.total_rssb_employee_deductions | number:'1.0-2' }}</td>
+            <td class="fw-bold text-warning">{{ selectedEmployee.total_rssb_employee_deductions | numberFormat }}</td>
           </tr>
           <tr>
             <th class="bg-light"><i class="bi bi-building me-1" data-bs-toggle="tooltip" title="Employer's RSSB contribution"></i> Total RSSB ER</th>
-            <td class="fw-bold text-warning">{{ selectedEmployee.total_rssb_employer_deductions | number:'1.0-2' }}</td>
+            <td class="fw-bold text-warning">{{ selectedEmployee.total_rssb_employer_deductions | numberFormat }}</td>
           </tr>
           <tr>
             <th class="bg-light"><i class="bi bi-dash-circle me-1" data-bs-toggle="tooltip" title="Other deductions (e.g. loans, penalties)"></i> Total Other Deduction</th>
-            <td class="fw-bold text-danger">{{ selectedEmployee.total_other_deductions | number:'1.0-2' }}</td>
+            <td class="fw-bold text-danger">{{ selectedEmployee.total_other_deductions | numberFormat }}</td>
           </tr>
           <tr>
             <th class="bg-light"><i class="bi bi-percent me-1" data-bs-toggle="tooltip" title="PAYE (tax) deduction"></i> Total PAYE</th>
-            <td class="fw-bold text-danger">{{ selectedEmployee.total_paye_deductions | number:'1.0-2' }}</td>
+            <td class="fw-bold text-danger">{{ selectedEmployee.total_paye_deductions | numberFormat }}</td>
           </tr>
           <tr>
             <th class="bg-light"><i class="bi bi-wallet2 me-1" data-bs-toggle="tooltip" title="Net salary after all deductions"></i> Total Net Salary</th>
-            <td class="fw-bold text-success fs-5">{{ selectedEmployee.total_net_salary | number:'1.0-2' }}</td>
+            <td class="fw-bold text-success fs-5">{{ selectedEmployee.total_net_salary | numberFormat }}</td>
           </tr>
           <tr>
             <th class="bg-light"><i class="bi bi-cash-stack me-1" data-bs-toggle="tooltip" title="Total mass salary (if applicable)"></i> Total Mass Salary</th>
-            <td class="fw-bold text-dark">{{ selectedEmployee.total_mass_salary | number:'1.0-2' }}</td>
+            <td class="fw-bold text-dark">{{ selectedEmployee.total_mass_salary | numberFormat }}</td>
           </tr>
         </tbody>
       </table>
@@ -207,19 +207,19 @@
           <tbody>
             <tr *ngFor="let rssb of selectedEmployee.rssb_details">
               <td>{{ rssb.name }}</td>
-              <td>{{ rssb.base | number:'1.0-2' }}</td>
+              <td>{{ rssb.base | numberFormat }}</td>
               <td>{{ rssb.employee_contribution_rate | percent:'1.0-2' }}</td>
               <td>{{ rssb.employer_contribution_rate | percent:'1.0-2' }}</td>
-              <td class="text-success fw-bold">{{ rssb.employee_contribution_amount | number:'1.0-2' }}</td>
-              <td class="text-info fw-bold">{{ rssb.employer_contribution_amount | number:'1.0-2' }}</td>
+              <td class="text-success fw-bold">{{ rssb.employee_contribution_amount | numberFormat }}</td>
+              <td class="text-info fw-bold">{{ rssb.employer_contribution_amount | numberFormat }}</td>
             </tr>
             <tr *ngIf="selectedEmployee.rssb_details.length">
               <th class="text-end" colspan="4">Total</th>
               <th class="text-success fw-bold">
-                {{ getRssbEmployeeTotal() | number:'1.0-2' }}
+                {{ getRssbEmployeeTotal() | numberFormat }}
               </th>
               <th class="text-info fw-bold">
-                {{ getRssbEmployerTotal() | number:'1.0-2' }}
+                {{ getRssbEmployerTotal() | numberFormat }}
               </th>
             </tr>
           </tbody>
@@ -243,8 +243,8 @@
             <tr *ngFor="let allowance of selectedEmployee.allowance_details">
               <td>{{ allowance.name }}</td>
               <td>{{ allowance.type }}</td>
-              <td>{{ allowance.rate_or_amount | number:'1.0-2' }}</td>
-              <td class="text-success fw-bold">{{ allowance.calculated_amount | number:'1.0-2' }}</td>
+              <td>{{ allowance.rate_or_amount | numberFormat }}</td>
+              <td class="text-success fw-bold">{{ allowance.calculated_amount | numberFormat }}</td>
             </tr>
             <tr *ngIf="selectedEmployee.allowance_details.length" class="bg-info-subtle">
               <th class="text-end" colspan="3">Total</th>
