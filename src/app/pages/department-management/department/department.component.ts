@@ -1,10 +1,10 @@
-import { Component, ViewChild, OnInit } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { Observable } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BsModalService, BsModalRef, ModalModule } from 'ngx-bootstrap/modal';
 import { ModalDirective } from 'ngx-bootstrap/modal';
-import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormGroup, FormArray, Validators } from '@angular/forms';
 import { DatePipe } from '@angular/common';
 import { Store } from '@ngrx/store';
 import { SkeletonComponent } from 'src/app/shared/ui/skeleton/skeleton.component';
@@ -59,51 +59,53 @@ export class DepartmentComponent {
      * Form Validation - Updated for Department Management
      */
     this.ordersForm = this.formBuilder.group({
-      id: [null],
-      name: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(100)]],
-      description: ['', [Validators.required, Validators.minLength(10), Validators.maxLength(500)]],
-      location: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(100)]],
-      manager: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(100)]],
-      budget: ['', [Validators.required, Validators.min(0)]],
-      status: ['active', [Validators.required]]
+      id: [''],
+      name: ['', [Validators.required]],
+      description: ['', [Validators.required]]
     });
 
     this.loadData();
   }
 
+  /**
+   * Load data with loading state
+   */
   loadData() {
     this.isLoading = true;
     this.departmentService.getDepartments().subscribe({
-      next: (response: any) => {
-        this.orderlist = response.data;
-        this.Allorderlist = response.data;
+      next: (departments) => {
+        this.orderlist = departments;
+        this.Allorderlist = departments;
         this.isLoading = false;
       },
-      error: (error) => {
-        console.error('Error fetching departments:', error);
+      error: () => {
         this.isLoading = false;
       }
     });
   }
 
+  /**
+   * Open modal
+   * @param content modal content
+   */
   openViewModal(content: any, department: Department) {
     this.selectedDepartment = department;
-    this.modalRef = this.modalService.show(content, { class: 'modal-lg' });
+    this.modalRef = this.modalService.show(content);
   }
 
   // The master checkbox will check/ uncheck all items
   checkUncheckAll(ev: any) {
-    this.orderlist.forEach((x: any) => (x.checked = ev.target.checked));
+    this.orderes?.forEach((x: { state: any; }) => x.state = ev.target.checked);
   }
 
   checkedValGet: any[] = [];
   // Delete Data
   deleteData(id: any) {
     if (id) {
-      document.getElementById('d_' + id)?.remove();
+      document.getElementById('u_' + id)?.remove();
     } else {
       this.checkedValGet?.forEach((item: any) => {
-        document.getElementById('d_' + item)?.remove();
+        document.getElementById('u_' + item)?.remove();
       });
     }
   }
@@ -111,39 +113,27 @@ export class DepartmentComponent {
   // Delete Data
   confirm(id: any) {
     this.deletId = id;
-    this.selectedDepartment = this.orderlist.find(d => d.id === id) || null;
     this.removeItemModal?.show();
   }
   // delete order
   deleteOrder() {
+    console.log('Delete order called for ID:', this.deletId);
     if (!this.deletId) return;
     this.departmentService.deleteDepartment(this.deletId).subscribe({
       next: () => {
-        this.loadData(); // Refresh the list
+        this.loadData();
         this.removeItemModal?.hide();
-        Swal.fire({
-          title: 'Deleted!',
-          text: 'Department has been deleted.',
-          icon: 'success',
-          confirmButtonColor: '#34c38f',
-        });
       },
-      error: (err) => {
-        console.error('Delete department error:', err);
-        Swal.fire({
-          title: 'Error!',
-          text: 'Failed to delete department. Please try again.',
-          icon: 'error',
-          confirmButtonColor: '#f46a6a',
-        });
+      error: () => {
+        // Optionally handle error
       }
     });
   }
 
-  // fiter job
+  // fiter job - Updated to search in department fields
   searchOrder() {
     if (this.term) {
-      this.orderlist = this.Allorderlist.filter((data: Department) => {
+      this.orderlist = this.Allorderlist.filter((data: any) => {
         return data.name.toLowerCase().includes(this.term.toLowerCase()) ||
                data.description.toLowerCase().includes(this.term.toLowerCase());
       });
@@ -154,18 +144,37 @@ export class DepartmentComponent {
 
   /**
    * Open modal
-   * @param content modal content
+   * @param isEdit boolean indicating if it's an edit operation
+   * @param department department to be edited or null for a new department
    */
   openModal(isEdit: boolean = false, department?: Department) {
     this.submitted = false;
-    this.ordersForm.reset();
-    
     if (isEdit && department) {
-      this.ordersForm.patchValue(department);
+      this.selectedDepartment = department;
+      this.ordersForm.patchValue({
+        id: department.id,
+        name: department.name,
+        description: department.description
+      });
+      setTimeout(() => {
+        const modelTitle = document.querySelector('.modal-title') as HTMLAreaElement;
+        if (modelTitle) modelTitle.innerHTML = 'Edit Department';
+        const updateBtn = document.getElementById('addNewUser-btn') as HTMLAreaElement;
+        if (updateBtn) updateBtn.innerHTML = 'Update';
+      });
+    } else {
+      this.selectedDepartment = null;
+      this.ordersForm.reset();
+      setTimeout(() => {
+        const modelTitle = document.querySelector('.modal-title') as HTMLAreaElement;
+        if (modelTitle) modelTitle.innerHTML = 'Add New Department';
+        const updateBtn = document.getElementById('addNewUser-btn') as HTMLAreaElement;
+        if (updateBtn) updateBtn.innerHTML = 'Save';
+      });
     }
-    
     this.showModal?.show();
   }
+
   /**
    * Form data get
    */
@@ -174,20 +183,23 @@ export class DepartmentComponent {
   }
 
   /**
-  * Save user
+  * Save department
   */
   saveUser() {
     this.submitted = true;
+    this.saving = true;
     if (this.ordersForm.invalid) {
+      setTimeout(() => {
+        this.saving = false;
+      }, 800); // Show spinner briefly even if invalid
       return;
     }
-    
-    this.saving = true;
     const formValue = this.ordersForm.value;
-    
     if (formValue.id) {
-      // Update existing department
-      this.departmentService.updateDepartment(formValue.id, formValue).subscribe({
+      this.departmentService.updateDepartment(formValue.id, {
+        name: formValue.name,
+        description: formValue.description
+      }).subscribe({
         next: () => {
           this.loadData();
           this.showModal?.hide();
@@ -195,26 +207,25 @@ export class DepartmentComponent {
           this.submitted = false;
           this.saving = false;
           Swal.fire({
-            title: 'Updated!',
-            text: 'Department has been updated.',
+            position: 'center',
             icon: 'success',
-            confirmButtonColor: '#34c38f',
+            title: 'Department updated successfully',
+            showConfirmButton: false,
+            timer: 1500
           });
         },
-        error: (err) => {
-          console.error('Update department error:', err);
+        error: () => {
           this.saving = false;
-          Swal.fire({
-            title: 'Error!',
-            text: 'Failed to update department. Please try again.',
-            icon: 'error',
-            confirmButtonColor: '#f46a6a',
-          });
         }
       });
     } else {
-      // Create new department
-      this.departmentService.createDepartment(formValue).subscribe({
+      // Add new department
+      const payload = {
+        department_name: formValue.name,
+        department_description: formValue.description
+      };
+      console.log('Payload sent to createDepartment:', payload);
+      this.departmentService.createDepartment(payload).subscribe({
         next: () => {
           this.loadData();
           this.showModal?.hide();
@@ -222,21 +233,15 @@ export class DepartmentComponent {
           this.submitted = false;
           this.saving = false;
           Swal.fire({
-            title: 'Created!',
-            text: 'Department has been created.',
+            position: 'center',
             icon: 'success',
-            confirmButtonColor: '#34c38f',
+            title: 'Department created successfully',
+            showConfirmButton: false,
+            timer: 1500
           });
         },
-        error: (err) => {
-          console.error('Create department error:', err);
+        error: () => {
           this.saving = false;
-          Swal.fire({
-            title: 'Error!',
-            text: 'Failed to create department. Please try again.',
-            icon: 'error',
-            confirmButtonColor: '#f46a6a',
-          });
         }
       });
     }
@@ -244,16 +249,16 @@ export class DepartmentComponent {
 
   /**
    * Open Edit modal
-   * @param content modal content
+   * @param department department to be edited
    */
   editModal(department: Department) {
     this.openModal(true, department);
   }
 
   // pagination
-  pagechanged(event: any): void {
+  pagechanged(event: any) {
     const startItem = (event.page - 1) * event.itemsPerPage;
-    const endItem = event.page * event.itemsPerPage;
-    this.orderlist = this.Allorderlist.slice(startItem, endItem);
+    this.enditem = event.page * event.itemsPerPage;
+    this.orderlist = this.orderlist.slice(startItem, this.enditem);
   }
 }

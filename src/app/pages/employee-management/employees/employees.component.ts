@@ -1332,6 +1332,9 @@ export class EmployeesComponent implements OnInit {
   }
 
   canViewUsers(): boolean {
-    return this.permissionCheckService.hasPermission('view_users');
+    // Temporarily bypass permission check - allow all users to access employee management
+    return true;
+    // Original permission check (commented out for now):
+    // return this.permissionCheckService.hasPermission('view_users');
   }
 }

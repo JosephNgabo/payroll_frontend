@@ -147,4 +147,11 @@ export class LoginComponent implements OnInit, OnDestroy {
     }
     return '';
   }
+
+  /**
+   * Navigate to employee registration page
+   */
+  navigateToEmployeeRegister() {
+    this.router.navigate(['/auth/employee-register']);
+  }
 }

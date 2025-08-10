@@ -1,4 +1,4 @@
-<!-- Full Screen Login Page -->
+<!-- Full Screen Employee Registration Page -->
 <div class="container-fluid p-0 vh-100">
     <div class="row g-0 h-100">
 
@@ -7,7 +7,6 @@
                 <div class="w-100 h-100">
                     <div class="bg-overlay"></div>
                     <div class="d-flex h-100 flex-column">
-
                         <div class="p-4 mt-auto">
                             <div class="row justify-content-center">
                                 <div class="col-lg-7">
@@ -75,7 +74,7 @@
 
                             <div>
                                 <h3 class="text-primary">Welcome to Kuranga Payroll & HR Management!</h3>
-                                <p class="text-muted">Sign in to access your dashboard.</p>
+                                <p class="text-muted">Enter your email to receive login credentials.</p>
                             </div>
 
                             <!-- Error Alert -->
@@ -88,79 +87,44 @@
                             }
 
                             <div class="mt-4">
-                                <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+                                <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
 
                                     <div class="mb-3">
-                                        <label for="username">Username</label>
-                                        <input type="text" class="form-control" id="username" formControlName="username"
-                                            [ngClass]="{ 'is-invalid': submitted && f?.username?.errors }"
-                                            placeholder="Enter username" [disabled]="isLoading">
-                                        @if(submitted && f?.username?.errors){
+                                        <label for="email">Email Address</label>
+                                        <input type="email" class="form-control" id="email" formControlName="email"
+                                            [ngClass]="{ 'is-invalid': submitted && f?.email?.errors }"
+                                            placeholder="Enter your email address" [disabled]="isLoading">
+                                        @if(submitted && f?.email?.errors){
                                         <div class="invalid-feedback">
-                                            @if(f.username.errors.required){
-                                            <div>Username is required</div>
+                                            @if(f.email.errors.required){
+                                            <div>Email is required</div>
                                             }
-                                            @if(f.username.errors.minlength){
-                                            <div>Username must be at least 3 characters</div>
+                                            @if(f.email.errors.email){
+                                            <div>Please enter a valid email address</div>
                                             }
                                         </div>}
                                     </div>
 
-                                    <div class="mb-3">
-                                        <div class="float-end">
-                                            <a routerLink="/auth/recoverpwd-2"
-                                                class="text-primary poppins-medium">Forgot
-                                                password?</a>
-                                        </div>
-                                        <label for="userpassword">Password</label>
-                                        <div class="input-group auth-pass-inputgroup">
-                                            <input type="password" class="form-control" formControlName="password"
-                                                [ngClass]="{ 'is-invalid': submitted && f?.password?.errors }"
-                                                placeholder="Enter password" aria-label="Password"
-                                                aria-describedby="password-addon" [disabled]="isLoading">
-                                          
-                                            @if(submitted && f?.password?.errors){
-                                            <div class="invalid-feedback">
-                                                @if(f.password.errors.required){
-                                                <span>Password is required</span>
-                                                }
-                                                @if(f.password.errors.minlength){
-                                                <span>Password must be at least 6 characters</span>
-                                                }
-                                            </div>}
-                                        </div>
-                                    </div>
-
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" id="remember-check">
-                                        <label class="form-check-label" for="remember-check">
-                                            Remember me
-                                        </label>
-                                    </div>
-
                                     <div class="mt-3 d-grid">
                                         <button class="btn btn-primary btn-block" type="submit"
-                                            [disabled]="isLoading || loginForm?.invalid">
+                                            [disabled]="isLoading || registerForm?.invalid">
                                             @if(isLoading){
                                             <span class="spinner-border spinner-border-sm me-2" role="status"
                                                 aria-hidden="true"></span>
-                                            Signing in...
+                                            Processing...
                                             } @else {
-                                            Log In
+                                            Register Employee
                                             }
                                         </button>
                                     </div>
-                                    
-                                    <div class="mt-3 d-grid">
-                                        <button class="btn btn-outline-primary btn-block" type="button"
-                                            (click)="navigateToEmployeeRegister()">
-                                            Employee Account creation
-                                        </button>
-                                    </div>
                                 </form>
-                                <!-- <div class="mt-5 text-center">
-                                    <p>Registering a User ? <a routerLink="/auth/signup-2" class="fw-medium text-primary"> Register User </a> </p>
-                                </div> -->
+                                
+                                <div class="mt-3 d-grid">
+                                    <button class="btn btn-outline-secondary btn-block" type="button"
+                                        (click)="goToLogin()">
+                                        Back to Login
+                                    </button>
+                                </div>
                             </div>
                         </div>
 

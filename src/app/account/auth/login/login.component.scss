@@ -1,0 +1,55 @@
+// Login Component Styles - Reduced Width for Inputs and Buttons
+
+.auth-full-page-content {
+  // Center the welcome section
+  .my-auto > div:first-child {
+    text-align: center;
+    max-width: 400px;
+    margin: 0 auto;
+  }
+  
+  form {
+    max-width: 400px;
+    margin: 0 auto;
+  }
+  
+  .form-control {
+    width: 100%;
+  }
+  
+  .btn {
+    width: 100%;
+  }
+  
+  .input-group {
+    width: 100%;
+  }
+  
+  .form-check {
+    width: 100%;
+  }
+  
+  .float-end {
+    width: 100%;
+    text-align: right;
+  }
+  
+  // Center any button containers outside the form
+  .mt-3.d-grid {
+    max-width: 400px;
+    margin: 0 auto;
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .auth-full-page-content {
+    .form-control,
+    .btn,
+    .input-group,
+    .form-check,
+    .float-end {
+      max-width: 100%;
+    }
+  }
+}
