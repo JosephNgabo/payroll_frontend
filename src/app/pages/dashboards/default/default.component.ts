@@ -10,13 +10,15 @@ import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 import { TransactionComponent } from 'src/app/shared/widget/transaction/transaction.component';
 import { PagetitleComponent } from 'src/app/shared/ui/pagetitle/pagetitle.component';
 import { LoaderComponent } from 'src/app/shared/ui/loader/loader.component';
+import { EmployeeDashboardComponent } from '../../employee-portal/dashboard/employee-dashboard.component';
+import { EmployeePortalModule } from '../../employee-portal/employee-portal.module';
 
 @Component({
   selector: 'app-default',
   templateUrl: './default.component.html',
   styleUrls: ['./default.component.scss'],
   standalone: true,
-  imports: [PagetitleComponent, LoaderComponent, CommonModule, NgApexchartsModule, BsDropdownModule, ModalModule, TransactionComponent]
+  imports: [PagetitleComponent, LoaderComponent, CommonModule, NgApexchartsModule, BsDropdownModule, ModalModule, TransactionComponent, EmployeePortalModule]
 })
 export class DefaultComponent implements OnInit {
   modalRef?: BsModalRef;
@@ -30,6 +32,8 @@ export class DefaultComponent implements OnInit {
     ignoreBackdropClick: true
   };
   isActive: string;
+  user:any;
+  session=window.sessionStorage;
 
   @ViewChild('content') content;
   @ViewChild('center', { static: false }) center?: ModalDirective;
@@ -39,6 +43,9 @@ export class DefaultComponent implements OnInit {
     private configService: ConfigService,
     private eventService: EventService
   ) {
+    let user=sessionStorage.getItem('current_user');
+    this.user=JSON.parse(user);
+    console.log(this.user);
     this.statData = [
       {
         title: 'Total Employees',

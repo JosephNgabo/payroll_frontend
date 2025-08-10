@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { LaravelAuthService } from 'src/app/core/services/laravel-auth.service';
+
 
 interface SummaryCard {
   title: string;
@@ -24,6 +26,7 @@ export class EmployeeDashboardComponent implements OnInit {
   breadCrumbItems: Array<{}>;
   
   // User information
+  user: any = null;
   userName: string = 'Frank';
   userFullName: string = 'Kwizera Frank';
   userPosition: string = 'Accountant';
@@ -75,13 +78,16 @@ export class EmployeeDashboardComponent implements OnInit {
   // Search functionality
   searchTerm: string = '';
 
-  constructor() { }
+  constructor(private laravelAuthService: LaravelAuthService) { }
 
   ngOnInit(): void {
     this.breadCrumbItems = [
       { label: 'Employee Portal' },
       { label: 'Dashboard', active: true }
     ];
+    
+    // Load user data
+    this.user = this.laravelAuthService.getCurrentUser();
     
     // Load user data and dashboard information
     this.loadDashboardData();
@@ -124,6 +130,15 @@ export class EmployeeDashboardComponent implements OnInit {
   requestLeave(): void {
     // Navigate to the leave request form
     window.location.href = '/employee-portal/leave-request';
+  }
+  get currentUserDisplayName(): string {
+    const user = this.laravelAuthService.getCurrentUser();
+    if (!user) return '';
+    if (user.first_name || user.last_name) {
+      return `${user.first_name || ''} ${user.last_name || ''}`.trim();
+    }
+    if (user.username) return user.username;
+    return user.email || '';
   }
 
   /**

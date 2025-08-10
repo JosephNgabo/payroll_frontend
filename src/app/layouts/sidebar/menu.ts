@@ -97,7 +97,8 @@ export const MENU: MenuItem[] = [
 //employee portal
     {
         id: 112,
-        label: 'Leave Management',
+        label: 'Time off',
+        icon: 'bx-calendar',
         link: '/employee-portal/leave-management',
         parentId: 11,
         p_id:7003
@@ -105,6 +106,7 @@ export const MENU: MenuItem[] = [
     {
         id: 113,
         label: 'Payslips',
+        icon: 'bx-file-blank',
         link: '/employee-portal/payslips',
         parentId: 11,
         p_id:7001
@@ -112,6 +114,7 @@ export const MENU: MenuItem[] = [
     {
         id: 115,
         label: 'Profile',
+        icon: 'bx-user',
         link: '/employee-portal/profile',
         parentId: 11
     }

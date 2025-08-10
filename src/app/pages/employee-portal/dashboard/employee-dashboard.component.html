@@ -1,36 +1,11 @@
 <!-- Main content area for the employee dashboard -->
 <div class="container-fluid">
-  <app-page-title title="Employee Dashboard" [breadcrumbItems]="breadCrumbItems"></app-page-title>
+  <app-page-title title="Hello, {{ currentUserDisplayName }}" [breadcrumbItems]="breadCrumbItems"></app-page-title>
 
   <div class="employee-dashboard p-4">
 
-    <!-- Header bar -->
-    <header class="d-flex align-items-center justify-content-between mb-4">
-      <!-- Search input -->
-      <div class="search-box position-relative w-100 me-3">
-        <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
-        <input 
-          type="text" 
-          class="form-control ps-5 rounded-pill" 
-          placeholder="Search ..." 
-          [(ngModel)]="searchTerm"
-          (keyup.enter)="onSearch()">
-      </div>
-      
-      <!-- User profile info -->
-      <div class="user-profile d-flex align-items-center ms-auto">
-        <div class="text-end me-3">
-          <p class="fw-bold mb-0">{{ userFullName }}</p>
-          <small class="text-muted">{{ userPosition }}</small>
-        </div>
-        <img src="https://placehold.co/40x40/007bff/ffffff?text=KF" alt="User Profile" class="rounded-circle me-2">
-        <i class="bi bi-chevron-down"></i>
-      </div>
-    </header>
-
     <!-- Dashboard content -->
     <div class="dashboard-body flex-grow-1">
-      <h1 class="fw-bold mb-4">Hello, {{ userName }}</h1>
 
       <!-- Summary cards section -->
       <div class="row g-4 mb-4">

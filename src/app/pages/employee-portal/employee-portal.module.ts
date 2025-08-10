@@ -8,7 +8,7 @@ import { EmployeePortalRoutingModule } from './employee-portal-routing.module';
 // Components
 import { EmployeeDashboardComponent } from './dashboard/employee-dashboard.component';
 import { LeaveRequestFormComponent } from './leave-management/leave-request-form/leave-request-form.component';
-import { PayslipsComponent } from './payslips/payslips.component';
+
 import { AttendanceComponent } from './attendance/attendance.component';
 import { EmployeeProfileComponent } from './profile/employee-profile.component';
 import { LeaveManagementComponent } from './leave-management/leave-management.component';
@@ -22,7 +22,6 @@ import { PagetitleComponent } from '../../shared/ui/pagetitle/pagetitle.componen
     EmployeeDashboardComponent,
     LeaveManagementComponent,
     LeaveRequestFormComponent,
-    PayslipsComponent,
     AttendanceComponent,
     EmployeeProfileComponent
   ],
@@ -34,6 +33,9 @@ import { PagetitleComponent } from '../../shared/ui/pagetitle/pagetitle.componen
     EmployeePortalRoutingModule,
     SharedModule,
     PagetitleComponent
+  ],
+  exports: [
+    EmployeeDashboardComponent
   ]
 })
 export class EmployeePortalModule { }
