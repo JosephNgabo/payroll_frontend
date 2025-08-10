@@ -7,6 +7,7 @@ export interface LoginResponse {
   status: boolean;
   message: string;
   data: {
+    permissions: any[];
     id: string;
     username: string;
     email: string;
@@ -33,6 +34,7 @@ export interface User {
   status?: string;
   created_at?: string;
   updated_at?: string;
+  permissions?: any[];
 }
 
 export interface AuthState {

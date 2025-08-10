@@ -7,7 +7,7 @@
     <!-- Left Menu Start -->
     <ul class="metismenu list-unstyled" id="side-menu" #sideMenu>
       <!-- {{menuItems}} -->
-      @for (item of menuItems; track $index) {
+      @for (item of menuItems2; track $index) {
       <ng-container>
         @if(item.isTitle){
         <li class="menu-title">{{ item.label | translate }}</li>
@@ -46,7 +46,7 @@
               </a>
               <ul class="sub-menu mm-collapse" aria-expanded="false">
                 @for (subSubitem of subitem.subItems; track $index) {
-                <li>
+                <li *ngIf="permissions.includes(subSubitem.p_id)">
                   <a [attr.data-parent]="subSubitem.parentId" routerLink="{{subSubitem.link}}" routerLinkActive="active" class="side-nav-link-ref">
                     {{ subSubitem.label | translate }}
                   </a>
@@ -54,7 +54,7 @@
                 }
               </ul>}
               @else{
-              <a routerLink="{{subitem.link}}" class="side-nav-link-ref" [attr.data-parent]="subitem.parentId" routerLinkActive="active" (click)="onMenuItemClick(subitem)">
+              <a *ngIf="showMenu(subitem)" routerLink="{{subitem.link}}" class="side-nav-link-ref" [attr.data-parent]="subitem.parentId" routerLinkActive="active" (click)="onMenuItemClick(subitem)">
                 {{ subitem.label | translate}}
                 @if(subitem.badge){
                 <span class="badge rounded-pill bg-{{subitem.badge.variant}} float-end">{{subitem.badge.text |

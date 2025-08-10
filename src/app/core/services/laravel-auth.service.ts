@@ -98,7 +98,8 @@ export class LaravelAuthService {
       title: data.title,
       user_profile: data.user_profile,
       language: data.language,
-      is_active: data.is_active
+      is_active: data.is_active,
+      permissions: data.permissions
     };
     
     console.log('LaravelAuthService - Created user object:', user);

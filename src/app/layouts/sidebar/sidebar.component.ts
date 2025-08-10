@@ -25,8 +25,12 @@ export class SidebarComponent implements OnInit, AfterViewInit, OnChanges {
   @Input() isCondensed = false;
   menu: any;
   data: any;
+  session=window.sessionStorage;
+  user=this.session.getItem('current_user');
+  permissions:any[];
 
   menuItems: MenuItem[] = [];
+  menuItems2: MenuItem[] = [];
 
   @ViewChild('sideMenu') sideMenu: ElementRef;
 
@@ -36,6 +40,7 @@ export class SidebarComponent implements OnInit, AfterViewInit, OnChanges {
     public translate: TranslateService, 
     private http: HttpClient
   ) {
+    this.session = window.sessionStorage;
     this.router.events.subscribe((event) => {
       if (event instanceof NavigationEnd) {
         this.handleSidebarOnRoute(event.urlAfterRedirects);
@@ -44,8 +49,11 @@ export class SidebarComponent implements OnInit, AfterViewInit, OnChanges {
   }
 
   ngOnInit() {
+    this.permissions=JSON.parse(this.user).permissions;
+    console.log(this.permissions);
     this.initialize();
     this._scrollElement();
+
   }
 
   ngAfterViewInit() {
@@ -166,8 +174,19 @@ export class SidebarComponent implements OnInit, AfterViewInit, OnChanges {
    * Initialize
    */
   initialize(): void {
-    this.menuItems = MENU;
+    if(this.permissions.length>0){
+      let menu=MENU.filter(item=>{
+        if(item.p_id && this.permissions.includes(item.p_id) || item.p_id==1){
+          return item;
+        }
+      });
+      this.menuItems2=menu;
+    }else{
+      this.menuItems2=[];
+    }
+    this.menuItems = [];
   }
+  
 
   /**
    * Returns true or false if given menu has any child menu.
@@ -175,6 +194,11 @@ export class SidebarComponent implements OnInit, AfterViewInit, OnChanges {
    */
   hasItems(item: MenuItem) {
     return item.subItems !== undefined ? item.subItems.length > 0 : false;
+  }
+
+  showMenu(item: MenuItem) {
+    console.log(item);
+    return this.permissions.includes(item.p_id);
   }
 
   /**
