@@ -78,7 +78,7 @@ export class ErrorInterceptor implements HttpInterceptor {
         
       case 404:
         console.error('🔍 Not Found Error:', errorLog);
-        this.toastr.error('The requested resource was not found.', 'Not Found');
+        // Don't show toast for 404 errors - let components handle them
         break;
         
       case 409:
