@@ -1,0 +1,88 @@
+<!-- Main content area for the employee dashboard -->
+<div class="container-fluid">
+  <app-page-title title="Employee Dashboard" [breadcrumbItems]="breadCrumbItems"></app-page-title>
+
+  <div class="employee-dashboard p-4">
+
+    <!-- Header bar -->
+    <header class="d-flex align-items-center justify-content-between mb-4">
+      <!-- Search input -->
+      <div class="search-box position-relative w-100 me-3">
+        <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
+        <input 
+          type="text" 
+          class="form-control ps-5 rounded-pill" 
+          placeholder="Search ..." 
+          [(ngModel)]="searchTerm"
+          (keyup.enter)="onSearch()">
+      </div>
+      
+      <!-- User profile info -->
+      <div class="user-profile d-flex align-items-center ms-auto">
+        <div class="text-end me-3">
+          <p class="fw-bold mb-0">{{ userFullName }}</p>
+          <small class="text-muted">{{ userPosition }}</small>
+        </div>
+        <img src="https://placehold.co/40x40/007bff/ffffff?text=KF" alt="User Profile" class="rounded-circle me-2">
+        <i class="bi bi-chevron-down"></i>
+      </div>
+    </header>
+
+    <!-- Dashboard content -->
+    <div class="dashboard-body flex-grow-1">
+      <h1 class="fw-bold mb-4">Hello, {{ userName }}</h1>
+
+      <!-- Summary cards section -->
+      <div class="row g-4 mb-4">
+        <div class="col-md-6 col-lg-3" *ngFor="let card of summaryCards">
+          <div class="card p-3 rounded-4 shadow-sm">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <span class="card-title fw-semibold text-muted">{{ card.title }}</span>
+              <div class="icon-circle" [ngClass]="card.bgClass">
+                <i [ngClass]="'bi ' + card.icon"></i>
+              </div>
+            </div>
+            <h3 class="fw-bold mb-0">{{ card.value }}</h3>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Actions section -->
+      <div class="quick-actions mb-4">
+        <h5 class="fw-bold mb-3">Quick Actions</h5>
+        <div class="d-flex gap-3">
+          <button 
+            type="button" 
+            class="btn btn-primary rounded-pill d-flex align-items-center"
+            (click)="downloadPayslip()">
+            <i class="bi bi-download me-2"></i>Download Payslip
+          </button>
+          <button 
+            type="button" 
+            class="btn btn-outline-primary rounded-pill d-flex align-items-center"
+            (click)="requestLeave()">
+            <i class="bi bi-box-arrow-in-left me-2"></i>Request Leave
+          </button>
+        </div>
+      </div>
+
+      <!-- Recent Activities section -->
+      <div class="recent-activities">
+        <h5 class="fw-bold mb-3">Recent Activities</h5>
+        <ul class="list-unstyled">
+          <li 
+            class="activity-item d-flex justify-content-between align-items-center p-3 mb-2 rounded-3 shadow-sm"
+            *ngFor="let activity of recentActivities">
+            <div>
+              <h6 class="fw-semibold mb-1">{{ activity.title }}</h6>
+              <small class="text-muted">{{ activity.description }}</small>
+            </div>
+            <i class="bi bi-three-dots" (click)="onActivityAction(activity)" style="cursor: pointer;"></i>
+          </li>
+        </ul>
+      </div>
+
+    </div>
+
+  </div>
+</div>

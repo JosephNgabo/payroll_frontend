@@ -9,159 +9,160 @@
     <p class="mt-2">Loading employee form...</p>
   </div>
 
-  <!-- Start Form Wizard Basic row -->
-  <div class="row" *ngIf="!isLoading">
-    <div class="col-lg-12">
-      <div class="card">
-        <div class="card-body">
-          <h4 class="card-title mb-4">Employee Creation</h4>
-          <div id="basic-example">
-            <ng-stepper #cdkStepper [linear]="true" class="wizard" (selectionChange)="onStepperChange()">
+  <div *ngIf="canViewUsers(); else noPermission">
+    <!-- Start Form Wizard Basic row -->
+    <div class="row" *ngIf="!isLoading">
+      <div class="col-lg-12">
+        <div class="card">
+          <div class="card-body">
+            <h4 class="card-title mb-4">Employee Creation</h4>
+            <div id="basic-example">
+              <ng-stepper #cdkStepper [linear]="true" class="wizard" (selectionChange)="onStepperChange()">
 
-              <!-- Step 1: Basic Info -->
-              <cdk-step [optional]="false">
-                <ng-template cdkStepLabel>
-                  <span class="number">1.</span>
-                  <span>Personal</span>
-                </ng-template>
-                <section *ngIf="cdkStepper.selectedIndex === 0">
-                  <form [formGroup]="basicInfoForm" (ngSubmit)="onBasicInfoNext()" novalidate>
-                    <div class="row">
-                      <!-- <div class="col-lg-4 mb-3">
-                        <label>Salutation <span class="text-danger">*</span></label>
-                        <ng-select [items]="salutations"
-                                   bindLabel="label"
-                                   bindValue="value"
-                                   formControlName="salutation"
-                                   placeholder="Select Salutation"
-                                   [ngClass]="{'is-invalid': submittedBasicInfo && basicInfo.salutation.errors, 'is-valid': submittedBasicInfo && basicInfo.salutation.valid}">
-                        </ng-select>
-                        <div class="invalid-feedback d-block" *ngIf="submittedBasicInfo && basicInfo.salutation.errors">
-                          <span *ngIf="basicInfo.salutation.errors.required">Salutation is required.</span>
+                <!-- Step 1: Basic Info -->
+                <cdk-step [optional]="false">
+                  <ng-template cdkStepLabel>
+                    <span class="number">1.</span>
+                    <span>Personal</span>
+                  </ng-template>
+                  <section *ngIf="cdkStepper.selectedIndex === 0">
+                    <form [formGroup]="basicInfoForm" (ngSubmit)="onBasicInfoNext()" novalidate>
+                      <div class="row">
+                        <!-- <div class="col-lg-4 mb-3">
+                          <label>Salutation <span class="text-danger">*</span></label>
+                          <ng-select [items]="salutations"
+                                     bindLabel="label"
+                                     bindValue="value"
+                                     formControlName="salutation"
+                                     placeholder="Select Salutation"
+                                     [ngClass]="{'is-invalid': submittedBasicInfo && basicInfo.salutation.errors, 'is-valid': submittedBasicInfo && basicInfo.salutation.valid}">
+                          </ng-select>
+                          <div class="invalid-feedback d-block" *ngIf="submittedBasicInfo && basicInfo.salutation.errors">
+                            <span *ngIf="basicInfo.salutation.errors.required">Salutation is required.</span>
+                          </div>
+                        </div> -->
+                        <div class="col-lg-4 mb-3">
+                          <label>First Name <span class="text-danger">*</span></label>
+                          <input type="text" class="form-control" formControlName="firstName" placeholder="Enter First Name"
+                                 [ngClass]="{'is-invalid': submittedBasicInfo && basicInfo.firstName.errors, 'is-valid': submittedBasicInfo && basicInfo.firstName.valid}">
+                          <div class="invalid-feedback" *ngIf="submittedBasicInfo && basicInfo.firstName.errors">
+                            <span *ngIf="basicInfo.firstName.errors.required">First name is required.</span>
+                          </div>
                         </div>
-                      </div> -->
-                      <div class="col-lg-4 mb-3">
-                        <label>First Name <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" formControlName="firstName" placeholder="Enter First Name"
-                               [ngClass]="{'is-invalid': submittedBasicInfo && basicInfo.firstName.errors, 'is-valid': submittedBasicInfo && basicInfo.firstName.valid}">
-                        <div class="invalid-feedback" *ngIf="submittedBasicInfo && basicInfo.firstName.errors">
-                          <span *ngIf="basicInfo.firstName.errors.required">First name is required.</span>
+                        <div class="col-lg-4 mb-3">
+                          <label>Last Name <span class="text-danger">*</span></label>
+                          <input type="text" class="form-control" formControlName="lastName" placeholder="Enter Last Name"
+                                 [ngClass]="{'is-invalid': submittedBasicInfo && basicInfo.lastName.errors, 'is-valid': submittedBasicInfo && basicInfo.lastName.valid}">
+                          <div class="invalid-feedback" *ngIf="submittedBasicInfo && basicInfo.lastName.errors">
+                            <span *ngIf="basicInfo.lastName.errors.required">Last name is required.</span>
+                          </div>
                         </div>
-                      </div>
-                      <div class="col-lg-4 mb-3">
-                        <label>Last Name <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" formControlName="lastName" placeholder="Enter Last Name"
-                               [ngClass]="{'is-invalid': submittedBasicInfo && basicInfo.lastName.errors, 'is-valid': submittedBasicInfo && basicInfo.lastName.valid}">
-                        <div class="invalid-feedback" *ngIf="submittedBasicInfo && basicInfo.lastName.errors">
-                          <span *ngIf="basicInfo.lastName.errors.required">Last name is required.</span>
-                        </div>
-                      </div>
 
-                      <div class="col-lg-4 mb-3">
-                        <label>Gender <span class="text-danger">*</span></label>
-                        <ng-select [items]="genders"
-                                   bindLabel="label"
-                                   bindValue="value"
-                                   formControlName="gender"
-                                   placeholder="Select Gender"
-                                   [ngClass]="{'is-invalid': submittedBasicInfo && basicInfo.gender.errors, 'is-valid': submittedBasicInfo && basicInfo.gender.valid}">
-                        </ng-select>
-                        <div class="invalid-feedback d-block" *ngIf="submittedBasicInfo && basicInfo.gender.errors">
-                          <span *ngIf="basicInfo.gender.errors.required">Gender is required.</span>
+                        <div class="col-lg-4 mb-3">
+                          <label>Gender <span class="text-danger">*</span></label>
+                          <ng-select [items]="genders"
+                                     bindLabel="label"
+                                     bindValue="value"
+                                     formControlName="gender"
+                                     placeholder="Select Gender"
+                                     [ngClass]="{'is-invalid': submittedBasicInfo && basicInfo.gender.errors, 'is-valid': submittedBasicInfo && basicInfo.gender.valid}">
+                          </ng-select>
+                          <div class="invalid-feedback d-block" *ngIf="submittedBasicInfo && basicInfo.gender.errors">
+                            <span *ngIf="basicInfo.gender.errors.required">Gender is required.</span>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                    <div class="row">
-                      <!-- <div class="col-lg-4 mb-3">
-                        <label>Gender <span class="text-danger">*</span></label>
-                        <ng-select [items]="genders"
-                                   bindLabel="label"
-                                   bindValue="value"
-                                   formControlName="gender"
-                                   placeholder="Select Gender"
-                                   [ngClass]="{'is-invalid': submittedBasicInfo && basicInfo.gender.errors, 'is-valid': submittedBasicInfo && basicInfo.gender.valid}">
-                        </ng-select>
-                        <div class="invalid-feedback d-block" *ngIf="submittedBasicInfo && basicInfo.gender.errors">
-                          <span *ngIf="basicInfo.gender.errors.required">Gender is required.</span>
+                      <div class="row">
+                        <!-- <div class="col-lg-4 mb-3">
+                          <label>Gender <span class="text-danger">*</span></label>
+                          <ng-select [items]="genders"
+                                     bindLabel="label"
+                                     bindValue="value"
+                                     formControlName="gender"
+                                     placeholder="Select Gender"
+                                     [ngClass]="{'is-invalid': submittedBasicInfo && basicInfo.gender.errors, 'is-valid': submittedBasicInfo && basicInfo.gender.valid}">
+                          </ng-select>
+                          <div class="invalid-feedback d-block" *ngIf="submittedBasicInfo && basicInfo.gender.errors">
+                            <span *ngIf="basicInfo.gender.errors.required">Gender is required.</span>
+                          </div>
+                        </div> -->
+                        <div class="col-lg-4 mb-3">
+                          <label>Date of Birth <span class="text-danger">*</span></label>
+                          <input type="date" class="form-control" formControlName="dateOfBirth"
+                                 [ngClass]="{'is-invalid': submittedBasicInfo && basicInfo.dateOfBirth.errors, 'is-valid': submittedBasicInfo && basicInfo.dateOfBirth.valid}">
+                          <div class="invalid-feedback" *ngIf="submittedBasicInfo && basicInfo.dateOfBirth.errors">
+                            <span *ngIf="basicInfo.dateOfBirth.errors.required">Date of birth is required.</span>
+                          </div>
                         </div>
-                      </div> -->
-                      <div class="col-lg-4 mb-3">
-                        <label>Date of Birth <span class="text-danger">*</span></label>
-                        <input type="date" class="form-control" formControlName="dateOfBirth"
-                               [ngClass]="{'is-invalid': submittedBasicInfo && basicInfo.dateOfBirth.errors, 'is-valid': submittedBasicInfo && basicInfo.dateOfBirth.valid}">
-                        <div class="invalid-feedback" *ngIf="submittedBasicInfo && basicInfo.dateOfBirth.errors">
-                          <span *ngIf="basicInfo.dateOfBirth.errors.required">Date of birth is required.</span>
+                        <div class="col-lg-4 mb-3">
+                          <label>Nationality <span class="text-danger">*</span></label>
+                          <ng-select *ngIf="countries && countries.length"
+                                     [items]="countries"
+                                     bindLabel="country"
+                                     bindValue="id"
+                                     formControlName="nationality"
+                                     placeholder="Select Nationality"
+                                 [ngClass]="{'is-invalid': submittedBasicInfo && basicInfo.nationality.errors, 'is-valid': submittedBasicInfo && basicInfo.nationality.valid}">
+                          </ng-select>
+                          <div class="invalid-feedback d-block" *ngIf="submittedBasicInfo && basicInfo.nationality.errors">
+                            <span *ngIf="basicInfo.nationality.errors.required">Nationality is required.</span>
+                          </div>
                         </div>
-                      </div>
-                      <div class="col-lg-4 mb-3">
-                        <label>Nationality <span class="text-danger">*</span></label>
-                        <ng-select *ngIf="countries && countries.length"
-                                   [items]="countries"
-                                   bindLabel="country"
-                                   bindValue="id"
-                                   formControlName="nationality"
-                                   placeholder="Select Nationality"
-                               [ngClass]="{'is-invalid': submittedBasicInfo && basicInfo.nationality.errors, 'is-valid': submittedBasicInfo && basicInfo.nationality.valid}">
-                        </ng-select>
-                        <div class="invalid-feedback d-block" *ngIf="submittedBasicInfo && basicInfo.nationality.errors">
-                          <span *ngIf="basicInfo.nationality.errors.required">Nationality is required.</span>
-                        </div>
-                      </div>
 
-                      <div class="col-lg-4 mb-3">
-                        <label>Country of Birth <span class="text-danger">*</span></label>
-                        <ng-select *ngIf="countries && countries.length"
-                                   [items]="countries"
-                                   bindLabel="country"
-                                   bindValue="id"
-                                   formControlName="countryOfBirth"
-                                   placeholder="Select Country of Birth"
-                                   [ngClass]="{'is-invalid': submittedBasicInfo && basicInfo.countryOfBirth.errors, 'is-valid': submittedBasicInfo && basicInfo.countryOfBirth.valid}">
-                        </ng-select>
-                        <div class="invalid-feedback d-block" *ngIf="submittedBasicInfo && basicInfo.countryOfBirth.errors">
-                          <span *ngIf="basicInfo.countryOfBirth.errors.required">Country of birth is required.</span>
+                        <div class="col-lg-4 mb-3">
+                          <label>Country of Birth <span class="text-danger">*</span></label>
+                          <ng-select *ngIf="countries && countries.length"
+                                     [items]="countries"
+                                     bindLabel="country"
+                                     bindValue="id"
+                                     formControlName="countryOfBirth"
+                                     placeholder="Select Country of Birth"
+                                     [ngClass]="{'is-invalid': submittedBasicInfo && basicInfo.countryOfBirth.errors, 'is-valid': submittedBasicInfo && basicInfo.countryOfBirth.valid}">
+                          </ng-select>
+                          <div class="invalid-feedback d-block" *ngIf="submittedBasicInfo && basicInfo.countryOfBirth.errors">
+                            <span *ngIf="basicInfo.countryOfBirth.errors.required">Country of birth is required.</span>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                    <div class="row">
-                      <!-- <div class="col-lg-4 mb-3">
-                        <label>Country of Birth <span class="text-danger">*</span></label>
-                        <ng-select *ngIf="countries && countries.length"
-                                   [items]="countries"
-                                   bindLabel="country"
-                                   bindValue="id"
-                                   formControlName="countryOfBirth"
-                                   placeholder="Select Country of Birth"
-                                   [ngClass]="{'is-invalid': submittedBasicInfo && basicInfo.countryOfBirth.errors, 'is-valid': submittedBasicInfo && basicInfo.countryOfBirth.valid}">
-                        </ng-select>
-                        <div class="invalid-feedback d-block" *ngIf="submittedBasicInfo && basicInfo.countryOfBirth.errors">
-                          <span *ngIf="basicInfo.countryOfBirth.errors.required">Country of birth is required.</span>
+                      <div class="row">
+                        <!-- <div class="col-lg-4 mb-3">
+                          <label>Country of Birth <span class="text-danger">*</span></label>
+                          <ng-select *ngIf="countries && countries.length"
+                                     [items]="countries"
+                                     bindLabel="country"
+                                     bindValue="id"
+                                     formControlName="countryOfBirth"
+                                     placeholder="Select Country of Birth"
+                                     [ngClass]="{'is-invalid': submittedBasicInfo && basicInfo.countryOfBirth.errors, 'is-valid': submittedBasicInfo && basicInfo.countryOfBirth.valid}">
+                          </ng-select>
+                          <div class="invalid-feedback d-block" *ngIf="submittedBasicInfo && basicInfo.countryOfBirth.errors">
+                            <span *ngIf="basicInfo.countryOfBirth.errors.required">Country of birth is required.</span>
+                          </div>
+                        </div> -->
+                        <div class="col-lg-4 mb-3">
+                          <label>Marital Status <span class="text-danger">*</span></label>
+                          <ng-select [items]="['single', 'married', 'widowed', 'divorced', 'separated']"
+                                     formControlName="maritalStatus"
+                                     placeholder="Select Marital Status"
+                                     [ngClass]="{'is-invalid': submittedBasicInfo && basicInfo.maritalStatus.errors, 'is-valid': submittedBasicInfo && basicInfo.maritalStatus.valid}">
+                          </ng-select>
+                          <div class="invalid-feedback d-block" *ngIf="submittedBasicInfo && basicInfo.maritalStatus.errors">
+                            <span *ngIf="basicInfo.maritalStatus.errors.required">Marital status is required.</span>
+                          </div>
                         </div>
-                      </div> -->
-                      <div class="col-lg-4 mb-3">
-                        <label>Marital Status <span class="text-danger">*</span></label>
-                        <ng-select [items]="['single', 'married', 'widowed', 'divorced', 'separated']"
-                                   formControlName="maritalStatus"
-                                   placeholder="Select Marital Status"
-                                   [ngClass]="{'is-invalid': submittedBasicInfo && basicInfo.maritalStatus.errors, 'is-valid': submittedBasicInfo && basicInfo.maritalStatus.valid}">
-                        </ng-select>
-                        <div class="invalid-feedback d-block" *ngIf="submittedBasicInfo && basicInfo.maritalStatus.errors">
-                          <span *ngIf="basicInfo.maritalStatus.errors.required">Marital status is required.</span>
+                        <div class="col-lg-4 mb-3">
+                          <label>Personal Mobile <span class="text-danger">*</span></label>
+                          <input type="text" class="form-control" formControlName="personalMobile" placeholder="Enter Personal Mobile"
+                                 [ngClass]="{'is-invalid': submittedBasicInfo && basicInfo.personalMobile.errors, 'is-valid': submittedBasicInfo && basicInfo.personalMobile.valid}">
+                          <div class="invalid-feedback" *ngIf="submittedBasicInfo && basicInfo.personalMobile.errors">
+                            <span *ngIf="basicInfo.personalMobile.errors.required">Personal mobile is required.</span>
+                          </div>
                         </div>
-                      </div>
-                      <div class="col-lg-4 mb-3">
-                        <label>Personal Mobile <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" formControlName="personalMobile" placeholder="Enter Personal Mobile"
-                               [ngClass]="{'is-invalid': submittedBasicInfo && basicInfo.personalMobile.errors, 'is-valid': submittedBasicInfo && basicInfo.personalMobile.valid}">
-                        <div class="invalid-feedback" *ngIf="submittedBasicInfo && basicInfo.personalMobile.errors">
-                          <span *ngIf="basicInfo.personalMobile.errors.required">Personal mobile is required.</span>
+                        <div class="col-lg-4 mb-3">
+                          <label>Personal Email</label>
+                          <input type="email" class="form-control" formControlName="personalEmail" placeholder="Enter Personal Email">
                         </div>
-                      </div>
-                      <div class="col-lg-4 mb-3">
-                        <label>Personal Email</label>
-                        <input type="email" class="form-control" formControlName="personalEmail" placeholder="Enter Personal Email">
-                      </div>
-                    
+                      
 
 
 
@@ -1108,3 +1109,9 @@
   <!-- Start Form Wizard vertical row-->
   <!-- end row -->
 </div>
+<ng-template #noPermission>
+  <div class="alert alert-warning mt-4">
+    <i class="mdi mdi-alert-outline me-2"></i>
+    You do not have permission to view employees.
+  </div>
+</ng-template>

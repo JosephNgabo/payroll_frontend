@@ -1,0 +1,96 @@
+// Leave Request Form Styles
+.leave-request-form {
+  .form-header {
+    .form-title {
+      color: #2c3e50;
+      font-size: 1.75rem;
+      font-weight: 600;
+    }
+  }
+  
+  .leave-form {
+    background: white;
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    
+    .form-label {
+      font-weight: 600;
+      color: #495057;
+      margin-bottom: 0.5rem;
+      font-size: 0.875rem;
+    }
+    
+    .form-control, .form-select {
+      border: 1px solid #e9ecef;
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      font-size: 0.875rem;
+      transition: all 0.3s ease;
+      
+      &:focus {
+        box-shadow: 0 0 0 0.2rem rgba(59, 77, 115, 0.25);
+        border-color: #3b4d73;
+      }
+      
+      &.is-invalid {
+        border-color: #dc3545;
+        
+        &:focus {
+          box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+        }
+      }
+    }
+    
+    .form-select {
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m1 6 7 7 7-7'/%3e%3c/svg%3e");
+    }
+    
+    .calendar-icon {
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #6c757d;
+      pointer-events: none;
+      font-size: 16px;
+    }
+    
+    .invalid-feedback {
+      font-size: 0.75rem;
+      margin-top: 0.25rem;
+    }
+    
+    .btn-primary {
+      background: #3b4d73;
+      border-color: #3b4d73;
+      border-radius: 8px;
+      padding: 0.75rem 2rem;
+      font-weight: 500;
+      
+      &:hover {
+        background: #2c3a5c;
+        border-color: #2c3a5c;
+      }
+      
+      &:disabled {
+        background: #6c757d;
+        border-color: #6c757d;
+      }
+    }
+  }
+}
+
+// Responsive Design
+@media (max-width: 768px) {
+  .leave-request-form {
+    .leave-form {
+      padding: 1.5rem;
+    }
+  }
+}
+
+// Loading state
+.spinner-border-sm {
+  width: 1rem;
+  height: 1rem;
+}

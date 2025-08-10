@@ -11,6 +11,7 @@ import { SkeletonComponent } from 'src/app/shared/ui/skeleton/skeleton.component
 import { TableSkeletonComponent } from 'src/app/shared/ui/skeleton/table-skeleton.component';
 import { AllowanceService } from 'src/app/core/services/allowance.service';
 import { Allowance } from 'src/app/core/models/allowance.model';
+import { PermissionCheckService } from 'src/app/core/services/permission-check.service';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -50,21 +51,18 @@ export class AllowancesBenefitsComponent {
     private formBuilder: UntypedFormBuilder,
     private datePipe: DatePipe,
     private store: Store,
-    private allowanceService: AllowanceService
+    private allowanceService: AllowanceService,
+    private permissionCheck: PermissionCheckService
   ) { }
 
-  ngOnInit() {
-    this.breadCrumbItems = [{ label: 'Payroll Management' }, { label: 'Allowances & Benefits', active: true }];
-
-    /**
-     * Form Validation - Updated for Allowances/Benefits
-     */
+  ngOnInit(): void {
+    // Initialize the form
     this.ordersForm = this.formBuilder.group({
-      id: [''],
+      id: [null],
       name: ['', [Validators.required]],
       description: ['', [Validators.required]]
     });
-
+    
     this.loadData();
   }
 
@@ -72,38 +70,46 @@ export class AllowancesBenefitsComponent {
     this.isLoading = true;
     this.allowanceService.getAllowances().subscribe({
       next: (response: any) => {
-        this.orderlist = response.data;
-        this.Allorderlist = response.data;
+        // Ensure response is an array
+        if (Array.isArray(response)) {
+          this.orderlist = response;
+          this.Allorderlist = response;
+        } else if (response && response.data && Array.isArray(response.data)) {
+          this.orderlist = response.data;
+          this.Allorderlist = response.data;
+        } else {
+          this.orderlist = [];
+          this.Allorderlist = [];
+        }
         this.isLoading = false;
       },
-      error: (err) => {
+      error: (error) => {
+        console.error('Error fetching allowances:', error);
+        this.orderlist = [];
+        this.Allorderlist = [];
         this.isLoading = false;
       }
     });
   }
 
-  /**
-   * Open modal
-   * @param content modal content
-   */
   openViewModal(content: any, allowance: Allowance) {
     this.selectedAllowance = allowance;
-    this.modalRef = this.modalService.show(content);
+    this.modalRef = this.modalService.show(content, { class: 'modal-lg' });
   }
 
   // The master checkbox will check/ uncheck all items
   checkUncheckAll(ev: any) {
-    this.orderes?.forEach((x: { state: any; }) => x.state = ev.target.checked);
+    this.orderlist.forEach((x: any) => (x.checked = ev.target.checked));
   }
 
   checkedValGet: any[] = [];
   // Delete Data
   deleteData(id: any) {
     if (id) {
-      document.getElementById('u_' + id)?.remove();
+      document.getElementById('a_' + id)?.remove();
     } else {
       this.checkedValGet?.forEach((item: any) => {
-        document.getElementById('u_' + item)?.remove();
+        document.getElementById('a_' + item)?.remove();
       });
     }
   }
@@ -111,7 +117,7 @@ export class AllowancesBenefitsComponent {
   // Delete Data
   confirm(id: any) {
     this.deletId = id;
-    this.deleteError = null;
+    this.selectedAllowance = this.orderlist.find(a => a.id === id) || null;
     this.removeItemModal?.show();
   }
   // delete order
@@ -119,26 +125,34 @@ export class AllowancesBenefitsComponent {
     if (!this.deletId) return;
     this.allowanceService.deleteAllowance(this.deletId).subscribe({
       next: () => {
-        this.loadData(); // Refresh the list after deletion
-        this.removeItemModal?.hide();
+        this.loadData(); // Refresh the list
+        this.modalRef?.hide();
+        Swal.fire({
+          title: 'Deleted!',
+          text: 'Allowance has been deleted.',
+          icon: 'success',
+          confirmButtonColor: '#34c38f',
+        });
       },
       error: (err) => {
-        if (err.status === 404 && err.error && err.error.message) {
-          this.deleteError = err.error.message;
-        } else {
-          this.deleteError = 'An unexpected error occurred while deleting the allowance.';
-        }
         console.error('Delete allowance error:', err);
+        Swal.fire({
+          title: 'Error!',
+          text: 'Failed to delete allowance. Please try again.',
+          icon: 'error',
+          confirmButtonColor: '#f46a6a',
+        });
       }
     });
   }
 
-  // fiter job - Updated to search in allowance/benefit fields
+  // fiter job
   searchOrder() {
     if (this.term) {
-      this.orderlist = this.Allorderlist.filter((data: any) => {
+      this.orderlist = this.Allorderlist.filter((data: Allowance) => {
         return data.name.toLowerCase().includes(this.term.toLowerCase()) ||
-               data.description.toLowerCase().includes(this.term.toLowerCase());
+               data.description.toLowerCase().includes(this.term.toLowerCase()) ||
+               data.taxValue.toString().includes(this.term);
       });
     } else {
       this.orderlist = this.Allorderlist;
@@ -151,7 +165,8 @@ export class AllowancesBenefitsComponent {
    */
   openModal(content: any) {
     this.submitted = false;
-    this.showModal.show();
+    this.ordersForm.reset();
+    this.modalRef = this.modalService.show(content, { class: 'modal-md' });
   }
   /**
    * Form data get
@@ -161,92 +176,88 @@ export class AllowancesBenefitsComponent {
   }
 
   /**
-  * Save allowance/benefit
+  * Save user
   */
   saveUser() {
     this.submitted = true;
-    this.saving = true;
     if (this.ordersForm.invalid) {
-      setTimeout(() => {
-        this.saving = false;
-      }, 800); // Show spinner briefly even if invalid
       return;
     }
+    
+    this.saving = true;
     const formValue = this.ordersForm.value;
+    
     if (formValue.id) {
       // Update existing allowance
-      this.allowanceService.updateAllowance(formValue.id, {
-        name: formValue.name,
-        description: formValue.description
-      }).subscribe({
-        next: (updated) => {
-          this.loadData(); // Refresh list
-          this.showModal.hide();
+      this.allowanceService.updateAllowance(formValue.id, formValue).subscribe({
+        next: () => {
+          this.loadData();
+          this.modalRef?.hide();
           this.ordersForm.reset();
           this.submitted = false;
           this.saving = false;
           Swal.fire({
-            position: 'center',
+            title: 'Updated!',
+            text: 'Allowance has been updated.',
             icon: 'success',
-            title: 'Your work has been updated',
-            showConfirmButton: false,
-            timer: 1500
+            confirmButtonColor: '#34c38f',
           });
         },
         error: (err) => {
-          // Handle error, show message if needed
+          console.error('Update allowance error:', err);
           this.saving = false;
+          Swal.fire({
+            title: 'Error!',
+            text: 'Failed to update allowance. Please try again.',
+            icon: 'error',
+            confirmButtonColor: '#f46a6a',
+          });
         }
       });
     } else {
-      // Add new allowance/benefit
-      this.allowanceService.createAllowance({
-        name: formValue.name,
-        description: formValue.description
-      }).subscribe({
-        next: (created) => {
-          this.loadData(); // Refresh list
-          this.showModal.hide();
+      // Create new allowance
+      this.allowanceService.createAllowance(formValue).subscribe({
+        next: () => {
+          this.loadData();
+          this.modalRef?.hide();
           this.ordersForm.reset();
           this.submitted = false;
           this.saving = false;
           Swal.fire({
-            position: 'center',
+            title: 'Created!',
+            text: 'Allowance has been created.',
             icon: 'success',
-            title: 'Your work has been saved',
-            showConfirmButton: false,
-            timer: 1500
+            confirmButtonColor: '#34c38f',
           });
         },
         error: (err) => {
-          // Handle error, e.g., show validation errors
           console.error('Create allowance error:', err);
           this.saving = false;
+          Swal.fire({
+            title: 'Error!',
+            text: 'Failed to create allowance. Please try again.',
+            icon: 'error',
+            confirmButtonColor: '#f46a6a',
+          });
         }
       });
     }
   }
+
   /**
    * Open Edit modal
    * @param content modal content
    */
   editModal(index: number) {
     this.submitted = false;
-    const allowance = this.orderlist[index];
-    this.ordersForm.patchValue({
-      id: allowance.id,
-      name: allowance.name,
-      description: allowance.description
-      // taxValue: allowance.taxValue (add later if needed)
-    });
+    this.ordersForm.patchValue(this.orderlist[index]);
     this.showModal.show();
-    // Optionally update modal title/button text for edit mode
   }
 
   // pagination
-  pagechanged(event: any) {
+  pagechanged(event: any): void {
     const startItem = (event.page - 1) * event.itemsPerPage;
-    this.enditem = event.page * event.itemsPerPage;
-    this.orderlist = this.orderlist.slice(startItem, this.enditem);
+    const endItem = event.page * event.itemsPerPage;
+    this.orderlist = this.Allorderlist.slice(startItem, endItem);
   }
 }

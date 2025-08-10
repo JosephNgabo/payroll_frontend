@@ -48,7 +48,7 @@
                     </tr>
                   </thead>
                   <tbody>
-                    @for (data of orderlist; track $index) {
+                    @for (data of orderlist || []; track $index) {
                     <tr id="u_{{data.id}}">
                       <td>
                         <div class="form-check font-size-16">

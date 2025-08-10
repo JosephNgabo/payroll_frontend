@@ -1,0 +1,211 @@
+// Employee Dashboard Styles
+.employee-dashboard {
+  background: #f8f9fa;
+  border-radius: 8px;
+  min-height: 600px;
+  
+  header {
+    .search-box {
+      max-width: 400px;
+      
+      input {
+        border: 1px solid #e9ecef;
+        padding: 12px 48px 12px 48px;
+        
+        &:focus {
+          box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+          border-color: #007bff;
+        }
+      }
+    }
+    
+    .user-profile {
+      img {
+        width: 40px;
+        height: 40px;
+      }
+      
+      .bi-chevron-down {
+        cursor: pointer;
+        margin-left: 8px;
+      }
+    }
+  }
+}
+
+// Dashboard Body Styles
+.dashboard-body {
+  h1 {
+    color: #2c3e50;
+    font-size: 2rem;
+  }
+  
+  // Summary Cards
+  .card {
+    border: none;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+    }
+    
+    .card-title {
+      font-size: 0.75rem;
+      letter-spacing: 0.5px;
+    }
+    
+    .icon-circle {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      
+      i {
+        font-size: 18px;
+      }
+    }
+    
+    h3 {
+      color: #2c3e50;
+      font-size: 1.75rem;
+    }
+  }
+  
+  // Quick Actions
+  .quick-actions {
+    .btn {
+      padding: 12px 24px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      
+      &.btn-primary {
+        background: #007bff;
+        border-color: #007bff;
+        
+        &:hover {
+          background: #0056b3;
+          border-color: #0056b3;
+          transform: translateY(-1px);
+        }
+      }
+      
+      &.btn-outline-primary {
+        color: #007bff;
+        border-color: #007bff;
+        
+        &:hover {
+          background: #007bff;
+          border-color: #007bff;
+          color: white;
+          transform: translateY(-1px);
+        }
+      }
+    }
+  }
+  
+  // Recent Activities
+  .recent-activities {
+    .activity-item {
+      background: white;
+      border: 1px solid #e9ecef;
+      transition: all 0.2s ease;
+      
+      &:hover {
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        border-color: #dee2e6;
+      }
+      
+      h6 {
+        color: #2c3e50;
+        margin-bottom: 4px;
+      }
+      
+      small {
+        color: #6c757d;
+      }
+      
+      .bi-three-dots {
+        color: #6c757d;
+        transition: color 0.2s ease;
+        
+        &:hover {
+          color: #495057;
+        }
+      }
+    }
+  }
+}
+
+// Bootstrap Icon Utilities
+.bi {
+  vertical-align: middle;
+}
+
+// Background utilities for icons
+.bg-primary-subtle {
+  background-color: rgba(13, 110, 253, 0.1) !important;
+}
+
+.text-primary {
+  color: #0d6efd !important;
+}
+
+// Responsive Design
+@media (max-width: 768px) {
+  .sidebar {
+    width: 100%;
+    min-height: auto;
+    position: fixed;
+    top: 0;
+    left: -100%;
+    z-index: 1000;
+    transition: left 0.3s ease;
+    
+    &.show {
+      left: 0;
+    }
+  }
+  
+  .main-content {
+    margin-left: 0;
+  }
+  
+  header {
+    .search-box {
+      max-width: none;
+      margin-right: 1rem !important;
+    }
+    
+    .user-profile {
+      .text-end {
+        display: none;
+      }
+    }
+  }
+  
+  .dashboard-body {
+    .row {
+      margin: 0 -8px;
+      
+      .col-md-6, .col-lg-3 {
+        padding: 0 8px;
+        margin-bottom: 16px;
+      }
+    }
+    
+    .quick-actions {
+      .d-flex {
+        flex-direction: column;
+        gap: 12px;
+        
+        .btn {
+          width: 100%;
+          justify-content: center;
+        }
+      }
+    }
+  }
+}

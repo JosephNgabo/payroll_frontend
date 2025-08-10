@@ -24,9 +24,7 @@ export class DeductionsComponent implements OnInit {
   constructor(
     private deductionsService: DeductionsService,
     private modalService: NgbModal
-  )      
-    
-   {}
+  ) {}
 
   ngOnInit(): void {
     this.loadDeductions();

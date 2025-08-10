@@ -86,7 +86,9 @@
                   <td>{{ user.title }}</td>
                   <td>
                     <span class="badge" [ngClass]="{'bg-success': user.is_active, 'bg-danger': !user.is_active}"
-                          style="cursor:pointer" (click)="openStatusModal(user, statusModal)">
+                          style="cursor: pointer"
+                          title="Click to change status"
+                          (click)="openStatusModal(user, statusModal)">
                       {{ user.is_active ? 'Active' : 'Inactive' }}
                     </span>
                   </td>
@@ -129,7 +131,6 @@
       </div>
     </div>
   </div>
-</div>
 
 <!-- Add/Edit User Modal -->
 <ng-template #showModal let-modal>
@@ -315,3 +316,5 @@
     </form>
   </div>
 </ng-template>
+
+</div>

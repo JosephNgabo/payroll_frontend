@@ -11,6 +11,8 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { OtherDeductionsService, CreateOtherDeductionDto } from '../../../core/services/other-deductions.service';
 import { OtherDeduction, PaginatedOtherDeductions } from '../../../core/models/other-deduction.model';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { PermissionCheckService } from 'src/app/core/services/permission-check.service';
+import { LaravelAuthService } from 'src/app/core/services/laravel-auth.service';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -41,7 +43,9 @@ export class OtherDeductionsComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private deductionsService: OtherDeductionsService,
-    private modalService: NgbModal
+    private modalService: NgbModal,
+    public permissionCheckService: PermissionCheckService,
+    private authService: LaravelAuthService
   ) {
     this.deductionForm = this.fb.group({
       name: ['', [Validators.required]],
@@ -52,7 +56,32 @@ export class OtherDeductionsComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    // Get real user data from auth service
+    const currentUser = this.authService.getCurrentUser();
+    if (currentUser) {
+      // TODO: Replace with real permissions from backend
+      // For now, set empty permissions and use real user_profile
+      this.permissionCheckService.setPermissions([], currentUser.user_profile);
+      console.log('Using real user profile for other deductions:', currentUser.user_profile);
+    } else {
+      console.warn('No current user found');
+    }
+
     this.loadDeductions();
+  }
+
+  // Helper methods for template
+  canViewOtherDeductions(): boolean {
+    return this.permissionCheckService.hasPermission('view_other_deductions');
+  }
+  canCreateOtherDeduction(): boolean {
+    return this.permissionCheckService.hasPermission('create_other_deduction');
+  }
+  canUpdateOtherDeduction(): boolean {
+    return this.permissionCheckService.hasPermission('update_other_deduction');
+  }
+  canDeleteOtherDeduction(): boolean {
+    return this.permissionCheckService.hasPermission('delete_other_deduction');
   }
 
   loadDeductions(page: number = 1) {

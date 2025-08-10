@@ -104,6 +104,8 @@ export class UsersComponent implements OnInit {
     this.fetchUsers();
   }
 
+
+
   fetchUsers(page: number = 1) {
     this.isLoading = true;
     this.error = null;
@@ -151,6 +153,7 @@ export class UsersComponent implements OnInit {
   // delete order
   deleteUser() {
     if (!this.deletId) return;
+    
     this.deleting = true;
     this.userService.deleteUser(this.deletId).subscribe({
       next: () => {
@@ -189,9 +192,9 @@ export class UsersComponent implements OnInit {
   openModal(content: any) {
     this.isEditMode = false;
     this.submitted = false;
-    this.error = null; // Clear any previous errors
+    this.error = null;
     this.ordersForm.reset();
-    this.originalUserData = null; // Clear original user data for new user creation
+    this.originalUserData = null;
     
     // Clear any server errors
     Object.keys(this.ordersForm.controls).forEach(key => {
@@ -212,12 +215,9 @@ export class UsersComponent implements OnInit {
   * Save user - Updated to handle new fields
   */
   saveUser() {
-    console.log('saveUser called. userId:', this.ordersForm.get('id')?.value, 'isEditMode:', this.isEditMode);
-    console.log('=== SAVE USER DEBUG ===');
     this.submitted = true;
     if (this.ordersForm.invalid) {
       this.ordersForm.markAllAsTouched();
-      console.log('Form is invalid, returning early');
       return;
     }
     
@@ -226,13 +226,6 @@ export class UsersComponent implements OnInit {
     
     const formValue = this.ordersForm.value;
     const userId = this.ordersForm.get('id')?.value;
-    console.log('userId:', userId);
-    
-    console.log('Full form value:', formValue); // Debug log
-    console.log('User ID from form:', userId, 'Type:', typeof userId); // Debug log
-    console.log('User ID as number:', Number(userId)); // Debug log
-    console.log('Is user ID truthy?', !!userId); // Debug log
-    console.log('Is user ID NaN?', isNaN(Number(userId))); // Debug log
     
     if (userId) {
       // Update existing user - include email and username (required by backend)
@@ -260,15 +253,8 @@ export class UsersComponent implements OnInit {
           this.showAlert('User updated successfully!', 'success');
         },
         error: (err) => {
-          console.log('=== UPDATE ERROR DEBUG ===');
-          console.log('Error response:', err); // Debug log
-          console.log('Error status:', err.status); // Debug log
-          console.log('Error message:', err.message); // Debug log
-          console.log('Error URL:', err.url); // Debug log
-          
           if (err.status === 422 && err.error && err.error.errors) {
             const errors = err.error.errors;
-            console.log('Validation errors:', errors); // Debug log
             
             // Clear any existing server errors first
             Object.keys(this.ordersForm.controls).forEach(key => {
@@ -289,7 +275,6 @@ export class UsersComponent implements OnInit {
                 const currentErrors = control.errors || {};
                 const errorMessage = errors[field][0];
                 control.setErrors({ ...currentErrors, serverError: errorMessage });
-                console.log(`Set error on ${field}:`, errorMessage); // Debug log
               }
             });
             
@@ -301,11 +286,9 @@ export class UsersComponent implements OnInit {
             this.showAlert('Failed to update user. Please try again.', 'error');
           }
           this.saving = false;
-          console.log('=== END UPDATE ERROR DEBUG ===');
         }
       });
     } else {
-      console.log('Creating new user - include email and username');
       // Create new user - include email and username
       const createPayload: CreateUserPayload = {
         firstname: formValue.firstname,
@@ -320,8 +303,6 @@ export class UsersComponent implements OnInit {
         user_profile: 'user'
       };
       
-      console.log('Create payload:', createPayload); // Debug log
-      
       this.userService.createUser(createPayload).subscribe({
         next: (newUser) => {
           this.fetchUsers();
@@ -332,15 +313,8 @@ export class UsersComponent implements OnInit {
           this.showAlert('User created successfully!', 'success');
         },
         error: (err) => {
-          console.log('=== UPDATE ERROR DEBUG ===');
-          console.log('Error response:', err); // Debug log
-          console.log('Error status:', err.status); // Debug log
-          console.log('Error message:', err.message); // Debug log
-          console.log('Error URL:', err.url); // Debug log
-          
           if (err.status === 422 && err.error && err.error.errors) {
             const errors = err.error.errors;
-            console.log('Validation errors:', errors); // Debug log
             
             // Clear any existing server errors first
             Object.keys(this.ordersForm.controls).forEach(key => {
@@ -361,7 +335,6 @@ export class UsersComponent implements OnInit {
                 const currentErrors = control.errors || {};
                 const errorMessage = errors[field][0];
                 control.setErrors({ ...currentErrors, serverError: errorMessage });
-                console.log(`Set error on ${field}:`, errorMessage); // Debug log
               }
             });
             
@@ -373,7 +346,6 @@ export class UsersComponent implements OnInit {
             this.showAlert('Failed to create user. Please try again.', 'error');
           }
           this.saving = false;
-          console.log('=== END UPDATE ERROR DEBUG ===');
         }
       });
     }
@@ -383,11 +355,6 @@ export class UsersComponent implements OnInit {
    * @param content modal content
    */
   editModal(user: UserDetail, content: any) {
-    console.log('=== EDIT MODAL DEBUG ===');
-    console.log('Editing user:', user); // Debug log
-    console.log('User ID type:', typeof user.id, 'Value:', user.id); // Debug log
-    console.log('User ID as number:', Number(user.id)); // Debug log
-    
     this.isEditMode = true;
     this.submitted = false;
     this.error = null; // Clear any previous errors
@@ -395,7 +362,6 @@ export class UsersComponent implements OnInit {
     
     // Store original user data for comparison
     this.originalUserData = { ...user };
-    console.log('Original user data stored:', this.originalUserData);
     
     // Clear any server errors
     Object.keys(this.ordersForm.controls).forEach(key => {
@@ -418,14 +384,7 @@ export class UsersComponent implements OnInit {
       email: user.email,
       password: null // Don't populate password in edit mode
     };
-    console.log('Form data to patch:', formData); // Debug log
     this.ordersForm.patchValue(formData);
-    
-    // Verify ID was set correctly
-    console.log('Form ID value after patch:', this.ordersForm.get('id')?.value); // Debug log
-    console.log('Form ID type after patch:', typeof this.ordersForm.get('id')?.value); // Debug log
-    console.log('Form ID as number after patch:', Number(this.ordersForm.get('id')?.value)); // Debug log
-    console.log('=== END EDIT MODAL DEBUG ===');
     
     // Show modal
     this.modalRef = this.modalService.show(content, { class: 'modal-md' });
@@ -444,6 +403,7 @@ export class UsersComponent implements OnInit {
 
   updateUserStatus() {
     if (!this.selectedUser) return;
+    
     const userId = this.selectedUser.id;
     this.updatingStatus = true;
     this.userService.updateUserStatus(userId, this.statusToUpdate).subscribe({
@@ -473,14 +433,13 @@ export class UsersComponent implements OnInit {
 
   resetPassword(modal: any) {
     if (this.passwordForm.invalid || !this.selectedUser) return;
+    
     this.resettingPassword = true;
-    console.log('selectedUser:', this.selectedUser); // Debug selectedUser
     const payload = {
       ...this.selectedUser,
       user_id: this.selectedUser.id,
       password: this.passwordForm.value.newPassword
     };
-    console.log('resetPassword payload:', payload); // Debug payload
     this.userService.resetPassword(payload).subscribe({
       next: () => {
         modal.close();

@@ -1,0 +1,189 @@
+<div class="container-fluid">
+  <app-page-title title="Employee Profile" [breadcrumbItems]="breadCrumbItems"></app-page-title>
+  
+  <div class="row">
+    <div class="col-lg-4">
+      <!-- Profile Card -->
+      <div class="card">
+        <div class="card-body text-center">
+          <img src="https://placehold.co/120x120/007bff/ffffff?text=FK" 
+               alt="Profile Picture" 
+               class="rounded-circle mb-3" 
+               width="120" height="120">
+          
+          <h5 class="mb-1">{{ profile.firstName }} {{ profile.lastName }}</h5>
+          <p class="text-muted mb-3">{{ profile.position }}</p>
+          
+          <div class="d-grid gap-2">
+            <button type="button" class="btn btn-primary" (click)="toggleEdit()" *ngIf="!isEditing">
+              <i class="mdi mdi-pencil"></i> Edit Profile
+            </button>
+            <button type="button" class="btn btn-outline-secondary" (click)="changePassword()">
+              <i class="mdi mdi-key"></i> Change Password
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-8">
+      <!-- Profile Information -->
+      <div class="card">
+        <div class="card-header">
+          <div class="d-flex justify-content-between align-items-center">
+            <h5 class="card-title mb-0">Profile Information</h5>
+            <div *ngIf="isEditing">
+              <button type="button" class="btn btn-success btn-sm me-2" (click)="saveProfile()">
+                <i class="mdi mdi-check"></i> Save
+              </button>
+              <button type="button" class="btn btn-secondary btn-sm" (click)="cancelEdit()">
+                <i class="mdi mdi-close"></i> Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <!-- Personal Information -->
+            <div class="col-md-6">
+              <h6 class="text-muted mb-3">Personal Information</h6>
+              
+              <div class="mb-3">
+                <label class="form-label">First Name</label>
+                <input 
+                  type="text" 
+                  class="form-control" 
+                  [(ngModel)]="profile.firstName"
+                  [readonly]="!isEditing">
+              </div>
+              
+              <div class="mb-3">
+                <label class="form-label">Last Name</label>
+                <input 
+                  type="text" 
+                  class="form-control" 
+                  [(ngModel)]="profile.lastName"
+                  [readonly]="!isEditing">
+              </div>
+              
+              <div class="mb-3">
+                <label class="form-label">Email</label>
+                <input 
+                  type="email" 
+                  class="form-control" 
+                  [(ngModel)]="profile.email"
+                  [readonly]="!isEditing">
+              </div>
+              
+              <div class="mb-3">
+                <label class="form-label">Phone</label>
+                <input 
+                  type="tel" 
+                  class="form-control" 
+                  [(ngModel)]="profile.phone"
+                  [readonly]="!isEditing">
+              </div>
+              
+              <div class="mb-3">
+                <label class="form-label">Address</label>
+                <textarea 
+                  class="form-control" 
+                  rows="3"
+                  [(ngModel)]="profile.address"
+                  [readonly]="!isEditing"></textarea>
+              </div>
+            </div>
+
+            <!-- Work Information -->
+            <div class="col-md-6">
+              <h6 class="text-muted mb-3">Work Information</h6>
+              
+              <div class="mb-3">
+                <label class="form-label">Employee ID</label>
+                <input 
+                  type="text" 
+                  class="form-control" 
+                  [(ngModel)]="profile.employeeId"
+                  readonly>
+              </div>
+              
+              <div class="mb-3">
+                <label class="form-label">Position</label>
+                <input 
+                  type="text" 
+                  class="form-control" 
+                  [(ngModel)]="profile.position"
+                  readonly>
+              </div>
+              
+              <div class="mb-3">
+                <label class="form-label">Department</label>
+                <input 
+                  type="text" 
+                  class="form-control" 
+                  [(ngModel)]="profile.department"
+                  readonly>
+              </div>
+              
+              <div class="mb-3">
+                <label class="form-label">Manager</label>
+                <input 
+                  type="text" 
+                  class="form-control" 
+                  [(ngModel)]="profile.manager"
+                  readonly>
+              </div>
+              
+              <div class="mb-3">
+                <label class="form-label">Join Date</label>
+                <input 
+                  type="date" 
+                  class="form-control" 
+                  [(ngModel)]="profile.joinDate"
+                  readonly>
+              </div>
+            </div>
+          </div>
+
+          <hr>
+
+          <!-- Emergency Contact -->
+          <h6 class="text-muted mb-3">Emergency Contact</h6>
+          <div class="row">
+            <div class="col-md-4">
+              <div class="mb-3">
+                <label class="form-label">Name</label>
+                <input 
+                  type="text" 
+                  class="form-control" 
+                  [(ngModel)]="profile.emergencyContact.name"
+                  [readonly]="!isEditing">
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="mb-3">
+                <label class="form-label">Relationship</label>
+                <input 
+                  type="text" 
+                  class="form-control" 
+                  [(ngModel)]="profile.emergencyContact.relationship"
+                  [readonly]="!isEditing">
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="mb-3">
+                <label class="form-label">Phone</label>
+                <input 
+                  type="tel" 
+                  class="form-control" 
+                  [(ngModel)]="profile.emergencyContact.phone"
+                  [readonly]="!isEditing">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+

@@ -186,7 +186,6 @@ const user = this.authService.getCurrentUser();
 
 // Subscribe to auth state changes
 this.authService.authState$.subscribe(state => {
-  console.log('Auth state:', state);
 });
 ```
 
@@ -208,7 +207,6 @@ this.http.get('/api/protected-endpoint').subscribe(response => {
 ### Debug Mode
 Enable console logging in the auth service for debugging:
 ```typescript
-console.log('Auth state:', this.authStateSubject.value);
 ```
 
 ## 📋 Next Steps

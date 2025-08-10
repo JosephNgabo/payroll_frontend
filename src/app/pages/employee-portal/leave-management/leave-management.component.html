@@ -1,0 +1,100 @@
+<div class="container-fluid">
+  <app-page-title title="Leave Management" [breadcrumbItems]="breadCrumbItems"></app-page-title>
+  
+  <div class="row">
+    <!-- Leave Balance Cards -->
+    <div class="col-lg-4 mb-4">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="card-title mb-0">Leave Balance</h5>
+        </div>
+        <div class="card-body">
+          <div class="leave-balance-item mb-3" *ngFor="let balance of leaveBalances">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <span class="fw-semibold">{{ balance.type }}</span>
+              <span class="text-muted">{{ balance.remaining }}/{{ balance.total }} days</span>
+            </div>
+            <div class="progress mb-2" style="height: 6px;">
+              <div 
+                class="progress-bar bg-primary" 
+                role="progressbar" 
+                [style.width.%]="(balance.remaining / balance.total) * 100">
+              </div>
+            </div>
+            <small class="text-muted">Used: {{ balance.used }} days</small>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Leave Requests -->
+    <div class="col-lg-8">
+      <div class="card">
+        <div class="card-header">
+          <div class="row align-items-center">
+            <div class="col">
+              <h5 class="card-title mb-0">My Leave Requests</h5>
+            </div>
+            <div class="col-auto">
+              <button type="button" class="btn btn-primary" (click)="requestNewLeave()">
+                <i class="mdi mdi-plus me-1"></i> Request Leave
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-nowrap mb-0">
+              <thead class="table-light">
+                <tr>
+                  <th scope="col">Leave Type</th>
+                  <th scope="col">Period</th>
+                  <th scope="col">Days</th>
+                  <th scope="col">Status</th>
+                  <th scope="col">Applied Date</th>
+                  <th scope="col">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let leave of leaveRequests">
+                  <td>{{ leave.type }}</td>
+                  <td>{{ leave.startDate | date:'MMM dd' }} - {{ leave.endDate | date:'MMM dd, yyyy' }}</td>
+                  <td>{{ leave.days }}</td>
+                  <td>
+                    <span class="badge" [ngClass]="getStatusBadgeClass(leave.status)">
+                      {{ leave.status | titlecase }}
+                    </span>
+                  </td>
+                  <td>{{ leave.appliedDate | date:'MMM dd, yyyy' }}</td>
+                  <td>
+                    <div class="btn-group" role="group">
+                      <button 
+                        type="button" 
+                        class="btn btn-primary btn-sm"
+                        (click)="viewLeaveDetails(leave)">
+                        <i class="mdi mdi-eye"></i>
+                      </button>
+                      <button 
+                        type="button" 
+                        class="btn btn-danger btn-sm"
+                        *ngIf="leave.status === 'pending'"
+                        (click)="cancelLeaveRequest(leave.id)">
+                        <i class="mdi mdi-close"></i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+                <tr *ngIf="leaveRequests.length === 0">
+                  <td colspan="6" class="text-center text-muted py-4">
+                    No leave requests found
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
