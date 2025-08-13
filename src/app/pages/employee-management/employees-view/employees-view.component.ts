@@ -44,6 +44,58 @@ export class EmployeesViewComponent implements OnInit {
     { label: 'All', value: 10000 }
   ];
 
+  // Permission system - using existing p_id approach
+  permissions: number[] = [];
+
+  constructor(
+    private employeeInformationService: EmployeeInformationService,
+    private modalService: NgbModal,
+    private departmentService: DepartmentService,
+    private employeeContractService: EmployeeContractService
+  ) {
+    // Get permissions from session storage (same as sidebar)
+    const user = sessionStorage.getItem('current_user');
+    if (user) {
+      try {
+        const userData = JSON.parse(user);
+        this.permissions = userData.permissions || [];
+      } catch (e) {
+        console.error('Error parsing user permissions:', e);
+        this.permissions = [];
+      }
+    }
+  }
+
+  ngOnInit() {
+    this.loadDepartmentsAndEmployees();
+  }
+
+  // Permission check methods using p_id system for Employee Management
+  canViewEmployees(): boolean {
+    return this.permissions.includes(6005); // p_id for view_employees
+  }
+
+  canCreateEmployee(): boolean {
+    return this.permissions.includes(6006); // p_id for create_employee
+  }
+
+  canUpdateEmployee(): boolean {
+    return this.permissions.includes(6007); // p_id for update_employee
+  }
+
+  canDeleteEmployee(): boolean {
+    return this.permissions.includes(6008); // p_id for delete_employee
+  }
+
+  canViewEmployeeDetails(): boolean {
+    return this.permissions.includes(6009); // p_id for view_employee_details
+  }
+
+  // Check if user has any employee management permissions
+  hasAnyEmployeePermission(): boolean {
+    return this.permissions.some(p_id => [6005, 6006, 6007, 6008, 6009].includes(p_id));
+  }
+
   get filteredEmployees() {
     return this.employeeList.filter(emp => {
       const matchesDepartment = this.selectedDepartment ? (emp as any).department === this.selectedDepartment : true;
@@ -73,17 +125,6 @@ export class EmployeesViewComponent implements OnInit {
     { value: 8, label: 'Suspended' },
     { value: 9, label: 'Pending Activation' }
   ];
-
-  constructor(
-    private employeeInformationService: EmployeeInformationService,
-    private modalService: NgbModal,
-    private departmentService: DepartmentService,
-    private employeeContractService: EmployeeContractService
-  ) {}
-
-  ngOnInit() {
-    this.loadDepartmentsAndEmployees();
-  }
 
   loadDepartmentsAndEmployees() {
     this.isLoading = true;

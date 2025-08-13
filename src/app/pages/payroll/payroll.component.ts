@@ -74,11 +74,52 @@ export class PayrollComponent implements OnInit {
   detailsModalTitle: string = '';
   @ViewChild('detailsModal') detailsModal: any;
 
+  // Permission system - using existing p_id approach
+  permissions: (number | string)[] = [];
+
   constructor(
     private modalService: NgbModal,
     private payrollService: PayrollService,
     private authService: LaravelAuthService
-  ) {}
+  ) {
+    // Get permissions from session storage (same as sidebar)
+    const user = sessionStorage.getItem('current_user');
+    console.log('Payroll Component - Raw session storage user:', user);
+    
+    if (user) {
+      try {
+        const userData = JSON.parse(user);
+        this.permissions = userData.permissions || [];
+        console.log('Payroll Component - Loaded permissions:', this.permissions);
+        console.log('Payroll Component - User data:', userData);
+        console.log('Payroll Component - Permissions type:', typeof this.permissions);
+        console.log('Payroll Component - Permissions length:', this.permissions.length);
+        
+        // Check if permissions are numbers or strings
+        if (this.permissions.length > 0) {
+          console.log('Payroll Component - First permission type:', typeof this.permissions[0]);
+          console.log('Payroll Component - First permission value:', this.permissions[0]);
+        }
+        
+        // Check all session storage keys
+        console.log('Payroll Component - All session storage keys:', Object.keys(sessionStorage));
+        
+      } catch (e) {
+        console.error('Error parsing user permissions:', e);
+        this.permissions = [];
+      }
+    } else {
+      console.log('Payroll Component - No user found in session storage');
+      // Check if there are other keys in session storage
+      console.log('Payroll Component - All session storage keys:', Object.keys(sessionStorage));
+      for (let i = 0; i < sessionStorage.length; i++) {
+        const key = sessionStorage.key(i);
+        if (key) {
+          console.log('Payroll Component - Session storage key:', key, 'value:', sessionStorage.getItem(key));
+        }
+      }
+    }
+  }
 
   ngOnInit(): void {
     // Populate year options (current year ±5 years)
@@ -89,6 +130,83 @@ export class PayrollComponent implements OnInit {
     }
     this.selectedYear = currentYear;
     this.selectedMonth = new Date().getMonth() + 1;
+
+    // Debug permission checks
+    console.log('Payroll Component - Permission checks:');
+    console.log('canViewPayrolls():', this.canViewPayrolls());
+    console.log('canGeneratePayroll():', this.canGeneratePayroll());
+    console.log('canUpdatePayroll():', this.canUpdatePayroll());
+    console.log('canDeletePayroll():', this.canDeletePayroll());
+    console.log('hasAnyPayrollPermission():', this.hasAnyPayrollPermission());
+
+    // Check permissions again after a delay to see if they get loaded later
+    setTimeout(() => {
+      console.log('Payroll Component - Delayed permission check:');
+      console.log('Permissions after delay:', this.permissions);
+      console.log('canViewPayrolls():', this.canViewPayrolls());
+      console.log('canGeneratePayroll():', this.canGeneratePayroll());
+      console.log('canUpdatePayroll():', this.canUpdatePayroll());
+      console.log('canDeletePayroll():', this.canDeletePayroll());
+      console.log('hasAnyPayrollPermission():', this.hasAnyPayrollPermission());
+    }, 2000);
+  }
+
+  // Permission check methods using p_id system for Payroll
+  canViewPayrolls(): boolean {
+    // Check for both string and number values
+    const hasPermission = this.permissions.some(p_id => p_id === 6001 || p_id === '6001');
+    console.log('canViewPayrolls check - permissions:', this.permissions, 'includes 6001:', hasPermission);
+    return hasPermission; // p_id for view_payrolls
+  }
+
+  canGeneratePayroll(): boolean {
+    // Check for both string and number values
+    const hasPermission = this.permissions.some(p_id => p_id === 6002 || p_id === '6002');
+    console.log('canGeneratePayroll check - permissions:', this.permissions, 'includes 6002:', hasPermission);
+    return hasPermission; // p_id for generate_payroll
+  }
+
+  canUpdatePayroll(): boolean {
+    // Check for both string and number values
+    const hasPermission = this.permissions.some(p_id => p_id === 6003 || p_id === '6003');
+    console.log('canUpdatePayroll check - permissions:', this.permissions, 'includes 6003:', hasPermission);
+    return hasPermission; // p_id for update_payroll
+  }
+
+  canDeletePayroll(): boolean {
+    // Check for both string and number values
+    const hasPermission = this.permissions.some(p_id => p_id === 6004 || p_id === '6004');
+    console.log('canDeletePayroll check - permissions:', this.permissions, 'includes 6004:', hasPermission);
+    return hasPermission; // p_id for delete_payroll
+  }
+
+  // Check if user has any payroll management permissions
+  hasAnyPayrollPermission(): boolean {
+    // Check for both string and number values
+    const payrollPermissionIds = [6001, 6002, 6003, 6004, '6001', '6002', '6003', '6004'];
+    const hasAnyPermission = this.permissions.some(p_id => payrollPermissionIds.includes(p_id));
+    console.log('hasAnyPayrollPermission check - permissions:', this.permissions, 'has any payroll permission:', hasAnyPermission);
+    return hasAnyPermission;
+  }
+
+  // Method to manually refresh permissions from session storage
+  refreshPermissions(): void {
+    const user = sessionStorage.getItem('current_user');
+    console.log('Payroll Component - Refreshing permissions, raw user:', user);
+    
+    if (user) {
+      try {
+        const userData = JSON.parse(user);
+        this.permissions = userData.permissions || [];
+        console.log('Payroll Component - Refreshed permissions:', this.permissions);
+      } catch (e) {
+        console.error('Error parsing user permissions during refresh:', e);
+        this.permissions = [];
+      }
+    } else {
+      console.log('Payroll Component - No user found during refresh');
+      this.permissions = [];
+    }
   }
 
   generatePayroll() {

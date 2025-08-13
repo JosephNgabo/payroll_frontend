@@ -68,6 +68,8 @@ export const MENU: MenuItem[] = [
         label: 'Employees',
         icon: 'bx-cog',
         link: '/employees/employees-view',   
+        p_id:6005,
+        
     },
     {
         id: 7,
@@ -116,7 +118,8 @@ export const MENU: MenuItem[] = [
         label: 'Profile',
         icon: 'bx-user',
         link: '/employee-portal/profile',
-        parentId: 11
+        parentId: 11,
+        p_id:7004
     }
 
 ];

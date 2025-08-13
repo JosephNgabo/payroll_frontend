@@ -79,12 +79,27 @@ export class UsersComponent implements OnInit {
     newPassword: ['', [Validators.required, Validators.minLength(6)]]
   });
 
+  // Permission system - using existing p_id approach
+  permissions: number[] = [];
+
   constructor(
     private modalService: BsModalService,
     private formBuilder: FormBuilder,
     private store: Store,
     private userService: UserService
-  ) {}
+  ) {
+    // Get permissions from session storage (same as sidebar)
+    const user = sessionStorage.getItem('current_user');
+    if (user) {
+      try {
+        const userData = JSON.parse(user);
+        this.permissions = userData.permissions || [];
+      } catch (e) {
+        console.error('Error parsing user permissions:', e);
+        this.permissions = [];
+      }
+    }
+  }
 
   ngOnInit() {
     this.breadCrumbItems = [{ label: 'Access Management' }, { label: 'Users', active: true }];
@@ -104,7 +119,33 @@ export class UsersComponent implements OnInit {
     this.fetchUsers();
   }
 
+  canViewUsers(): boolean {
+    return this.permissions.includes(1001); 
+  }
 
+  canCreateUser(): boolean {
+    return this.permissions.includes(1002); 
+  }
+
+  canUpdateUser(): boolean {
+    return this.permissions.includes(1003);
+  }
+
+  canDeleteUser(): boolean {
+    return this.permissions.includes(1004); 
+  }
+
+  canResetUserPassword(): boolean {
+    return this.permissions.includes(1005);
+  }
+
+  canUpdateUserStatus(): boolean {
+    return this.permissions.includes(1006);
+  }
+
+  hasAnyUserPermission(): boolean {
+    return this.permissions.includes(1001);
+  }
 
   fetchUsers(page: number = 1) {
     this.isLoading = true;

@@ -1,10 +1,31 @@
 <app-page-title title="Employees Management"></app-page-title>
-<div class="container-fluid">
+
+<!-- Access Denied Message -->
+<div class="container-fluid" *ngIf="!hasAnyEmployeePermission()">
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-body text-center">
+          <div class="alert alert-warning" role="alert">
+            <i class="mdi mdi-alert-circle font-size-24 me-2"></i>
+            <strong>Access Denied</strong>
+            <p class="mb-0 mt-2">You don't have permission to access the Employee Management module.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Employee Management Content -->
+<div class="container-fluid" *ngIf="hasAnyEmployeePermission()">
   <div>
     <div class="row mb-3">
       <div class="col-12 d-flex justify-content-between align-items-center">
         <h3></h3>
-        <button class="btn btn-primary btn-rounded mb-2 me-2" [routerLink]="['/employees']">
+        <button class="btn btn-primary btn-rounded mb-2 me-2" 
+                [routerLink]="['/employees']"
+                *ngIf="canCreateEmployee()">
           <i class="mdi mdi-plus me-1"></i> Create Employee
         </button>
       </div>
@@ -70,7 +91,7 @@
     </div>
     <div class="row">
       <div class="col-12">
-        <div class="table-responsive">
+        <div class="table-responsive" *ngIf="canViewEmployees()">
           <table class="table align-middle table-nowrap table-check">
             <thead>
               <tr>
@@ -78,7 +99,6 @@
                 <th>First Name</th>
                 <th>Last Name</th>
                 <th>Email</th>
-                <!-- <th>Department</th> -->
                 <th>Department</th>
                 <th>Personal Mobile</th>
                 <th>Status</th>
@@ -92,7 +112,6 @@
                   <td>{{ emp.first_name }}</td>
                   <td>{{ emp.last_name }}</td>
                   <td>{{ emp.personal_email }}</td>
-                  <!-- <td>{{ emp.department }}</td> -->
                   <td>{{ emp['department'] }}</td>
                   <td>{{ emp.personal_mobile }}</td>
                   <td>
@@ -106,10 +125,18 @@
                         <i class="bi bi-three-dots"></i>
                       </button>
                       <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" [routerLink]="['/employees/employee-modification', emp.id]">Edit</a></li>
-                        <li><a class="dropdown-item" [routerLink]="['/employees/employee-details', emp.id]">View Details</a></li>
-                        <li><button class="dropdown-item text-danger fw-bold" type="button" (click)="onDelete(emp)">Delete</button></li>
-                        <li><button class="dropdown-item" type="button" (click)="openStatusModal(emp)">Change Status</button></li>
+                        <li *ngIf="canUpdateEmployee()">
+                          <a class="dropdown-item" [routerLink]="['/employees/employee-modification', emp.id]">Edit</a>
+                        </li>
+                        <li *ngIf="canViewEmployeeDetails()">
+                          <a class="dropdown-item" [routerLink]="['/employees/employee-details', emp.id]">View Details</a>
+                        </li>
+                        <li *ngIf="canDeleteEmployee()">
+                          <button class="dropdown-item text-danger fw-bold" type="button" (click)="onDelete(emp)">Delete</button>
+                        </li>
+                        <li *ngIf="canUpdateEmployee()">
+                          <button class="dropdown-item" type="button" (click)="openStatusModal(emp)">Change Status</button>
+                        </li>
                       </ul>
                     </div>
                   </td>
@@ -142,33 +169,18 @@
             </tbody>
           </table>
         </div>
+
+        <!-- No View Permission Message -->
+        <div *ngIf="!canViewEmployees()" class="text-center">
+          <div class="alert alert-info" role="alert">
+            <i class="mdi mdi-information font-size-24 me-2"></i>
+            <strong>No View Permission</strong>
+            <p class="mb-0 mt-2">You don't have permission to view employees.</p>
+          </div>
+        </div>
+
         <div class="row justify-content-between align-items-center mt-3">
-          <!-- <div class="col-md-4 mb-2 mb-md-0"> -->
-            <!-- <div class="d-flex align-items-center">
-              <label class="me-2 mb-0">Show</label>
-              <ng-select
-                [items]="pageSizeOptions"
-                bindLabel="label"
-                bindValue="value"
-                [(ngModel)]="itemsPerPage"
-                (change)="onPageSizeChange($event)"
-                [clearable]="false"
-                class="w-auto"
-                placeholder="Select">
-              </ng-select>
-              <span class="ms-2">entries</span>
-            </div> -->
-          <!-- </div> -->
-          <!-- <div class="col-md-8 text-md-end"> -->
-            <!-- <div class="pagination-rounded">
-              <pagination
-                [totalItems]="totalItems"
-                [itemsPerPage]="itemsPerPage"
-                [(ngModel)]="currentPage"
-                (pageChanged)="onPageChange($event)">
-              </pagination>
-            </div> -->
-          <!-- </div> -->
+          <!-- Pagination controls can be added here if needed -->
         </div>
       </div>
     </div>

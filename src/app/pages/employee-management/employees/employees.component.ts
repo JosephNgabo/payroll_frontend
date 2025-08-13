@@ -149,7 +149,7 @@ export class EmployeesComponent implements OnInit {
   savingNext: boolean = false;
   savingPrevious: boolean = false;
   salaryBasisOptions = [
-    { label: 'Net Salary', value: 'net' },
+    { label: 'Basic Salary', value: 'basic' },
     { label: 'Gross Salary', value: 'gross' },
     { label: 'Mass Salary', value: 'mass' }
   ];

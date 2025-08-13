@@ -46,6 +46,9 @@ export class AllowancesBenefitsComponent {
   selectedAllowance: Allowance | null = null;
   saving: boolean = false;
 
+  // Permission system - using existing p_id approach
+  permissions: number[] = [];
+
   constructor(
     private modalService: BsModalService,
     private formBuilder: UntypedFormBuilder,
@@ -53,7 +56,19 @@ export class AllowancesBenefitsComponent {
     private store: Store,
     private allowanceService: AllowanceService,
     private permissionCheck: PermissionCheckService
-  ) { }
+  ) {
+    // Get permissions from session storage (same as sidebar)
+    const user = sessionStorage.getItem('current_user');
+    if (user) {
+      try {
+        const userData = JSON.parse(user);
+        this.permissions = userData.permissions || [];
+      } catch (e) {
+        console.error('Error parsing user permissions:', e);
+        this.permissions = [];
+      }
+    }
+  }
 
   ngOnInit(): void {
     // Initialize the form
@@ -64,6 +79,28 @@ export class AllowancesBenefitsComponent {
     });
     
     this.loadData();
+  }
+
+  // Permission check methods using p_id system for Allowances
+  canViewAllowances(): boolean {
+    return this.permissions.includes(2001); // p_id for view_allowances
+  }
+
+  canCreateAllowance(): boolean {
+    return this.permissions.includes(2002); // p_id for create_allowance
+  }
+
+  canUpdateAllowance(): boolean {
+    return this.permissions.includes(2003); // p_id for update_allowance
+  }
+
+  canDeleteAllowance(): boolean {
+    return this.permissions.includes(2004); // p_id for delete_allowance
+  }
+
+  // Check if user has any allowance management permissions
+  hasAnyAllowancePermission(): boolean {
+    return this.permissions.some(p_id => [2001, 2002, 2003, 2004].includes(p_id));
   }
 
   loadData() {

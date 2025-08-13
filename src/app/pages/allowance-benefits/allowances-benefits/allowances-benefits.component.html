@@ -1,7 +1,23 @@
 <div class="container-fluid">
     <app-page-title title="Allowances & Benefits Management" [breadcrumbItems]="breadCrumbItems"></app-page-title>
   
-    <div class="row">
+    <!-- Access Denied Message -->
+    <div class="row" *ngIf="!hasAnyAllowancePermission()">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-body text-center">
+            <div class="alert alert-warning" role="alert">
+              <i class="mdi mdi-alert-circle font-size-24 me-2"></i>
+              <strong>Access Denied</strong>
+              <p class="mb-0 mt-2">You don't have permission to access the Allowances & Benefits Management module.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Allowances Management Content -->
+    <div class="row" *ngIf="hasAnyAllowancePermission()">
       <div class="col-12">
         <div class="card">
           <div class="card-body">
@@ -25,13 +41,16 @@
                 </div>
                 <div class="col-sm-8">
                   <div class="text-sm-end">
-                    <button type="button" class="btn btn-primary btn-rounded mb-2 me-2" (click)="showModal.show()"><i class="mdi mdi-plus mr-1"></i>
-                      Add new allowance/benefit</button>
+                    <button type="button" class="btn btn-primary btn-rounded mb-2 me-2" 
+                            (click)="showModal.show()"
+                            *ngIf="canCreateAllowance()">
+                      <i class="mdi mdi-plus mr-1"></i> Add new allowance/benefit
+                    </button>
                   </div>
                 </div>
               </div>
               <!-- Table data -->
-              <div class="table-responsive mb-0">
+              <div class="table-responsive mb-0" *ngIf="canViewAllowances()">
                 <table class="table align-middle table-nowrap dt-responsive nowrap w-100 table-check" id="user-list">
                   <thead class="table-light">
                     <tr>
@@ -63,16 +82,34 @@
                       </td>
                       <td>
                         <div class="d-flex gap-3">
-                          <a href="javascript:void(0);" class="text-success" (click)="editModal($index)"><i class="mdi mdi-pencil font-size-18"></i></a>
-                          <a href="javascript:void(0);" class="text-danger" (click)="confirm(data.id)"><i class="mdi mdi-delete font-size-18"></i></a>
+                          <a href="javascript:void(0);" class="text-success" 
+                             (click)="editModal($index)"
+                             *ngIf="canUpdateAllowance()">
+                            <i class="mdi mdi-pencil font-size-18"></i>
+                          </a>
+                          <a href="javascript:void(0);" class="text-danger" 
+                             (click)="confirm(data.id)"
+                             *ngIf="canDeleteAllowance()">
+                            <i class="mdi mdi-delete font-size-18"></i>
+                          </a>
                         </div>
                       </td>
                     </tr>}
                   </tbody>
                 </table>
               </div>
+
+              <!-- No View Permission Message -->
+              <div *ngIf="!canViewAllowances()" class="text-center">
+                <div class="alert alert-info" role="alert">
+                  <i class="mdi mdi-information font-size-24 me-2"></i>
+                  <strong>No View Permission</strong>
+                  <p class="mb-0 mt-2">You don't have permission to view allowances.</p>
+                </div>
+              </div>
+
               <!-- end table -->
-              <ul class="pagination pagination-rounded justify-content-end mb-2">
+              <ul class="pagination pagination-rounded justify-content-end mb-2" *ngIf="canViewAllowances()">
                 <pagination [totalItems]="orderlist?.length" [itemsPerPage]="8" (pagechanged)="pagechanged($event)"></pagination>
               </ul>
             </div>
