@@ -146,7 +146,7 @@ export class EmployeeModificationComponent implements OnInit {
   employeeAllowances: any[] = [];
   editingAllowanceIndex: number | null = null;
   salaryBasisOptions = [
-    { label: 'Net Salary', value: 'net' },
+    { label: 'Basic Salary', value: 'basic' },
     { label: 'Gross Salary', value: 'gross' },
     { label: 'Mass Salary', value: 'mass' }
   ];

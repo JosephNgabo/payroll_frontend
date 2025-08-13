@@ -1,0 +1,35 @@
+.table {
+  th {
+    border-top: none;
+    font-weight: 600;
+    color: #495057;
+    font-size: 0.875rem;
+  }
+  
+  td {
+    vertical-align: middle;
+    font-size: 0.875rem;
+  }
+}
+
+.btn-group {
+  .btn {
+    padding: 0.25rem 0.75rem;
+    font-size: 0.75rem;
+    margin-right: 0.25rem;
+    
+    &:last-child {
+      margin-right: 0;
+    }
+    
+    i {
+      font-size: 0.875rem;
+    }
+  }
+}
+
+.badge {
+  font-size: 0.75rem;
+  padding: 0.35em 0.65em;
+}
+

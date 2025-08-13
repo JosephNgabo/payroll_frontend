@@ -36,7 +36,10 @@ export class ListPayrollsComponent implements OnInit {
   selectedPayrollDate: NgbDateStruct | null = null;
   @ViewChild('regenerateModal') regenerateModal: any;
 
-  constructor(private payrollService: PayrollService, private modalService: NgbModal) {}
+  constructor(
+    private payrollService: PayrollService, 
+    private modalService: NgbModal
+  ) {}
 
   ngOnInit(): void {
     this.fetchPayrolls(1);
@@ -95,59 +98,71 @@ export class ListPayrollsComponent implements OnInit {
 
   openRegenerateModal(payroll: any) {
     this.selectedRegeneratePayroll = payroll;
-    this.selectedRegenerateMonth = payroll.payroll_month;
-    this.modalService.open(this.regenerateModal, { centered: true });
+    this.selectedRegenerateMonth = payroll.month;
+    this.modalService.open(this.regenerateModal, { size: 'lg' });
   }
 
   confirmRegenerate(modal: any) {
-    if (!this.selectedRegeneratePayroll || !this.selectedRegenerateMonth) return;
-    Swal.fire({
-      title: 'Regenerate Payroll',
-      text: `Are you sure you want to regenerate payroll for ${this.getMonthName(this.selectedRegenerateMonth)}?`,
-      icon: 'question',
-      showCancelButton: true,
-      confirmButtonText: 'Yes, regenerate',
-      cancelButtonText: 'Cancel'
-    }).then(result => {
-      if (result.isConfirmed) {
-        this.loading = true;
-        this.payrollService.regeneratePayroll(this.selectedRegeneratePayroll.id).subscribe({
-          next: (res) => {
-            this.loading = false;
-            Swal.fire('Success', 'Payroll has been regenerated.', 'success');
-            modal.close();
-            this.fetchPayrolls(this.currentPage);
-          },
-          error: (err) => {
-            this.loading = false;
-            Swal.fire('Error', 'Failed to regenerate payroll.', 'error');
-          }
+    if (!this.selectedRegeneratePayroll || !this.selectedRegenerateMonth) {
+      return;
+    }
+
+    this.loading = true;
+    this.payrollService.regeneratePayroll(this.selectedRegeneratePayroll.id).subscribe({
+      next: () => {
+        modal.close();
+        this.loading = false;
+        this.fetchPayrolls(this.currentPage);
+        Swal.fire({
+          title: 'Success!',
+          text: 'Payroll regenerated successfully.',
+          icon: 'success',
+          confirmButtonColor: '#34c38f',
+        });
+      },
+      error: (err) => {
+        this.loading = false;
+        console.error('Error regenerating payroll:', err);
+        Swal.fire({
+          title: 'Error!',
+          text: 'Failed to regenerate payroll. Please try again.',
+          icon: 'error',
+          confirmButtonColor: '#f46a6a',
         });
       }
     });
   }
 
   deletePayroll(payroll: any) {
-    if (!payroll?.id) return;
     Swal.fire({
-      title: 'Delete Payroll',
-      text: 'Are you sure you want to delete this payroll? This action cannot be undone.',
+      title: 'Are you sure?',
+      text: "You won't be able to revert this!",
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonText: 'Yes, delete it',
-      cancelButtonText: 'Cancel'
-    }).then(result => {
+      confirmButtonColor: '#34c38f',
+      cancelButtonColor: '#f46a6a',
+      confirmButtonText: 'Yes, delete it!'
+    }).then((result) => {
       if (result.isConfirmed) {
         this.loading = true;
         this.payrollService.deletePayroll(payroll.id).subscribe({
-          next: (res) => {
+          next: () => {
             this.loading = false;
-            Swal.fire('Deleted!', 'Payroll has been deleted.', 'success');            
             this.fetchPayrolls(this.currentPage);
+            Swal.fire(
+              'Deleted!',
+              'Payroll has been deleted.',
+              'success'
+            );
           },
           error: (err) => {
             this.loading = false;
-            Swal.fire('Error', 'Failed to delete payroll.', 'error');
+            console.error('Error deleting payroll:', err);
+            Swal.fire(
+              'Error!',
+              'Failed to delete payroll.',
+              'error'
+            );
           }
         });
       }
@@ -159,38 +174,45 @@ export class ListPayrollsComponent implements OnInit {
   }
 
   generatePayroll() {
-    if (!this.selectedPayrollDate) return;
+    if (!this.selectedPayrollDate) {
+      Swal.fire('Error!', 'Please select a payroll date.', 'error');
+      return;
+    }
+
+    const date = new Date(
+      this.selectedPayrollDate.year,
+      this.selectedPayrollDate.month - 1,
+      this.selectedPayrollDate.day
+    );
+
     this.loading = true;
-    const payload = {
-      payroll_month: this.selectedPayrollDate.month.toString(),
-      payroll_year: this.selectedPayrollDate.year.toString(),
-      payroll_day: this.selectedPayrollDate.day.toString()
-    };
-    this.payrollService.generatePayroll(payload).subscribe({
-      next: (response: any) => {
+    this.payrollService.generatePayroll({
+      payroll_date: date.toISOString().split('T')[0]
+    }).subscribe({
+      next: () => {
         this.loading = false;
-        Swal.fire({ icon: 'success', text: 'Payroll generated successfully.' });
         this.fetchPayrolls(1);
+        Swal.fire({
+          title: 'Success!',
+          text: 'Payroll generated successfully.',
+          icon: 'success',
+          confirmButtonColor: '#34c38f',
+        });
       },
       error: (err) => {
         this.loading = false;
-        let errorMsg = 'Failed to generate payroll.';
-        if (typeof err === 'string') {
-          errorMsg = err;
-        } else if (err && typeof err === 'object') {
-          if (err.message) {
-            errorMsg = err.message;
-          } else if (err.errors) {
-            errorMsg = Object.values(err.errors).flat().join(' ');
-          }
-        }
-        Swal.fire({ icon: 'error', text: errorMsg });
+        console.error('Error generating payroll:', err);
+        Swal.fire({
+          title: 'Error!',
+          text: 'Failed to generate payroll. Please try again.',
+          icon: 'error',
+          confirmButtonColor: '#f46a6a',
+        });
       }
     });
   }
 
   onPayrollDateChange(date: NgbDateStruct) {
     this.selectedPayrollDate = date;
-    // Optionally, filter or fetch payrolls for the selected date here
   }
 } 

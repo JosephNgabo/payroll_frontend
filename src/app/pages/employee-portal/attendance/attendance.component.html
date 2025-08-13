@@ -1,0 +1,84 @@
+<div class="container-fluid">
+  <app-page-title title="Attendance" [breadcrumbItems]="breadCrumbItems"></app-page-title>
+  
+  <div class="row">
+    <!-- Attendance Summary -->
+    <div class="col-lg-4 mb-4">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="card-title mb-0">Attendance Summary</h5>
+        </div>
+        <div class="card-body">
+          <div class="row text-center">
+            <div class="col-6 mb-3">
+              <h4 class="text-success">{{ presentDays }}</h4>
+              <p class="text-muted mb-0">Present</p>
+            </div>
+            <div class="col-6 mb-3">
+              <h4 class="text-danger">{{ absentDays }}</h4>
+              <p class="text-muted mb-0">Absent</p>
+            </div>
+            <div class="col-6">
+              <h4 class="text-warning">{{ lateDays }}</h4>
+              <p class="text-muted mb-0">Late</p>
+            </div>
+            <div class="col-6">
+              <h4 class="text-primary">{{ attendanceRate }}%</h4>
+              <p class="text-muted mb-0">Rate</p>
+            </div>
+          </div>
+          
+          <hr>
+          
+          <!-- Quick Actions -->
+          <div class="d-grid gap-2">
+            <button type="button" class="btn btn-success" (click)="checkIn()">
+              <i class="mdi mdi-clock-in"></i> Check In
+            </button>
+            <button type="button" class="btn btn-outline-danger" (click)="checkOut()">
+              <i class="mdi mdi-clock-out"></i> Check Out
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Attendance Records -->
+    <div class="col-lg-8">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="card-title mb-0">Recent Attendance</h5>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-nowrap mb-0">
+              <thead class="table-light">
+                <tr>
+                  <th scope="col">Date</th>
+                  <th scope="col">Check In</th>
+                  <th scope="col">Check Out</th>
+                  <th scope="col">Hours Worked</th>
+                  <th scope="col">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let record of attendanceRecords">
+                  <td>{{ record.date | date:'EEE, MMM dd' }}</td>
+                  <td>{{ record.checkIn }}</td>
+                  <td>{{ record.checkOut }}</td>
+                  <td>{{ record.hoursWorked }}h</td>
+                  <td>
+                    <span class="badge" [ngClass]="getStatusBadgeClass(record.status)">
+                      {{ record.status | titlecase }}
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+

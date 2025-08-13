@@ -1,0 +1,134 @@
+<!-- Leave Request Form Container -->
+<div class="container-fluid">
+  <div class="leave-request-form p-4">
+
+    <!-- Page Title -->
+    <app-page-title title="New Leave Request" [breadcrumbItems]="breadCrumbItems"></app-page-title>
+
+    <!-- Form header -->
+    <div class="form-header d-flex justify-content-between align-items-center mb-4">
+      <h2 class="form-title mb-0">New Leave Request</h2>
+      <button type="button" class="btn btn-outline-danger" (click)="onCancel()">
+        <i class="mdi mdi-close me-1"></i> Exit
+      </button>
+    </div>
+
+    <!-- Leave request form -->
+    <form [formGroup]="leaveRequestForm" (ngSubmit)="onSubmit()" class="leave-form">
+      <div class="row">
+        
+        <!-- Employee Name -->
+        <div class="col-md-6 mb-4">
+          <label for="employeeName" class="form-label">
+            Employee Name <span class="text-danger">*</span>
+          </label>
+          <select 
+            id="employeeName"
+            class="form-select"
+            formControlName="employeeName"
+            [class.is-invalid]="f['employeeName'].invalid && f['employeeName'].touched">
+            <option value="" disabled>Field name ...</option>
+            <option *ngFor="let employee of employees" [value]="employee.name">
+              {{ employee.name }}
+            </option>
+          </select>
+          <div class="invalid-feedback" *ngIf="f['employeeName'].invalid && f['employeeName'].touched">
+            Employee name is required
+          </div>
+        </div>
+
+        <!-- Reason -->
+        <div class="col-md-6 mb-4">
+          <label for="reason" class="form-label">
+            Reason <span class="text-danger">*</span>
+          </label>
+          <select 
+            id="reason"
+            class="form-select"
+            formControlName="reason"
+            [class.is-invalid]="f['reason'].invalid && f['reason'].touched">
+            <option value="" disabled>Field name ...</option>
+            <option *ngFor="let type of leaveTypes" [value]="type.name">
+              {{ type.name }}
+            </option>
+          </select>
+          <div class="invalid-feedback" *ngIf="f['reason'].invalid && f['reason'].touched">
+            Reason is required
+          </div>
+        </div>
+
+        <!-- Start Date -->
+        <div class="col-md-6 mb-4">
+          <label for="startDate" class="form-label">
+            Start Date <span class="text-danger">*</span>
+          </label>
+          <div class="position-relative">
+            <input 
+              type="date"
+              id="startDate"
+              class="form-control"
+              formControlName="startDate"
+              (change)="onStartDateChange()"
+              [class.is-invalid]="f['startDate'].invalid && f['startDate'].touched">
+            <i class="mdi mdi-calendar position-absolute calendar-icon"></i>
+          </div>
+          <div class="invalid-feedback" *ngIf="f['startDate'].invalid && f['startDate'].touched">
+            Start date is required
+          </div>
+        </div>
+
+        <!-- Number of Days -->
+        <div class="col-md-6 mb-4">
+          <label for="numberOfDays" class="form-label">
+            Number of Days <span class="text-danger">*</span>
+          </label>
+          <select 
+            id="numberOfDays"
+            class="form-select"
+            formControlName="numberOfDays"
+            (change)="onNumberOfDaysChange()"
+            [class.is-invalid]="f['numberOfDays'].invalid && f['numberOfDays'].touched">
+            <option value="" disabled>Field name ...</option>
+            <option *ngFor="let day of dayOptions" [value]="day">
+              {{ day }} {{ day === 1 ? 'day' : 'days' }}
+            </option>
+          </select>
+          <div class="invalid-feedback" *ngIf="f['numberOfDays'].invalid && f['numberOfDays'].touched">
+            Number of days is required
+          </div>
+        </div>
+
+      </div>
+
+      <!-- End Date Display (calculated) -->
+      <div class="row" *ngIf="calculateEndDate()">
+        <div class="col-md-6 mb-4">
+          <label class="form-label">End Date (Calculated)</label>
+          <input 
+            type="text" 
+            class="form-control" 
+            [value]="calculateEndDate() | date:'mediumDate'" 
+            readonly>
+        </div>
+      </div>
+
+      <!-- Submit button -->
+      <div class="row">
+        <div class="col-12">
+          <div class="d-flex justify-content-end">
+            <button 
+              type="submit" 
+              class="btn btn-primary btn-lg"
+              [disabled]="leaveRequestForm.invalid || isSubmitting">
+              <span *ngIf="isSubmitting" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+              <i class="mdi mdi-check me-2" *ngIf="!isSubmitting"></i>
+              {{ isSubmitting ? 'Adding Leave Request...' : 'Add Leave Request' }}
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </form>
+
+  </div>
+</div>

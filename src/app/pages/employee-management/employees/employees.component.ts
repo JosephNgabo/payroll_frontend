@@ -40,6 +40,7 @@ import { EmployeeDocumentService } from 'src/app/core/services/employee-document
 import { EmployeeDocument } from 'src/app/core/models/employee-document.model';
 import Swal from 'sweetalert2';
 import { Router, ActivatedRoute } from '@angular/router';
+import { PermissionCheckService } from 'src/app/core/services/permission-check.service';
 
 @Component({
   selector: 'app-employees',
@@ -148,7 +149,7 @@ export class EmployeesComponent implements OnInit {
   savingNext: boolean = false;
   savingPrevious: boolean = false;
   salaryBasisOptions = [
-    { label: 'Net Salary', value: 'net' },
+    { label: 'Basic Salary', value: 'basic' },
     { label: 'Gross Salary', value: 'gross' },
     { label: 'Mass Salary', value: 'mass' }
   ];
@@ -174,6 +175,7 @@ export class EmployeesComponent implements OnInit {
     private employeeDocumentService: EmployeeDocumentService,
     private router: Router,
     private route: ActivatedRoute,
+    private permissionCheckService: PermissionCheckService,
   ) { }
 
   ngOnInit() {
@@ -1327,5 +1329,12 @@ export class EmployeesComponent implements OnInit {
     if (this.cdkStepper && this.cdkStepper.selectedIndex === 9) {
       this.loadAddressDataForReview();
     }
+  }
+
+  canViewUsers(): boolean {
+    // Temporarily bypass permission check - allow all users to access employee management
+    return true;
+    // Original permission check (commented out for now):
+    // return this.permissionCheckService.hasPermission('view_users');
   }
 }

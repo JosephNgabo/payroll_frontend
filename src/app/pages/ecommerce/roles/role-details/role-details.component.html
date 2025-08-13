@@ -1,0 +1,236 @@
+<div class="container-fluid">
+  <app-page-title title="Role Details" [breadcrumbItems]="breadCrumbItems"></app-page-title>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="text-center">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+    <p class="mt-2">Loading role details...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error" class="alert alert-danger">
+    {{ error }}
+  </div>
+
+  <!-- Role Details -->
+  <div *ngIf="!isLoading && !error && roleDetail" class="row">
+    <div class="col-lg-12">
+      <div class="card">
+        <div class="card-header">
+          <div class="d-flex justify-content-between align-items-center">
+            <h5 class="card-title mb-0">
+              <i class="bx bx-shield me-2"></i>
+              Role Information
+            </h5>
+            <div class="d-flex gap-2">
+              <button type="button" class="btn btn-secondary" (click)="goBack()">
+                <i class="bx bx-arrow-back me-1"></i> Back to Roles
+              </button>
+              <button type="button" class="btn btn-primary" (click)="editRole()">
+                <i class="bx bx-edit me-1"></i> Edit Role
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="mb-4">
+                <label class="form-label fw-bold text-primary">
+                  <i class="bx bx-user me-1"></i>
+                  Role Name
+                </label>
+                <div class="role-name-display">
+                  <h4 class="mb-0 text-dark fs-5">{{ roleDetail.name }}</h4>
+                  <small class="text-muted">Primary identifier for this role</small>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="mb-4">
+                <label class="form-label fw-bold text-primary">
+                  <i class="bx bx-calendar me-1"></i>
+                  Created At
+                </label>
+                <div class="date-display">
+                  <h6 class="mb-0">{{ roleDetail.created_at | date:'medium' }}</h6>
+                  <small class="text-muted">When this role was first created</small>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="row">
+            <div class="col-md-6">
+              <div class="mb-4">
+                <label class="form-label fw-bold text-primary">
+                  <i class="bx bx-time me-1"></i>
+                  Last Updated
+                </label>
+                <div class="date-display">
+                  <h6 class="mb-0">{{ roleDetail.updated_at | date:'medium' }}</h6>
+                  <small class="text-muted">Last modification date</small>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6" *ngIf="roleDetail.description">
+              <div class="mb-4">
+                <label class="form-label fw-bold text-primary">
+                  <i class="bx bx-info-circle me-1"></i>
+                  Description
+                </label>
+                <div class="description-display">
+                  <p class="mb-0">{{ roleDetail.description }}</p>
+                  <small class="text-muted">Role description and purpose</small>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="mb-4" *ngIf="roleDetail.description && !roleDetail.description.includes('col-md-6')">
+            <label class="form-label fw-bold text-primary">
+              <i class="bx bx-info-circle me-1"></i>
+              Description
+            </label>
+            <div class="description-display">
+              <p class="mb-0">{{ roleDetail.description }}</p>
+              <small class="text-muted">Role description and purpose</small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Permissions Section -->
+  <div *ngIf="!isLoading && !error && roleDetail" class="row mt-4">
+    <div class="col-lg-12">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="card-title mb-0">
+            Permissions 
+            <span class="badge bg-primary ms-2">{{ getTotalPermissionsCount() }} total</span>
+          </h5>
+        </div>
+        <div class="card-body">
+          <!-- Loading Permissions State -->
+          <div *ngIf="isLoadingPermissions" class="text-center py-4">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">Loading permissions...</span>
+            </div>
+            <p class="mt-2">Loading permissions...</p>
+          </div>
+
+          <!-- Permissions Error State -->
+          <div *ngIf="permissionsError" class="alert alert-warning">
+            {{ permissionsError }}
+          </div>
+
+          <!-- Permissions by Category -->
+          <div *ngIf="!isLoadingPermissions && !permissionsError" class="permission-categories">
+            <div class="permission-category" *ngFor="let categoryPermissions of getPermissionsByCategory() | keyvalue">
+              <div class="category-header">
+                <div class="d-flex align-items-center w-100 justify-content-between">
+                  <div class="d-flex align-items-center">
+                    <span class="fw-bold">{{ getCategoryName(categoryPermissions.key) }}</span>
+                    <span class="badge bg-secondary ms-2">{{ getCategoryCode(categoryPermissions.key) }}</span>
+                    <span class="badge bg-info ms-2">{{ categoryPermissions.value.length }} permissions</span>
+                  </div>
+                </div>
+              </div>
+              <div class="category-body">
+                <div class="row">
+                  <div class="col-md-6 mb-3" *ngFor="let permission of categoryPermissions.value">
+                    <div class="permission-item">
+                      <div class="d-flex align-items-start">
+                        <div class="flex-grow-1">
+                          <div class="d-flex align-items-center mb-1">
+                            <span class="fw-medium">{{ permission.label }}</span>
+                            <span class="badge bg-info ms-2">{{ permission.code }}</span>
+                          </div>
+                          <small class="text-muted d-block">{{ permission.description }}</small>
+                          <small class="text-muted">
+                            <code>{{ permission.name }}</code>
+                          </small>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- No Permissions Message -->
+          <div *ngIf="!isLoadingPermissions && !permissionsError && getTotalPermissionsCount() === 0" class="text-center py-4">
+            <div class="text-muted">
+              <i class="bx bx-shield-x font-size-24 mb-2"></i>
+              <p>No permissions assigned to this role.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Summary Card -->
+  <div *ngIf="!isLoading && !error && roleDetail" class="row mt-4">
+    <div class="col-lg-12">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="card-title mb-0">Summary</h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-3">
+              <div class="text-center">
+                <div class="avatar-sm mx-auto mb-3">
+                  <div class="avatar-title bg-primary text-primary bg-opacity-10 rounded-3">
+                    <i class="bx bx-shield font-size-24"></i>
+                  </div>
+                </div>
+                <h6>Total Permissions</h6>
+                <h4 class="text-primary">{{ getTotalPermissionsCount() }}</h4>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="text-center">
+                <div class="avatar-sm mx-auto mb-3">
+                  <div class="avatar-title bg-success text-success bg-opacity-10 rounded-3">
+                    <i class="bx bx-category font-size-24"></i>
+                  </div>
+                </div>
+                <h6>Categories</h6>
+                <h4 class="text-success">{{ (getPermissionsByCategory() | keyvalue).length }}</h4>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="text-center">
+                <div class="avatar-sm mx-auto mb-3">
+                  <div class="avatar-title bg-info text-info bg-opacity-10 rounded-3">
+                    <i class="bx bx-calendar font-size-24"></i>
+                  </div>
+                </div>
+                <h6>Created</h6>
+                <small class="text-muted">{{ roleDetail.created_at | date:'short' }}</small>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="text-center">
+                <div class="avatar-sm mx-auto mb-3">
+                  <div class="avatar-title bg-warning text-warning bg-opacity-10 rounded-3">
+                    <i class="bx bx-time font-size-24"></i>
+                  </div>
+                </div>
+                <h6>Last Updated</h6>
+                <small class="text-muted">{{ roleDetail.updated_at | date:'short' }}</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div> 

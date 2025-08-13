@@ -1,0 +1,268 @@
+<div class="container-fluid">
+  <app-page-title title="Roles" [breadcrumbItems]="breadCrumbItems"></app-page-title>
+
+  <!-- Alert Notifications -->
+  <div class="row mb-3" *ngIf="alertMessage">
+    <div class="col-12">
+      <div class="alert alert-dismissible fade show" 
+           [ngClass]="{
+             'alert-success': alertType === 'success',
+             'alert-danger': alertType === 'error',
+             'alert-warning': alertType === 'warning',
+             'alert-info': alertType === 'info'
+           }" 
+           role="alert">
+        <div class="d-flex align-items-center">
+          <i class="me-2" 
+             [ngClass]="{
+               'mdi mdi-check-circle': alertType === 'success',
+               'mdi mdi-alert-circle': alertType === 'error',
+               'mdi mdi-alert': alertType === 'warning',
+               'mdi mdi-information': alertType === 'info'
+             }"></i>
+          <span>{{ alertMessage }}</span>
+        </div>
+        <button type="button" class="btn-close" (click)="clearAlert()" aria-label="Close"></button>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-lg-12">
+      <div class="card">
+        <div class="card-body">
+          <div class="row mb-2">
+            <div class="col-sm-4">
+              <div class="search-box me-2 mb-2 d-inline-block">
+                <div class="position-relative">
+                  <input type="text" class="form-control" placeholder="Search roles..." [(ngModel)]="term" (ngModelChange)="searchRole()">
+                  <i class="bx bx-search-alt search-icon"></i>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-8">
+              <div class="text-sm-end">
+                <button type="button" class="btn btn-primary btn-rounded mb-2 me-2" (click)="openModal(showModal)" [disabled]="isLoading">
+                  <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                  <i class="mdi mdi-plus me-1" *ngIf="!isLoading"></i> {{ isLoading ? 'Loading...' : 'Add New Role' }}
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Loading State -->
+          <div *ngIf="isLoading" class="text-center">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="mt-2">Loading roles...</p>
+          </div>
+
+          <!-- Error State -->
+          <div *ngIf="error" class="alert alert-danger">
+            {{ error }}
+          </div>
+
+          <!-- Role Table -->
+          <div *ngIf="!isLoading && !error" class="table-responsive">
+            <table class="table align-middle table-nowrap table-check">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Role Name</th>
+                  <!-- <th>Permissions</th> -->
+                  <th>Created</th>
+                  <th><span style="margin-left: 3em;"></span>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let role of roleList; let i = index">
+                  <td>{{ i + 1 }}</td>
+                  <td>
+                    <h6 class="mb-0">{{ role.name }}</h6>
+                  </td>
+                  <!-- <td>
+                    <div class="d-flex flex-wrap gap-1">
+                      <span class="badge bg-info me-1" *ngFor="let permissionId of (role.permissions || []).slice(0, 3)">
+                        {{ getPermissionName(permissionId) }}
+                      </span>
+                      <span class="badge bg-secondary" *ngIf="(role.permissions || []).length > 3">
+                        +{{ (role.permissions || []).length - 3 }} more
+                      </span>
+                      <span class="badge bg-warning" *ngIf="!role.permissions || role.permissions.length === 0">
+                        No permissions
+                      </span>
+                    </div>
+                  </td> -->
+                  <td>
+                    <small class="text-muted">{{ role.created_at | date:'short' }}</small>
+                  </td>
+                  <td>
+                    <div class="d-flex gap-2">
+                      <button type="button" class="btn btn-info btn-sm btn-rounded" (click)="viewRoleDetails(role.id)">
+                        <i class="mdi mdi-eye font-size-16"></i>
+                      </button>
+                      <button type="button" class="btn btn-success btn-sm btn-rounded" (click)="editModal(role, showModal)">
+                        <i class="mdi mdi-pencil font-size-16"></i>
+                      </button>
+                      <button type="button" class="btn btn-danger btn-sm btn-rounded ms-1" (click)="confirmDelete(role.id)">
+                        <i class="mdi mdi-delete font-size-16"></i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+                <tr *ngIf="!isLoading && roleList.length === 0">
+                  <td colspan="5" class="text-center">No roles found.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Pagination -->
+          <div *ngIf="!isLoading && !error && totalRecords > 0" class="row justify-content-md-between align-items-md-center mt-3">
+            <div class="col-sm-12 col-md-5">
+              <div class="dataTables_info mb-2" role="status" aria-live="polite">
+                Showing page {{ currentPage }} of {{ totalPages }}
+              </div>
+            </div>
+            <div class="col-sm-12 col-md-7">
+              <div class="text-md-end float-md-end pagination-rounded">
+                <pagination [totalItems]="totalRecords" [itemsPerPage]="10" (pageChanged)="pageChanged($event)"></pagination>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Add/Edit Role Modal -->
+<ng-template #showModal let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title">{{ isEditMode ? 'Edit Role' : 'Add New Role' }}</h5>
+    <button type="button" class="btn-close" (click)="modalRef?.hide()"></button>
+  </div>
+  <div class="modal-body">
+    <form (ngSubmit)="saveRole()" [formGroup]="roleForm">
+      <!-- Hidden field for role ID -->
+      <input type="hidden" formControlName="id">
+      
+      <div class="mb-3">
+        <label for="name-field" class="form-label">Role Name</label>
+        <input type="text" id="name-field" class="form-control" formControlName="name" required>
+        <div *ngIf="(form['name'].touched || submitted) && form['name'].errors" class="text-danger mt-1">
+          <small *ngIf="form['name'].errors['required']">Role name is required</small>
+          <small *ngIf="form['name'].errors['minlength']">Role name must be at least 3 characters</small>
+          <small *ngIf="form['name'].errors['maxlength']">Role name cannot exceed 100 characters</small>
+          <small *ngIf="form['name'].errors['serverError']">{{ form['name'].errors['serverError'] }}</small>
+        </div>
+      </div>
+      
+      <div class="mb-3">
+        <label for="permissions-field" class="form-label">
+          Permissions 
+          <span class="badge bg-primary ms-2">{{ getSelectedPermissionsCount() }} selected</span>
+        </label>
+        
+        <!-- Loading State for Permissions -->
+        <div *ngIf="permissionCategories.length === 0" class="text-center py-4">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+          <p class="mt-2 text-muted">Loading permissions...</p>
+          <small class="text-muted">Debug: {{ permissionCategories.length }} categories loaded</small>
+        </div>
+        
+        <!-- Permission Categories -->
+        <div class="permission-categories" *ngIf="permissionCategories.length > 0">
+          <div class="permission-category" *ngFor="let category of permissionCategories; let categoryIndex = index">
+            <div class="category-header" 
+                 (click)="toggleCategory(categoryIndex)"
+                 [class.expanded]="expandedCategories.includes(categoryIndex)">
+              <div class="d-flex align-items-center w-100 justify-content-between">
+                <div class="d-flex align-items-center">
+                  <span class="fw-bold">{{ category.name }}</span>
+                  <span class="badge bg-secondary ms-2">{{ category.permissions.length }} permissions</span>
+                  <small class="text-muted ms-2">{{ category.description }}</small>
+                </div>
+                <div class="d-flex align-items-center">
+                  <span class="badge bg-primary me-2">{{ getSelectedPermissionsInCategory(category.id) }} selected</span>
+                  <i class="bx" [class.bx-chevron-down]="!expandedCategories.includes(categoryIndex)" [class.bx-chevron-up]="expandedCategories.includes(categoryIndex)"></i>
+                </div>
+              </div>
+            </div>
+            <div class="category-body" 
+                 [class.show]="expandedCategories.includes(categoryIndex)"
+                 *ngIf="expandedCategories.includes(categoryIndex)">
+              <div class="row">
+                <div class="col-md-6 mb-3" *ngFor="let permission of category.permissions">
+                  <div class="form-check permission-item">
+                    <input class="form-check-input" 
+                           type="checkbox" 
+                           [id]="'permission-' + permission.id"
+                           [value]="permission.id"
+                           [checked]="isPermissionSelected(permission.id)"
+                           (change)="onPermissionChange($event, permission.id)">
+                    <label class="form-check-label" [for]="'permission-' + permission.id">
+                      <div class="d-flex align-items-start">
+                        <div class="flex-grow-1">
+                          <div class="d-flex align-items-center mb-1">
+                            <span class="fw-medium">{{ permission.label }}</span>
+                            <span class="badge bg-info ms-2">{{ permission.code }}</span>
+                          </div>
+                          <small class="text-muted d-block">{{ permission.description }}</small>
+                        </div>
+                      </div>
+                    </label>
+                  </div>
+                </div>
+              </div>
+              <div class="text-center mt-3" *ngIf="category.permissions.length === 0">
+                <small class="text-muted">No permissions available in this category</small>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div *ngIf="(form['permissions'].touched || submitted) && form['permissions'].errors" class="text-danger mt-1">
+          <small *ngIf="form['permissions'].errors['required']">At least one permission is required</small>
+          <small *ngIf="form['permissions'].errors['minlength']">At least one permission must be selected</small>
+          <small *ngIf="form['permissions'].errors['serverError']">{{ form['permissions'].errors['serverError'] }}</small>
+        </div>
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-light" (click)="modalRef?.hide()" [disabled]="saving">Close</button>
+    <button type="button" class="btn btn-primary" (click)="saveRole()" [disabled]="saving || roleForm.invalid">
+      <span *ngIf="saving" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+      {{ saving ? 'Saving...' : (isEditMode ? 'Update' : 'Save') }}
+    </button>
+  </div>
+</ng-template>
+
+<!-- Delete Confirmation Modal -->
+<ng-template #removeItemModal let-modal>
+  <div class="modal-body px-4 py-5 text-center">
+    <button type="button" class="btn-close position-absolute end-0 top-0 m-3" (click)="modal.close()"></button>
+    <div class="avatar-sm mb-4 mx-auto">
+      <div class="avatar-title bg-primary text-primary bg-opacity-10 font-size-20 rounded-3">
+        <i class="mdi mdi-trash-can-outline"></i>
+      </div>
+    </div>
+    <p class="text-muted font-size-16 mb-4">
+      Are you sure you want to remove <br>
+      <span class="fw-bold text-danger">{{ selectedRole?.name | titlecase }}</span>
+      ?
+    </p>
+    <div class="hstack gap-2 justify-content-center mb-0">
+      <button type="button" class="btn btn-danger" (click)="deleteRole(); modal.close();" [disabled]="deleting">
+        <span *ngIf="deleting" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+        {{ deleting ? 'Removing...' : 'Remove Now' }}
+      </button>
+      <button type="button" class="btn btn-secondary" (click)="modal.close()" [disabled]="deleting">Close</button>
+    </div>
+  </div>
+</ng-template> 

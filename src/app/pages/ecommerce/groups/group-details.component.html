@@ -1,0 +1,177 @@
+<div class="container-fluid py-4">
+  <div class="row mb-3">
+    <div class="col-12 d-flex align-items-center">
+      <button class="btn btn-link px-0 me-2" (click)="goBack()">
+        <i class="bx bx-arrow-back"></i> Back to Groups
+      </button>
+      <h3 class="mb-0 fw-bold ms-2">Group Details</h3>
+    </div>
+  </div>
+
+  <div *ngIf="isLoading" class="text-center py-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+    <p class="mt-3 text-muted">Loading group details...</p>
+  </div>
+
+  <div *ngIf="error" class="alert alert-danger">
+    <i class="bx bx-error-circle me-2"></i>{{ error }}
+  </div>
+
+  <!-- <div *ngIf="group && !isLoading">
+    <div class="card mb-4">
+      <div class="card-body">
+        <h4 class="fw-bold mb-1">{{ group.name }}</h4>
+        <p class="text-muted mb-2">{{ group.description || 'No description' }}</p>
+        <div class="d-flex flex-wrap gap-3 mb-2">
+          <span class="badge bg-light text-dark">ID: <code>{{ group.id }}</code></span>
+          <span class="badge bg-secondary">Created: {{ group.created_at | date:'medium' }}</span>
+          <span class="badge bg-info">Updated: {{ group.updated_at | date:'medium' }}</span>
+        </div>
+      </div>
+    </div>
+    <div class="row mb-4">
+      <div class="col-md-6">
+        <div class="card h-100">
+          <div class="card-header bg-light fw-semibold">
+            <i class="bx bx-user me-1"></i>Users ({{ group.users?.length || 0 }})
+          </div>
+          <div class="card-body p-0">
+            <div *ngIf="group.users && group.users.length > 0; else noUsers">
+              <table class="table table-sm table-bordered mb-0">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Username</th>
+                    <th>Title</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let user of group.users">
+                    <td>{{ user.firstname }} {{ user.lastname }}</td>
+                    <td>{{ user.email }}</td>
+                    <td>{{ user.username }}</td>
+                    <td>{{ user.title }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <ng-template #noUsers>
+              <div class="text-muted p-3">No users assigned</div>
+            </ng-template>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="card h-100">
+          <div class="card-header bg-light fw-semibold">
+            <i class="bx bx-shield me-1"></i>Roles ({{ group.roles?.length || 0 }})
+          </div>
+          <div class="card-body p-0">
+            <div *ngIf="group.roles && group.roles.length > 0; else noRoles">
+              <table class="table table-sm table-bordered mb-0">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Created</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let role of group.roles">
+                    <td>{{ role.name }}</td>
+                    <td>{{ role.descrition || 'No description' }}</td>
+                    <td>{{ role.created_at | date:'short' }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <ng-template #noRoles>
+              <div class="text-muted p-3">No roles assigned</div>
+            </ng-template>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div> -->
+  <div *ngIf="group && !isLoading">
+  
+    <!-- Wizard Tabs -->
+    <ul class="nav nav-tabs mb-3" id="groupTabs" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="users-tab" data-bs-toggle="tab" data-bs-target="#users"
+          type="button" role="tab">Users ({{ group.users?.length || 0 }})</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="roles-tab" data-bs-toggle="tab" data-bs-target="#roles"
+          type="button" role="tab">Roles ({{ group.roles?.length || 0 }})</button>
+      </li>
+    </ul>
+  
+    <div class="tab-content" id="groupTabsContent">
+        <!-- Users Tab -->
+        <div class="tab-pane fade show active" id="users" role="tabpanel" aria-labelledby="users-tab">
+          <div class="card">
+            <div class="card-body p-0">
+              <div *ngIf="group.users && group.users.length > 0; else noUsers">
+                <table class="table table-sm table-bordered mb-0 table-xs">
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Email</th>
+                      <th>Username</th>
+                      <th>Title</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let user of group.users">
+                      <td>{{ user.firstname }} {{ user.lastname }}</td>
+                      <td>{{ user.email }}</td>
+                      <td>{{ user.username }}</td>
+                      <td>{{ user.title }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <ng-template #noUsers>
+                <div class="text-muted p-3">No users assigned</div>
+              </ng-template>
+            </div>
+          </div>
+        </div>
+      
+        <!-- Roles Tab -->
+        <div class="tab-pane fade" id="roles" role="tabpanel" aria-labelledby="roles-tab">
+          <div class="card">
+            <div class="card-body p-0">
+              <div *ngIf="group.roles && group.roles.length > 0; else noRoles">
+                <table class="table table-sm table-bordered mb-0 table-xs">
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Description</th>
+                      <th>Created</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let role of group.roles">
+                      <td>{{ role.name }}</td>
+                      <td>{{ role.descrition || 'No description' }}</td>
+                      <td>{{ role.created_at | date:'short' }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <ng-template #noRoles>
+                <div class="text-muted p-3">No roles assigned</div>
+              </ng-template>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+  </div>
+  
+</div> 

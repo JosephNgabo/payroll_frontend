@@ -173,4 +173,14 @@ export class TopbarComponent implements OnInit {
       document.documentElement.setAttribute('data-layout', layout)
     })
   }
+
+  get currentUserDisplayName(): string {
+    const user = this.laravelAuthService.getCurrentUser();
+    if (!user) return '';
+    if (user.first_name || user.last_name) {
+      return `${user.first_name || ''} ${user.last_name || ''}`.trim();
+    }
+    if (user.username) return user.username;
+    return user.email || '';
+  }
 }

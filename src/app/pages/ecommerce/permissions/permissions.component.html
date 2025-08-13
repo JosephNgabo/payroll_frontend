@@ -1,0 +1,206 @@
+<div class="container-fluid">
+  <app-page-title title="Permissions" [breadcrumbItems]="breadCrumbItems"></app-page-title>
+
+  <!-- Alert Notifications -->
+  <div class="row mb-3" *ngIf="alertMessage">
+    <div class="col-12">
+      <div class="alert alert-dismissible fade show" 
+           [ngClass]="{
+             'alert-success': alertType === 'success',
+             'alert-danger': alertType === 'error',
+             'alert-warning': alertType === 'warning',
+             'alert-info': alertType === 'info'
+           }" 
+           role="alert">
+        <div class="d-flex align-items-center">
+          <i class="me-2" 
+             [ngClass]="{
+               'mdi mdi-check-circle': alertType === 'success',
+               'mdi mdi-alert-circle': alertType === 'error',
+               'mdi mdi-alert': alertType === 'warning',
+               'mdi mdi-information': alertType === 'info'
+             }"></i>
+          <span>{{ alertMessage }}</span>
+        </div>
+        <button type="button" class="btn-close" (click)="clearAlert()" aria-label="Close"></button>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-lg-12">
+      <div class="card">
+        <div class="card-body">
+          <!-- Category Overview Header -->
+          <div class="row mb-3">
+            <div class="col-12">
+              <div class="d-flex justify-content-between align-items-center">
+                <h6 class="mb-0">
+                  <i class="bx bx-shield me-2"></i>
+                  Permission Categories
+                </h6>
+              </div>
+            </div>
+          </div>
+
+          <!-- Loading State -->
+          <div *ngIf="isLoading" class="text-center">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="mt-2">Loading permissions...</p>
+          </div>
+
+          <!-- Error State -->
+          <div *ngIf="error" class="alert alert-danger">
+            {{ error }}
+          </div>
+
+          <!-- Permissions Display -->
+          <div *ngIf="!isLoading && !error">
+            <!-- Category Filter Info -->
+            <div class="mb-3" *ngIf="selectedCategory !== 'all'">
+              <h6 class="text-muted">
+                Showing permissions for: 
+                <span class="badge bg-primary">{{ getCategoryName(selectedCategory) }}</span>
+                <span class="badge bg-secondary ms-1">{{ getCategoryCode(selectedCategory) }}</span>
+              </h6>
+            </div>
+
+            <!-- Permissions Table -->
+           
+            
+
+            <!-- Summary -->
+            <div class="row mt-3">
+              <div class="col-12">
+                <div class="text-center">
+                  <span class="text-muted">
+                    <i class="bx bx-category me-1"></i>
+                    {{ permissionCategories.length }} categories • {{ allPermissions.length }} total permissions
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Categories Overview -->
+  <div class="row mt-4" *ngIf="!isLoading && !error">
+    <div class="col-lg-12">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="card-title mb-0">Permission Categories Overview</h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-6 col-lg-4 mb-3" *ngFor="let category of permissionCategories">
+              <div class="card border">
+                <div class="card-body">
+                  <div class="d-flex align-items-center mb-2">
+                    <div class="avatar-sm me-3">
+                      <div class="avatar-title bg-primary text-primary bg-opacity-10 rounded-3">
+                        <i class="bx bx-shield font-size-16"></i>
+                      </div>
+                    </div>
+                    <div>
+                      <h6 class="mb-1">{{ category.name }}</h6>
+                      <p class="text-muted mb-0">{{ category.code }}</p>
+                    </div>
+                  </div>
+                  <p class="text-muted small mb-2">{{ category.description }}</p>
+                  <div class="d-flex justify-content-between align-items-center">
+                    <span class="badge bg-primary">{{ category.permissions.length }} permissions</span>
+                    <button type="button" 
+                            class="btn btn-sm btn-outline-primary" 
+                            (click)="openCategoryModal(category)">
+                      View Permissions
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Category Permissions Modal -->
+<ng-template #categoryModal let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title">
+      <i class="bx bx-shield me-2"></i>
+      {{ selectedCategoryForModal?.name }} Permissions
+    </h5>
+    <button type="button" class="btn-close" (click)="modal.dismiss()" aria-label="Close"></button>
+  </div>
+  <div class="modal-body">
+    <div class="row mb-3">
+      <div class="col-12">
+        <div class="alert alert-info">
+          <div class="d-flex align-items-center">
+            <i class="bx bx-info-circle me-2"></i>
+            <div>
+              <strong>{{ selectedCategoryForModal?.name }}</strong> ({{ selectedCategoryForModal?.code }})
+              <br>
+              <small class="text-muted">{{ selectedCategoryForModal?.description }}</small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="table-responsive">
+      <table class="table table-hover">
+        <thead class="table-light">
+          <tr>
+            <th width="10%">Code</th>
+            <th width="25%">Permission Name</th>
+            <th width="25%">Label</th>
+            <th width="40%">Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let permission of selectedCategoryPermissions">
+            <td>
+              <span class="badge bg-info">{{ permission.code }}</span>
+            </td>
+            <td>
+              <code class="text-primary">{{ permission.name }}</code>
+            </td>
+            <td>{{ permission.label }}</td>
+            <td>
+              <small class="text-muted">{{ permission.description }}</small>
+            </td>
+          </tr>
+          <tr *ngIf="selectedCategoryPermissions.length === 0">
+            <td colspan="4" class="text-center text-muted">
+              <i class="bx bx-info-circle me-2"></i>
+              No permissions found in this category.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="row mt-3">
+      <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center">
+          <span class="text-muted">
+            <i class="bx bx-list-ul me-1"></i>
+            {{ selectedCategoryPermissions.length }} permission{{ selectedCategoryPermissions.length !== 1 ? 's' : '' }} in this category
+          </span>
+          <span class="badge bg-primary">{{ selectedCategoryForModal?.code }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="modal.dismiss()">Close</button>
+  </div>
+</ng-template> 

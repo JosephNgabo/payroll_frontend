@@ -8,7 +8,23 @@
     </div>
   </div>
 
-  <div class="row">
+  <!-- Access Denied Message -->
+  <div class="row" *ngIf="!hasAnyRssbDeductionPermission()">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-body text-center">
+          <div class="alert alert-warning" role="alert">
+            <i class="mdi mdi-alert-circle font-size-24 me-2"></i>
+            <strong>Access Denied</strong>
+            <p class="mb-0 mt-2">You don't have permission to access the RSSB Deductions module.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RSSB Deductions Management Content -->
+  <div class="row" *ngIf="hasAnyRssbDeductionPermission()">
     <div class="col-12">
       <div class="card">
         <div class="card-body">
@@ -31,14 +47,17 @@
                 </div>
               </div>
               <div class="col-sm-8">
-                <!-- <div class="text-sm-end">
-                  <button type="button" class="btn btn-success btn-rounded mb-2 me-2" (click)="openModal(deductionModal)"><i class="mdi mdi-plus mr-1"></i>
-                    Add New Deduction</button>
-                </div> -->
+                <div class="text-sm-end">
+                  <button type="button" class="btn btn-success btn-rounded mb-2 me-2" 
+                          (click)="openModal(deductionModal)"
+                          *ngIf="canCreateRssbDeduction()">
+                    <i class="mdi mdi-plus mr-1"></i> Add New Deduction
+                  </button>
+                </div>
               </div>
             </div>
             <!-- Table data -->
-            <div class="table-responsive mb-0">
+            <div class="table-responsive mb-0" *ngIf="canViewRssbDeductions()">
               @if(error) {
                 <div class="alert alert-danger" role="alert">
                   {{ error }}
@@ -47,7 +66,9 @@
               } @else if(deductions.length === 0) {
                 <div class="text-center py-4">
                   <p>No deductions found.</p>
-                  <button type="button" class="btn btn-success" (click)="openModal(deductionModal)">
+                  <button type="button" class="btn btn-success" 
+                          (click)="openModal(deductionModal)"
+                          *ngIf="canCreateRssbDeduction()">
                     <i class="mdi mdi-plus mr-1"></i> Add New Deduction
                   </button>
                 </div>
@@ -74,12 +95,33 @@
                       <td>{{deduction.rssb_employer_contribution}}</td>
                       <td>{{deduction.rssb_employee_contribution}}</td>
                       <td>
-                        <button type="button" class="btn btn-primary btn-sm btn-rounded" (click)="openViewModal(ViewContent, deduction)">View Details</button>
+                        <div class="d-flex gap-2">
+                          <button type="button" class="btn btn-primary btn-sm btn-rounded" (click)="openViewModal(ViewContent, deduction)">View Details</button>
+                          <button type="button" class="btn btn-success btn-sm btn-rounded ms-1" 
+                                  (click)="openModal(deductionModal, deduction)"
+                                  *ngIf="canUpdateRssbDeduction()">
+                            <i class="mdi mdi-pencil font-size-16"></i>
+                          </button>
+                          <button type="button" class="btn btn-danger btn-sm btn-rounded ms-1" 
+                                  (click)="confirm(deduction.id, removeItemModal)"
+                                  *ngIf="canDeleteRssbDeduction()">
+                            <i class="mdi mdi-delete font-size-16"></i>
+                          </button>
+                        </div>
                       </td>
                     </tr>}
                   </tbody>
                 </table>
               }
+            </div>
+
+            <!-- No View Permission Message -->
+            <div *ngIf="!canViewRssbDeductions()" class="text-center">
+              <div class="alert alert-info" role="alert">
+                <i class="mdi mdi-information font-size-24 me-2"></i>
+                <strong>No View Permission</strong>
+                <p class="mb-0 mt-2">You don't have permission to view RSSB deductions.</p>
+              </div>
             </div>
           </ng-container>
         </div>

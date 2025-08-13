@@ -38,6 +38,9 @@ export class OtherDeductionsComponent implements OnInit {
   saving = false;
   deleteLoading = false;
 
+  // Permission system - using existing p_id approach
+  permissions: (number | string)[] = [];
+
   constructor(
     private fb: FormBuilder,
     private deductionsService: OtherDeductionsService,
@@ -49,10 +52,45 @@ export class OtherDeductionsComponent implements OnInit {
       has_tax: [false],
       rate: [0, [Validators.required, Validators.min(0)]]
     });
+
+    // Get permissions from session storage (same as sidebar)
+    const user = sessionStorage.getItem('current_user');
+    if (user) {
+      try {
+        const userData = JSON.parse(user);
+        this.permissions = userData.permissions || [];
+      } catch (e) {
+        console.error('Error parsing user permissions:', e);
+        this.permissions = [];
+      }
+    }
   }
 
   ngOnInit(): void {
     this.loadDeductions();
+  }
+
+  // Permission check methods using p_id system for Other Deductions
+  canViewOtherDeductions(): boolean {
+    return this.permissions.some(p_id => p_id === 4001 || p_id === '4001'); // p_id for view_other_deductions
+  }
+
+  canCreateOtherDeduction(): boolean {
+    return this.permissions.some(p_id => p_id === 4002 || p_id === '4002'); // p_id for create_other_deduction
+  }
+
+  canUpdateOtherDeduction(): boolean {
+    return this.permissions.some(p_id => p_id === 4003 || p_id === '4003'); // p_id for update_other_deduction
+  }
+
+  canDeleteOtherDeduction(): boolean {
+    return this.permissions.some(p_id => p_id === 4004 || p_id === '4004'); // p_id for delete_other_deduction
+  }
+
+  // Check if user has any other deduction management permissions
+  hasAnyOtherDeductionPermission(): boolean {
+    const otherDeductionPermissionIds = [4001, 4002, 4003, 4004, '4001', '4002', '4003', '4004'];
+    return this.permissions.some(p_id => otherDeductionPermissionIds.includes(p_id));
   }
 
   loadDeductions(page: number = 1) {

@@ -81,4 +81,22 @@ export class UserService {
     const headers = this.authService.getAuthHeaders();
     return this.http.patch(`${this.API_URL}/user/reset-password`, payload, { headers });
   }
+
+  /**
+   * Get user's groups
+   * @param userId The user ID
+   */
+  getUserGroups(userId: string): Observable<{status: boolean; message: string; data: any[]}> {
+    const headers = this.authService.getAuthHeaders();
+    return this.http.get<{status: boolean; message: string; data: any[]}>(`${this.API_URL}/users/${userId}/groups`, { headers });
+  }
+
+  /**
+   * Get user's permissions (if available)
+   * @param userId The user ID
+   */
+  getUserPermissions(userId: string): Observable<{status: boolean; message: string; data: string[]}> {
+    const headers = this.authService.getAuthHeaders();
+    return this.http.get<{status: boolean; message: string; data: string[]}>(`${this.API_URL}/users/${userId}/permissions`, { headers });
+  }
 }

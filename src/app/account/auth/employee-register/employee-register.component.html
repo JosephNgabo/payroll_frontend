@@ -1,0 +1,139 @@
+<!-- Full Screen Employee Registration Page -->
+<div class="container-fluid p-0 vh-100">
+    <div class="row g-0 h-100">
+
+        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 h-100">
+            <div class="auth-full-bg pt-lg-5 p-4 h-100">
+                <div class="w-100 h-100">
+                    <div class="bg-overlay"></div>
+                    <div class="d-flex h-100 flex-column">
+                        <div class="p-4 mt-auto">
+                            <div class="row justify-content-center">
+                                <div class="col-lg-7">
+                                    <div class="text-center">
+                                        <h4 class="mb-3"><i
+                                                class="bx bxs-quote-alt-left text-primary h1 align-middle me-3"></i><span
+                                                class="text-primary">5k</span>+ Satisfied clients</h4>
+
+                                        <div dir="ltr">
+                                            <ngx-slick-carousel dir="ltr" class="owl-theme auth-review-carousel"
+                                                [config]="slideConfig">
+                                                <div class="item" ngxSlickItem>
+                                                    <div class="py-3">
+                                                        <p class="font-size-14 mb-4">" This payroll management system
+                                                            has transformed our HR operations. The features are
+                                                            intuitive, and it significantly reduces the time spent on
+                                                            payroll <br> processing. A truly indispensable tool for any
+                                                            <br> modern business! "
+                                                        </p>
+
+                                                        <div>
+                                                            <h4 class="font-size-14 text-primary">Satisfied User</h4>
+                                                            <p class="font-size-14 mb-0">- Payroll Manager</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="item" ngxSlickItem>
+                                                    <div class="py-3">
+                                                        <p class="font-size-14 mb-4">" The HR Management system
+                                                            application provides a comprehensive solution for all our
+                                                            human resources needs. From employee onboarding to
+                                                            performance tracking, it's an all-in-one platform that's
+                                                            easy to use and highly efficient. "</p>
+
+                                                        <div>
+                                                            <h4 class="font-size-14 text-primary">HR Professional</h4>
+                                                            <p class="font-size-14 mb-0">- HR Coordinator</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </ngx-slick-carousel>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- end col -->
+
+        <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 h-100">
+            <div class="auth-full-page-content p-md-5 p-4 h-100">
+                <div class="w-100 h-100">
+
+                    <div class="d-flex flex-column h-100">
+                        <!-- <div class="mb-4 mb-md-5">
+                            <a routerLink="/" class="d-block auth-logo">
+                                <img src="assets/images/logo-dark.png" alt="" height="18" class="auth-logo-dark">
+                                <img src="assets/images/logo-light.png" alt="" height="18" class="auth-logo-light">
+                            </a>
+                        </div> -->
+                        <div class="my-auto">
+
+                            <div>
+                                <!-- <h3 class="text-primary">Welcome to Kuranga Payroll & HR Management!</h3> -->
+                                <p class="text-muted">Enter your email to receive login credentials.</p>
+                            </div>
+
+                            <!-- Error Alert -->
+                            @if(error){
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                <i class="mdi mdi-block-helper me-2"></i>
+                                {{ error }}
+                                <button type="button" class="btn-close" (click)="clearError()"></button>
+                            </div>
+                            }
+
+                            <div class="mt-4">
+                                <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+
+                                    <div class="mb-3">
+                                        <label for="email">Email Address</label>
+                                        <input type="email" class="form-control" id="email" formControlName="email"
+                                            [ngClass]="{ 'is-invalid': submitted && f?.email?.errors }"
+                                            placeholder="Enter your email address" [disabled]="isLoading">
+                                        @if(submitted && f?.email?.errors){
+                                        <div class="invalid-feedback">
+                                            @if(f.email.errors.required){
+                                            <div>Email is required</div>
+                                            }
+                                            @if(f.email.errors.email){
+                                            <div>Please enter a valid email address</div>
+                                            }
+                                        </div>}
+                                    </div>
+
+                                    <div class="mt-3 d-grid">
+                                        <button class="btn btn-primary btn-block" type="submit"
+                                            [disabled]="isLoading || registerForm?.invalid">
+                                            @if(isLoading){
+                                            <span class="spinner-border spinner-border-sm me-2" role="status"
+                                                aria-hidden="true"></span>
+                                            Processing...
+                                            } @else {
+                                            Register Employee
+                                            }
+                                        </button>
+                                    </div>
+                                </form>
+                                
+                                <div class="mt-3 d-grid">
+                                    <button class="btn btn-outline-secondary btn-block" type="button"
+                                        (click)="goToLogin()">
+                                        Back to Login
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- end col -->
+    </div>
+    <!-- end row -->
+</div>
+<!-- end container-fluid -->

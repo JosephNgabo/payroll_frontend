@@ -1,61 +1,44 @@
 import { NgModule } from '@angular/core';
-import { CommonModule, DatePipe } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-
-// module
-import { AccessManagementRoutingModule } from './access-management-routing.module';
-
-// bootstrap module
-import { NgxSliderModule } from 'ngx-slider-v2';
-import { TabsModule } from 'ngx-bootstrap/tabs';
-import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
+import { NgbDropdownModule, NgbModalModule, NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgApexchartsModule } from 'ng-apexcharts';
+import { NgSelectModule } from '@ng-select/ng-select';
 import { ModalModule } from 'ngx-bootstrap/modal';
 import { PaginationModule } from 'ngx-bootstrap/pagination';
-import { NgSelectModule } from '@ng-select/ng-select';
-import { BsDatepickerModule } from 'ngx-bootstrap/datepicker';
-
-// Swiper Slider
-import { SlickCarouselModule } from 'ngx-slick-carousel';
-// component
+import { AccessManagementRoutingModule } from './access-management-routing.module';
 import { UsersComponent } from './users/users.component';
-// dropzone
-import { DropzoneModule } from 'ngx-dropzone-wrapper';
-import { DROPZONE_CONFIG } from 'ngx-dropzone-wrapper';
-import { DropzoneConfigInterface } from 'ngx-dropzone-wrapper';
+import { PermissionsComponent } from './permissions/permissions.component';
+import { RolesComponent } from './roles/roles.component';
+import { RoleDetailsComponent } from './roles/role-details/role-details.component';
+import { GroupsComponent } from './groups/groups.component';
 import { PagetitleComponent } from 'src/app/shared/ui/pagetitle/pagetitle.component';
-
-const DEFAULT_DROPZONE_CONFIG: DropzoneConfigInterface = {
-  // Change this to your upload POST address:
-  url: 'https://httpbin.org/post',
-  maxFilesize: 50,
-  acceptedFiles: 'image/*'
-};
+import { SharedModule } from '../../shared/shared.module';
+import { GroupDetailsComponent } from './groups/group-details.component';
 
 @NgModule({
-  declarations: [ UsersComponent],
+  declarations: [
+    UsersComponent,
+    PermissionsComponent,
+    RolesComponent,
+    RoleDetailsComponent,
+    GroupsComponent,
+    GroupDetailsComponent
+  ],
   imports: [
     CommonModule,
-    AccessManagementRoutingModule,
-    TabsModule.forRoot(),
-    ModalModule.forRoot(),
     FormsModule,
-    SlickCarouselModule,
-    BsDropdownModule.forRoot(),
     ReactiveFormsModule,
-    NgxSliderModule,
+    NgbDropdownModule,
+    NgbModalModule,
+    NgbPaginationModule,
+    NgApexchartsModule,
     NgSelectModule,
+    ModalModule.forRoot(),
     PaginationModule.forRoot(),
-    BsDatepickerModule.forRoot(),
-    DropzoneModule,
-    PagetitleComponent
-  ],
-  providers: [
-    DatePipe,
-    {
-      provide: DROPZONE_CONFIG,
-      useValue: DEFAULT_DROPZONE_CONFIG
-    }
-  ],
-
+    AccessManagementRoutingModule,
+    PagetitleComponent,
+    SharedModule
+  ]
 })
 export class AccessManagementModule { }

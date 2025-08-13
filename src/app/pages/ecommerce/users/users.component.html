@@ -27,7 +27,23 @@
     </div>
   </div>
 
-  <div class="row">
+  <!-- Access Denied Message -->
+  <div class="row" *ngIf="!hasAnyUserPermission()">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-body text-center">
+          <div class="alert alert-warning" role="alert">
+            <i class="mdi mdi-alert-circle font-size-24 me-2"></i>
+            <strong>Access Denied</strong>
+            <p class="mb-0 mt-2">You don't have permission to access the Users Management module.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Users Management Content -->
+  <div class="row" *ngIf="hasAnyUserPermission()">
     <div class="col-lg-12">
       <div class="card">
         <div class="card-body">
@@ -42,7 +58,10 @@
             </div>
             <div class="col-sm-8">
               <div class="text-sm-end">
-                <button type="button" class="btn btn-primary btn-rounded mb-2 me-2" (click)="openModal(showModal)" [disabled]="isLoading">
+                <button type="button" class="btn btn-primary btn-rounded mb-2 me-2" 
+                        (click)="openModal(showModal)" 
+                        [disabled]="isLoading || !canCreateUser()"
+                        *ngIf="canCreateUser()">
                   <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
                   <i class="mdi mdi-plus me-1" *ngIf="!isLoading"></i> {{ isLoading ? 'Loading...' : 'Add New User' }}
                 </button>
@@ -64,7 +83,7 @@
           </div>
 
           <!-- User Table -->
-          <div *ngIf="!isLoading && !error" class="table-responsive">
+          <div *ngIf="!isLoading && !error && canViewUsers()" class="table-responsive">
             <table class="table align-middle table-nowrap table-check">
               <thead>
                 <tr>
@@ -85,20 +104,35 @@
                   <td>{{ user.email }}</td>
                   <td>{{ user.title }}</td>
                   <td>
-                    <span class="badge" [ngClass]="{'bg-success': user.is_active, 'bg-danger': !user.is_active}"
-                          style="cursor:pointer" (click)="openStatusModal(user, statusModal)">
+                    <span class="badge" 
+                          [ngClass]="{'bg-success': user.is_active, 'bg-danger': !user.is_active}"
+                          [style.cursor]="canUpdateUserStatus() ? 'pointer' : 'default'"
+                          [title]="canUpdateUserStatus() ? 'Click to change status' : 'Status cannot be changed'"
+                          (click)="canUpdateUserStatus() ? openStatusModal(user, statusModal) : null"
+                          *ngIf="canUpdateUserStatus()">
+                      {{ user.is_active ? 'Active' : 'Inactive' }}
+                    </span>
+                    <span class="badge" 
+                          [ngClass]="{'bg-success': user.is_active, 'bg-danger': !user.is_active}"
+                          *ngIf="!canUpdateUserStatus()">
                       {{ user.is_active ? 'Active' : 'Inactive' }}
                     </span>
                   </td>
                   <td>
                     <div class="d-flex gap-2">
-                      <button type="button" class="btn btn-success btn-sm btn-rounded" (click)="editModal(user, showModal)">
+                      <button type="button" class="btn btn-success btn-sm btn-rounded" 
+                              (click)="editModal(user, showModal)"
+                              *ngIf="canUpdateUser()">
                         <i class="mdi mdi-pencil font-size-16"></i>
                       </button>
-                      <button type="button" class="btn btn-danger btn-sm btn-rounded ms-1" (click)="confirmDelete(user.id)">
+                      <button type="button" class="btn btn-danger btn-sm btn-rounded ms-1" 
+                              (click)="confirmDelete(user.id)"
+                              *ngIf="canDeleteUser()">
                         <i class="mdi mdi-delete font-size-16"></i>
                       </button>
-                      <button type="button" class="btn btn-warning btn-sm btn-rounded ms-1" (click)="openPasswordModal(user, passwordModal)">
+                      <button type="button" class="btn btn-warning btn-sm btn-rounded ms-1" 
+                              (click)="openPasswordModal(user, passwordModal)"
+                              *ngIf="canResetUserPassword()">
                         <i class="mdi mdi-lock-reset font-size-16"></i>
                       </button>
                     </div>
@@ -111,8 +145,17 @@
             </table>
           </div>
 
+          <!-- No View Permission Message -->
+          <div *ngIf="!isLoading && !error && !canViewUsers()" class="text-center">
+            <div class="alert alert-info" role="alert">
+              <i class="mdi mdi-information font-size-24 me-2"></i>
+              <strong>No View Permission</strong>
+              <p class="mb-0 mt-2">You don't have permission to view users.</p>
+            </div>
+          </div>
+
           <!-- Pagination -->
-          <div *ngIf="!isLoading && !error && totalRecords > 0" class="row justify-content-md-between align-items-md-center mt-3">
+          <div *ngIf="!isLoading && !error && totalRecords > 0 && canViewUsers()" class="row justify-content-md-between align-items-md-center mt-3">
             <div class="col-sm-12 col-md-5">
               <div class="dataTables_info mb-2" role="status" aria-live="polite">
                 Showing page {{ currentPage }} of {{ totalPages }}
@@ -129,7 +172,6 @@
       </div>
     </div>
   </div>
-</div>
 
 <!-- Add/Edit User Modal -->
 <ng-template #showModal let-modal>
@@ -315,3 +357,5 @@
     </form>
   </div>
 </ng-template>
+
+</div>

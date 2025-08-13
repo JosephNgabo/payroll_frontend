@@ -1,0 +1,113 @@
+// Employee Registration Component Styles - Matching Login Page
+
+.auth-full-bg {
+    // background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    position: relative;
+}
+
+.bg-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    // background: rgba(188, 200, 212, 0.3);
+}
+
+.auth-full-page-content {
+    background-color: #f8f9fa;
+    
+    // Center the welcome section
+    .my-auto > div:first-child {
+        text-align: center;
+        max-width: 400px;
+        margin: 0 auto;
+    }
+    
+    // Reduced width for inputs and buttons
+    form {
+        max-width: 400px;
+        margin: 0 auto;
+    }
+    
+    .form-control {
+        width: 100%;
+    }
+    
+    .btn {
+        width: 100%;
+    }
+    
+    .input-group {
+        width: 100%;
+    }
+    
+    .form-check {
+        width: 100%;
+    }
+    
+    .float-end {
+        width: 100%;
+        text-align: right;
+    }
+    
+    // Center the "Back to Login" button container
+    .mt-3.d-grid {
+        max-width: 400px;
+        margin: 0 auto;
+    }
+}
+
+.text-primary {
+    color: #667eea !important;
+}
+
+.btn-primary {
+    background-color: #667eea;
+    border-color: #667eea;
+    
+    &:hover {
+        background-color: #5a6fd8;
+        border-color: #5a6fd8;
+    }
+}
+
+.btn-outline-secondary {
+    border-color: #6c757d;
+    color: #6c757d;
+    
+    &:hover {
+        background-color: #6c757d;
+        border-color: #6c757d;
+        color: white;
+    }
+}
+
+// Carousel styles
+.auth-review-carousel {
+    .item {
+        text-align: center;
+    }
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+    .auth-full-bg {
+        display: none;
+    }
+    
+    .col-xl-6.col-lg-6.col-md-6.col-sm-12 {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+    
+    .auth-full-page-content {
+        .form-control,
+        .btn,
+        .input-group,
+        .form-check,
+        .float-end {
+            max-width: 100%;
+        }
+    }
+}

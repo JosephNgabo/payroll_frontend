@@ -2,9 +2,7 @@ import { Component, OnInit, AfterViewInit, ElementRef, ViewChild, Input, OnChang
 import MetisMenu from 'metismenujs';
 import { EventService } from '../../core/services/event.service';
 import { Router, NavigationEnd, RouterModule } from '@angular/router';
-
 import { HttpClient } from '@angular/common/http';
-
 import { MENU } from './menu';
 import { MenuItem } from './menu.model';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
@@ -27,12 +25,22 @@ export class SidebarComponent implements OnInit, AfterViewInit, OnChanges {
   @Input() isCondensed = false;
   menu: any;
   data: any;
+  session=window.sessionStorage;
+  user=this.session.getItem('current_user');
+  permissions:any[];
 
   menuItems: MenuItem[] = [];
+  menuItems2: MenuItem[] = [];
 
   @ViewChild('sideMenu') sideMenu: ElementRef;
 
-  constructor(private eventService: EventService, private router: Router, public translate: TranslateService, private http: HttpClient) {
+  constructor(
+    private eventService: EventService, 
+    private router: Router, 
+    public translate: TranslateService, 
+    private http: HttpClient
+  ) {
+    this.session = window.sessionStorage;
     this.router.events.subscribe((event) => {
       if (event instanceof NavigationEnd) {
         this.handleSidebarOnRoute(event.urlAfterRedirects);
@@ -41,8 +49,11 @@ export class SidebarComponent implements OnInit, AfterViewInit, OnChanges {
   }
 
   ngOnInit() {
+    this.permissions=JSON.parse(this.user).permissions;
+    console.log(this.permissions);
     this.initialize();
     this._scrollElement();
+
   }
 
   ngAfterViewInit() {
@@ -93,89 +104,128 @@ export class SidebarComponent implements OnInit, AfterViewInit, OnChanges {
     this._removeAllClass('mm-show');
     const links = document.getElementsByClassName('side-nav-link-ref');
     let menuItemEl = null;
-    // tslint:disable-next-line: prefer-for-of
     const paths = [];
-    for (let i = 0; i < links.length; i++) {
-      paths.push(links[i]['pathname']);
-    }
-    var itemIndex = paths.indexOf(window.location.pathname);
-    if (itemIndex === -1) {
-      const strIndex = window.location.pathname.lastIndexOf('/');
-      const item = window.location.pathname.substr(0, strIndex).toString();
-      menuItemEl = links[paths.indexOf(item)];
-    } else {
-      menuItemEl = links[itemIndex];
-    }
-    if (menuItemEl) {
-      menuItemEl.classList.add('active');
-      const parentEl = menuItemEl.parentElement;
-      if (parentEl) {
-        parentEl.classList.add('mm-active');
-        const parent2El = parentEl.parentElement.closest('ul');
-        if (parent2El && parent2El.id !== 'side-menu') {
-          parent2El.classList.add('mm-show');
-          const parent3El = parent2El.parentElement;
-          if (parent3El && parent3El.id !== 'side-menu') {
-            parent3El.classList.add('mm-active');
-            const childAnchor = parent3El.querySelector('.has-arrow');
-            const childDropdown = parent3El.querySelector('.has-dropdown');
-            if (childAnchor) { childAnchor.classList.add('mm-active'); }
-            if (childDropdown) { childDropdown.classList.add('mm-active'); }
-            const parent4El = parent3El.parentElement;
-            if (parent4El && parent4El.id !== 'side-menu') {
-              parent4El.classList.add('mm-show');
-              const parent5El = parent4El.parentElement;
-              if (parent5El && parent5El.id !== 'side-menu') {
-                parent5El.classList.add('mm-active');
-                const childanchor = parent5El.querySelector('.is-parent');
-                if (childanchor && parent5El.id !== 'side-menu') { childanchor.classList.add('mm-active'); }
-              }
-            }
-          }
+    Array.from(links).forEach((link) => {
+      paths.push(link['pathname']);
+    });
+    const matchingMenuItem = paths.find((path) => {
+      const pathname = window.location.pathname;
+      if (pathname === path) {
+        return true;
+      }
+      if (pathname.charAt(0) !== '/' && pathname.charAt(pathname.length - 1) !== '/') {
+        if (pathname + '/' === path) {
+          return true;
         }
       }
+      if (path.charAt(0) !== '/' && path.charAt(path.length - 1) !== '/') {
+        if (path + '/' === pathname) {
+          return true;
+        }
+      }
+      return false;
+    });
+    if (matchingMenuItem == null) {
+      const activeId = sessionStorage.getItem('active_ul');
+      if (activeId) {
+        document.getElementById(activeId)?.classList.add('mm-show');
+      }
+    } else {
+      menuItemEl = document.querySelector('[href="' + matchingMenuItem + '"]');
+      if (menuItemEl) {
+        menuItemEl.classList.add('active');
+        const parentEl = menuItemEl.parentElement;
+        if (parentEl) {
+          parentEl.classList.add('mm-active');
+          const parent2El = parentEl.parentElement.closest('ul');
+          if (parent2El && parent2El.id !== 'side-menu') {
+            parent2El.classList.add('mm-show');
+            const parent3El = parent2El.parentElement;
+            if (parent3El && parent3El.id !== 'side-menu') {
+              parent3El.classList.add('mm-active');
+              const childAnchor = parent3El.querySelector('.has-arrow');
+              const childDropdown = parent3El.querySelector('.has-dropdown');
+              if (childAnchor) childAnchor.classList.add('mm-active');
+              if (childDropdown) childDropdown.classList.add('mm-show');
+              const parent4El = parent3El.parentElement;
+              if (parent4El && parent4El.id !== 'side-menu') {
+                parent4El.classList.add('mm-show');
+                const parent5El = parent4El.parentElement;
+                if (parent5El && parent5El.id !== 'side-menu') {
+                  parent5El.classList.add('mm-active');
+                  const childanchor = parent5El.querySelector('.is-parent');
+                  if (childanchor && parent5El.id !== 'side-menu') {
+                    childanchor.classList.add('mm-active');
+                  }
+                }
+              }
+            }
+            sessionStorage.setItem('active_ul', parent2El.id);
+          } else {
+            sessionStorage.removeItem('active_ul');
+          }
+        }
+        sessionStorage.setItem('active_ul', parentEl.id);
+      }
     }
-
   }
 
   /**
    * Initialize
    */
   initialize(): void {
-    this.menuItems = MENU;
+    if(this.permissions.length>0){
+      let menu=MENU.filter(item=>{
+        if(item.p_id && this.permissions.includes(item.p_id) || item.p_id==1){
+          return item;
+        }
+      });
+      this.menuItems2=menu;
+    }else{
+      this.menuItems2=[];
+    }
+    this.menuItems = [];
   }
+  
 
   /**
-   * Returns true or false if given menu item has child or not
+   * Returns true or false if given menu has any child menu.
    * @param item menuItem
    */
   hasItems(item: MenuItem) {
     return item.subItems !== undefined ? item.subItems.length > 0 : false;
   }
 
-  hideSidebar() {
-    document.body.classList.remove('sidebar-enable');
-    document.body.classList.add('vertical-collpsed');
-  }
-
-  handleSidebarOnRoute(url: string) {
-    if (url === '/employees' || url === '/employees/employees-view') {
-      // Hide sidebar for large forms
-      document.body.classList.remove('sidebar-enable');
-      document.body.classList.add('vertical-collpsed');
-    } else {
-      // Show sidebar for other routes
-      document.body.classList.add('sidebar-enable');
-      document.body.classList.remove('vertical-collpsed');
-    }
+  showMenu(item: MenuItem) {
+    console.log(item);
+    return this.permissions.includes(item.p_id);
   }
 
   /**
-   * Handle menu item click (placeholder to prevent errors)
+   * Toggle the menu bar when having mobile screen
+   */
+  hideSidebar() {
+    this.eventService.broadcast('collapse', true);
+  }
+
+  /**
+   * Handles the click
+   */
+  handleSidebarOnRoute(url: string) {
+    if (this.menu) {
+      this.menu.dispose();
+    }
+    this.menu = new MetisMenu(this.sideMenu.nativeElement);
+    this._activateMenuDropdown();
+  }
+
+  /**
+   * on menu click
    */
   onMenuItemClick(item: any) {
-    // You can add logic here if needed, e.g., navigation, analytics, etc.
-    // For now, just log the item
-    // console.log('Menu item clicked:', item);
+    if (item.subItems && item.subItems.length > 0) {
+      return;
+    }
+    this.hideSidebar();
   }
 }
