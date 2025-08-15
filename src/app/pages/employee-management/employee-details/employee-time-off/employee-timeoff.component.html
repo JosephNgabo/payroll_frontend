@@ -1,89 +1,204 @@
 <div class="bg-white p-4 rounded shadow-sm mb-4">
   <div class="d-flex justify-content-between align-items-center mb-4">
     <h6 class="mb-0">About Time Off</h6>
-    <button class="btn btn-primary btn-sm">Book time off</button>
+    <div>
+      <button class="btn btn-primary btn-sm me-2" (click)="openAddModal()">
+        <i class="fas fa-plus me-1"></i>Add New Balance
+      </button>
+      <!-- <button class="btn btn-outline-primary btn-sm">Book time off</button> -->
+    </div>
   </div>
-  <div class="row gap-3 mb-4">
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="text-center py-4">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+    <p class="mt-2">Loading time-off balances...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error" class="alert alert-danger" role="alert">
+    <i class="mdi mdi-alert-circle me-2"></i>
+    {{ error }}
+    <button type="button" class="btn btn-primary btn-sm ms-3" (click)="loadEmployeeTimeOffBalances()">Try Again</button>
+  </div>
+
+  <!-- Time Off Summary Cards -->
+  <div class="row gap-3 mb-4" *ngIf="!isLoading && !error">
     <div class="col-md-3">
       <div class="summary-card">
         <div class="icon-circle"><i class="fas fa-umbrella-beach text-primary"></i></div>
-        <h5>06 days</h5>
+        <h5>{{ totalDaysToBook }} days</h5>
         <p class="mb-0">To book time off</p>
       </div>
     </div>
     <div class="col-md-3">
       <div class="summary-card pending">
         <div class="icon-circle"><i class="fas fa-hourglass-half text-warning"></i></div>
-        <h5>2 pending requests</h5>
+        <h5>{{ totalPendingRequests }} pending requests</h5>
         <p class="mb-0">Awaiting admin approval</p>
       </div>
     </div>
     <div class="col-md-3">
       <div class="summary-card">
         <div class="icon-circle"><i class="fas fa-calendar-check text-primary"></i></div>
-        <h5>15 days</h5>
+        <h5>{{ totalDaysInContract }} days</h5>
         <p class="mb-0">In the contract</p>
       </div>
     </div>
     <div class="col-md-3">
       <div class="summary-card upcoming">
         <div class="icon-circle"><i class="fas fa-arrow-alt-circle-down text-info"></i></div>
-        <h5>0 days</h5>
-        <p class="mb-0">0 days taken</p>
+        <h5>{{ totalDaysTaken }} days</h5>
+        <p class="mb-0">Days taken</p>
       </div>
     </div>
     <div class="col-md-3">
       <div class="summary-card extra">
         <div class="icon-circle"><i class="fas fa-suitcase-rolling text-success"></i></div>
-        <h5>0 days</h5>
+        <h5>{{ totalCarryoverDays }} days</h5>
         <p class="mb-0">Carryover / Allowances</p>
       </div>
     </div>
   </div>
-  <div class="mb-4">
-    <h6 class="mb-3">Requested time off</h6>
+  <!-- Time Off Balances -->
+  <div class="mb-4" *ngIf="!isLoading && !error">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h6 class="mb-0">Time Off Balances</h6>
+      <div class="d-flex gap-2">
+        <button class="btn btn-outline-secondary btn-sm" (click)="toggleSearchFilters()">
+          <i class="fas fa-filter me-1"></i>
+          {{ showSearchFilters ? 'Hide' : 'Show' }} Filters
+        </button>
+        <button *ngIf="searchTerm || selectedYearFilter || selectedTypeFilter" 
+                class="btn btn-outline-danger btn-sm" 
+                (click)="clearSearchFilters()">
+          <i class="fas fa-times me-1"></i>Clear
+        </button>
+      </div>
+    </div>
+
+    <!-- Search and Filter Section -->
+    <div class="card mb-3" *ngIf="showSearchFilters">
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-4 mb-2">
+            <label for="searchInput" class="form-label">Search</label>
+            <input 
+              type="text" 
+              class="form-control form-control-sm" 
+              id="searchInput"
+              placeholder="Search by type, code, year, days..."
+              [(ngModel)]="searchTerm"
+              (input)="onSearchChange()">
+          </div>
+          <div class="col-md-4 mb-2">
+            <label for="yearFilter" class="form-label">Year</label>
+            <select 
+              class="form-select form-select-sm" 
+              id="yearFilter"
+              [(ngModel)]="selectedYearFilter"
+              (change)="onYearFilterChange()">
+              <option [value]="null">All Years</option>
+              <option *ngFor="let year of availableYears" [value]="year">{{ year }}</option>
+            </select>
+          </div>
+          <div class="col-md-4 mb-2">
+            <label for="typeFilter" class="form-label">Time Off Type</label>
+            <select 
+              class="form-select form-select-sm" 
+              id="typeFilter"
+              [(ngModel)]="selectedTypeFilter"
+              (change)="onTypeFilterChange()">
+              <option [value]="''">All Types</option>
+              <option *ngFor="let type of timeOffTypes" [value]="type.id">
+                {{ type.name }} ({{ type.code }})
+              </option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Search Results Summary -->
+    <div class="alert alert-info py-2 mb-3" *ngIf="searchTerm || selectedYearFilter || selectedTypeFilter">
+      <small>
+        <i class="fas fa-info-circle me-1"></i>
+        Showing {{ filteredTimeOffBalances.length }} of {{ timeOffBalances.length }} records
+        <span *ngIf="searchTerm"> • Search: "{{ searchTerm }}"</span>
+        <span *ngIf="selectedYearFilter"> • Year: {{ selectedYearFilter }}</span>
+        <span *ngIf="selectedTypeFilter"> • Type: {{ getTimeOffTypeNameById(selectedTypeFilter) }}</span>
+      </small>
+    </div>
+
     <div class="table-responsive">
       <table class="table table-bordered align-middle">
         <thead class="table-light">
           <tr>
-            <th>LEAVE TYPE</th>
-            <th>DURATION</th>
-            <th>DATE FROM</th>
-            <th>DATE TO</th>
-            <th>NOTES</th>
-            <th>ADDED ON</th>
+            <th>TIME OFF TYPE</th>
+            <th>YEAR</th>
+            <th>TOTAL DAYS</th>
+            <th>USED DAYS</th>
+            <th>REMAINING DAYS</th>
+            <th>PENDING DAYS</th>
+            <th>CARRIED OVER</th>
             <th>ACTION</th>
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <td>Time off</td>
-            <td>2 days, 4 hours</td>
-            <td>2024-05-20</td>
-            <td>2024-05-22</td>
-            <td>Going on vacation</td>
-            <td>2024-05-20</td>
-            <td><i class="fas fa-ellipsis-h text-muted"></i></td>
-          </tr>
-          <tr>
-            <td>Sick</td>
-            <td>1 day</td>
-            <td>2024-05-14</td>
-            <td>2024-05-14</td>
-            <td>-</td>
-            <td>2024-05-14</td>
-            <td><i class="fas fa-ellipsis-h text-muted"></i></td>
+          <tr *ngFor="let balance of filteredTimeOffBalances">
+            <td>
+              <div>
+                <strong>{{ getTimeOffTypeName(balance) }}</strong>
+                <br>
+                <small class="text-muted">{{ getTimeOffTypeCode(balance) }}</small>
+              </div>
+            </td>
+            <td>{{ balance.year }}</td>
+            <td>
+              <span class="badge badge-pill badge-soft-primary">{{ balance.total_days }} days</span>
+            </td>
+            <td>
+              <span class="badge badge-pill badge-soft-info">{{ balance.used_days }} days</span>
+            </td>
+            <td>
+              <span class="badge badge-pill badge-soft-success">{{ balance.remaining_days }} days</span>
+            </td>
+            <td>
+              <span class="badge badge-pill badge-soft-warning" *ngIf="balance.pending_days > 0">{{ balance.pending_days }} days</span>
+              <span class="text-muted" *ngIf="balance.pending_days === 0">-</span>
+            </td>
+            <td>
+              <span class="badge badge-pill badge-soft-secondary" *ngIf="balance.carried_over_days > 0">{{ balance.carried_over_days }} days</span>
+              <span class="text-muted" *ngIf="balance.carried_over_days === 0">-</span>
+            </td>
+                          <td>
+                <div class="d-flex gap-1">
+                  <button class="btn btn-outline-primary btn-sm" (click)="openEditModal(balance)" title="Edit">
+                    <i class="fas fa-edit"></i>
+                  </button>
+                  <button class="btn btn-outline-danger btn-sm" (click)="openDeleteModal(balance)" title="Delete">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </div>
+              </td>
           </tr>
         </tbody>
       </table>
     </div>
-    <p class="text-muted small text-center">2 records</p>
+    <p class="text-muted small text-center" *ngIf="filteredTimeOffBalances.length > 0">
+      {{ filteredTimeOffBalances.length }} of {{ timeOffBalances.length }} record(s)
+    </p>
+    <div class="text-center py-4" *ngIf="filteredTimeOffBalances.length === 0">
+      <p class="text-muted" *ngIf="timeOffBalances.length === 0">No time-off balances found for this employee.</p>
+      <p class="text-muted" *ngIf="timeOffBalances.length > 0">No time-off balances match your search criteria.</p>
+    </div>
   </div>
   <div>
-    <div class="d-flex justify-content-between align-items-center mb-3">
+    <!-- <div class="d-flex justify-content-between align-items-center mb-3">
       <h6 class="mb-0">Time off summary</h6>
       <button class="btn btn-outline-secondary btn-sm"><i class="fas fa-filter me-2"></i>Filter</button>
-    </div>
+    </div> -->
     <div class="table-responsive">
       <table class="table table-bordered align-middle">
         <thead class="table-light">
@@ -123,5 +238,233 @@
       </table>
     </div>
     <p class="text-muted small text-center">2 records</p>
+  </div>
+</div>
+
+<!-- Add New Time-Off Balance Modal -->
+<div class="modal fade" [class.show]="showAddModal" [style.display]="showAddModal ? 'block' : 'none'" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">
+          <i class="fas fa-plus-circle me-2"></i>Add New Time-Off Balance
+        </h5>
+        <button type="button" class="btn-close" (click)="closeAddModal()"></button>
+      </div>
+      <div class="modal-body">
+        <form [formGroup]="timeOffBalanceForm" (ngSubmit)="onSubmit()">
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label for="time_off_type_id" class="form-label">Time Off Type *</label>
+              <select class="form-select" id="time_off_type_id" formControlName="time_off_type_id">
+                <option value="">Select Time Off Type</option>
+                <option *ngFor="let type of timeOffTypes" [value]="type.id">
+                  {{ type.name }} ({{ type.code }})
+                </option>
+              </select>
+              <div *ngIf="timeOffBalanceForm.get('time_off_type_id')?.invalid && timeOffBalanceForm.get('time_off_type_id')?.touched" class="text-danger small">
+                Time off type is required
+              </div>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="year" class="form-label">Year *</label>
+              <input type="number" class="form-control" id="year" formControlName="year" min="2020" max="2030">
+              <div *ngIf="timeOffBalanceForm.get('year')?.invalid && timeOffBalanceForm.get('year')?.touched" class="text-danger small">
+                Valid year is required (2020-2030)
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-4 mb-3">
+              <label for="total_days" class="form-label">Total Days *</label>
+              <input type="number" class="form-control" id="total_days" formControlName="total_days" min="0" step="0.5">
+              <div *ngIf="timeOffBalanceForm.get('total_days')?.invalid && timeOffBalanceForm.get('total_days')?.touched" class="text-danger small">
+                Total days must be 0 or greater
+              </div>
+            </div>
+            <div class="col-md-4 mb-3">
+              <label for="used_days" class="form-label">Used Days *</label>
+              <input type="number" class="form-control" id="used_days" formControlName="used_days" min="0" step="0.5">
+              <div *ngIf="timeOffBalanceForm.get('used_days')?.invalid && timeOffBalanceForm.get('used_days')?.touched" class="text-danger small">
+                Used days must be 0 or greater
+              </div>
+            </div>
+            <div class="col-md-4 mb-3">
+              <label for="remaining_days" class="form-label">Remaining Days *</label>
+              <input type="number" class="form-control" id="remaining_days" formControlName="remaining_days" min="0" step="0.5">
+              <div *ngIf="timeOffBalanceForm.get('remaining_days')?.invalid && timeOffBalanceForm.get('remaining_days')?.touched" class="text-danger small">
+                Remaining days must be 0 or greater
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label for="carried_over_days" class="form-label">Carried Over Days *</label>
+              <input type="number" class="form-control" id="carried_over_days" formControlName="carried_over_days" min="0" step="0.5">
+              <div *ngIf="timeOffBalanceForm.get('carried_over_days')?.invalid && timeOffBalanceForm.get('carried_over_days')?.touched" class="text-danger small">
+                Carried over days must be 0 or greater
+              </div>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="pending_days" class="form-label">Pending Days *</label>
+              <input type="number" class="form-control" id="pending_days" formControlName="pending_days" min="0" step="0.5">
+              <div *ngIf="timeOffBalanceForm.get('pending_days')?.invalid && timeOffBalanceForm.get('pending_days')?.touched" class="text-danger small">
+                Pending days must be 0 or greater
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeAddModal()">Cancel</button>
+        <button type="button" class="btn btn-primary" (click)="onSubmit()" [disabled]="isSubmitting || timeOffBalanceForm.invalid">
+          <span *ngIf="isSubmitting" class="spinner-border spinner-border-sm me-2" role="status"></span>
+          <i *ngIf="!isSubmitting" class="fas fa-save me-2"></i>
+          {{ isSubmitting ? 'Creating...' : 'Create Balance' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Backdrop -->
+<div class="modal-backdrop fade show" *ngIf="showAddModal || showEditModal || showDeleteModal"></div>
+
+<!-- Edit Time-Off Balance Modal -->
+<div class="modal fade" [class.show]="showEditModal" [style.display]="showEditModal ? 'block' : 'none'" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">
+          <i class="fas fa-edit me-2"></i>Edit Time-Off Balance
+        </h5>
+        <button type="button" class="btn-close" (click)="closeEditModal()"></button>
+      </div>
+      <div class="modal-body">
+        <form [formGroup]="timeOffBalanceForm" (ngSubmit)="onSubmit()">
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label for="edit_time_off_type_id" class="form-label">Time Off Type *</label>
+              <select class="form-select" id="edit_time_off_type_id" formControlName="time_off_type_id">
+                <option value="">Select Time Off Type</option>
+                <option *ngFor="let type of timeOffTypes" [value]="type.id">
+                  {{ type.name }} ({{ type.code }})
+                </option>
+              </select>
+              <div *ngIf="timeOffBalanceForm.get('time_off_type_id')?.invalid && timeOffBalanceForm.get('time_off_type_id')?.touched" class="text-danger small">
+                Time off type is required
+              </div>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="edit_year" class="form-label">Year *</label>
+              <input type="number" class="form-control" id="edit_year" formControlName="year" min="2020" max="2030">
+              <div *ngIf="timeOffBalanceForm.get('year')?.invalid && timeOffBalanceForm.get('year')?.touched" class="text-danger small">
+                Valid year is required (2020-2030)
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-4 mb-3">
+              <label for="edit_total_days" class="form-label">Total Days *</label>
+              <input type="number" class="form-control" id="edit_total_days" formControlName="total_days" min="0" step="0.5">
+              <div *ngIf="timeOffBalanceForm.get('total_days')?.invalid && timeOffBalanceForm.get('total_days')?.touched" class="text-danger small">
+                Total days must be 0 or greater
+              </div>
+            </div>
+            <div class="col-md-4 mb-3">
+              <label for="edit_used_days" class="form-label">Used Days *</label>
+              <input type="number" class="form-control" id="edit_used_days" formControlName="used_days" min="0" step="0.5">
+              <div *ngIf="timeOffBalanceForm.get('used_days')?.invalid && timeOffBalanceForm.get('used_days')?.touched" class="text-danger small">
+                Used days must be 0 or greater
+              </div>
+            </div>
+            <div class="col-md-4 mb-3">
+              <label for="edit_remaining_days" class="form-label">Remaining Days *</label>
+              <input type="number" class="form-control" id="edit_remaining_days" formControlName="remaining_days" min="0" step="0.5">
+              <div *ngIf="timeOffBalanceForm.get('remaining_days')?.invalid && timeOffBalanceForm.get('remaining_days')?.touched" class="text-danger small">
+                Remaining days must be 0 or greater
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label for="edit_carried_over_days" class="form-label">Carried Over Days *</label>
+              <input type="number" class="form-control" id="edit_carried_over_days" formControlName="carried_over_days" min="0" step="0.5">
+              <div *ngIf="timeOffBalanceForm.get('carried_over_days')?.invalid && timeOffBalanceForm.get('carried_over_days')?.touched" class="text-danger small">
+                Carried over days must be 0 or greater
+              </div>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="edit_pending_days" class="form-label">Pending Days *</label>
+              <input type="number" class="form-control" id="edit_pending_days" formControlName="pending_days" min="0" step="0.5">
+              <div *ngIf="timeOffBalanceForm.get('pending_days')?.invalid && timeOffBalanceForm.get('pending_days')?.touched" class="text-danger small">
+                Pending days must be 0 or greater
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeEditModal()">Cancel</button>
+        <button type="button" class="btn btn-primary" (click)="onSubmit()" [disabled]="isSubmitting || timeOffBalanceForm.invalid">
+          <span *ngIf="isSubmitting" class="spinner-border spinner-border-sm me-2" role="status"></span>
+          <i *ngIf="!isSubmitting" class="fas fa-save me-2"></i>
+          {{ isSubmitting ? 'Updating...' : 'Update Balance' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" [class.show]="showDeleteModal" [style.display]="showDeleteModal ? 'block' : 'none'" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">
+          <i class="fas fa-exclamation-triangle text-danger me-2"></i>Delete Time-Off Balance
+        </h5>
+        <button type="button" class="btn-close" (click)="closeDeleteModal()"></button>
+      </div>
+      <div class="modal-body">
+        <div class="alert alert-warning" role="alert">
+          <i class="fas fa-exclamation-triangle me-2"></i>
+          <strong>Warning:</strong> This action cannot be undone.
+        </div>
+        <p>Are you sure you want to delete this time-off balance?</p>
+        <div class="card">
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-6">
+                <strong>Time Off Type:</strong><br>
+                <span class="text-muted">{{ selectedBalance?.time_off_type?.name }} ({{ selectedBalance?.time_off_type?.code }})</span>
+              </div>
+              <div class="col-md-6">
+                <strong>Year:</strong><br>
+                <span class="text-muted">{{ selectedBalance?.year }}</span>
+              </div>
+            </div>
+            <div class="row mt-2">
+              <div class="col-md-6">
+                <strong>Total Days:</strong><br>
+                <span class="text-muted">{{ selectedBalance?.total_days }} days</span>
+              </div>
+              <div class="col-md-6">
+                <strong>Remaining Days:</strong><br>
+                <span class="text-muted">{{ selectedBalance?.remaining_days }} days</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeDeleteModal()">Cancel</button>
+        <button type="button" class="btn btn-danger" (click)="onDelete()" [disabled]="isSubmitting">
+          <span *ngIf="isSubmitting" class="spinner-border spinner-border-sm me-2" role="status"></span>
+          <i *ngIf="!isSubmitting" class="fas fa-trash me-2"></i>
+          {{ isSubmitting ? 'Deleting...' : 'Delete Balance' }}
+        </button>
+      </div>
+    </div>
   </div>
 </div> 

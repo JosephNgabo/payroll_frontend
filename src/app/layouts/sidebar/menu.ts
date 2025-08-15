@@ -87,6 +87,13 @@ export const MENU: MenuItem[] = [
     },
     {
         id: 9,
+        label: 'Time Off Types',
+        icon: 'bx-calendar-check',
+        link: '/time-off-types',
+        p_id:6005,
+    },
+    {
+        id: 10,
         label: 'Payroll',
         icon: 'bx-calculator',
         link: '/payroll/list',
@@ -110,7 +117,7 @@ export const MENU: MenuItem[] = [
         icon: 'bx-calendar',
         link: '/employee-portal/leave-management',
         parentId: 12,
-        p_id:7003
+        p_id:7002
     },
     {
         id: 113,

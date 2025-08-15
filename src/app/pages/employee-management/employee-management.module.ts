@@ -35,6 +35,7 @@ import { EmployeePersonalComponent } from './employee-details/employee-personal/
 import { EmployeeJobComponent } from './employee-details/employee-job/employee-job.component';
 import { EmployeeBankInfoComponent } from './employee-details/employee-bank-info/employee-bank-info.component';
 import { EmployeePayHistoryComponent } from './employee-details/employee-pay-history/employee-pay-history.component';
+import { EmployeeTimeoffComponent } from './employee-details/employee-time-off/employee-timeoff.component';
 import { SharedModule } from '../../shared/shared.module';
 
 
@@ -55,6 +56,7 @@ const DEFAULT_DROPZONE_CONFIG: DropzoneConfigInterface = {
     EmployeeJobComponent,
     EmployeeBankInfoComponent,
     EmployeePayHistoryComponent,
+    EmployeeTimeoffComponent,
     EmployeeSearchPipe
   ],
   imports: [
