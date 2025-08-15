@@ -1,0 +1,109 @@
+<div class="container-fluid">
+    <!-- Page title -->
+    <div class="row">
+      <div class="col-12">
+        <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+          <h4 class="mb-sm-0">Workflow Management</h4>
+        </div>
+      </div>
+    </div>
+  
+    <!-- Access Denied Message -->
+    <div class="row" *ngIf="!hasAnyWorkflowPermission()">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-body text-center">
+            <div class="alert alert-warning" role="alert">
+              <i class="mdi mdi-alert-circle font-size-24 me-2"></i>
+              <strong>Access Denied</strong>
+              <p class="mb-0 mt-2">You don't have permission to access the Workflow Management module.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  
+    <!-- Workflow Management Content -->
+    <div class="row" *ngIf="hasAnyWorkflowPermission()">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-body">
+            <!-- Skeleton Loader -->
+            <div *ngIf="isLoading">
+              <app-table-skeleton 
+                [columns]="['Name', 'Code', 'Description', 'Entity Type', 'Status', 'Action']" 
+                [rowCount]="5">
+              </app-table-skeleton>
+            </div>
+            <!-- Main Content: Only show when not loading -->
+            <ng-container *ngIf="!isLoading">
+              <div class="row mb-2">
+                <div class="col-sm-4">
+                  <div class="search-box me-2 mb-2 d-inline-block">
+                    <div class="position-relative">
+                      <input type="text" class="form-control" autocomplete="off" id="searchTableList" placeholder="Search workflows..." [(ngModel)]="term" (ngModelChange)="searchWorkflows()">
+                      <i class="bx bx-search-alt search-icon"></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- Table data -->
+              <div class="table-responsive mb-0" *ngIf="canViewWorkflows()">
+                @if(error) {
+                  <div class="alert alert-danger" role="alert">
+                    {{ error }}
+                    <button type="button" class="btn btn-primary mt-2" (click)="loadWorkflows()">Try Again</button>
+                  </div>
+                } @else if(workflows.length === 0) {
+                  <div class="text-center py-4">
+                    <p>No workflows found.</p>
+                  </div>
+                } @else {
+                  <table class="table align-middle table-nowrap dt-responsive nowrap w-100 table-check" id="workflow-list">
+                    <thead class="table-light">
+                      <tr>
+                        <th class="align-middle">Name</th>
+                        <th class="align-middle">Code</th>              
+                        <th class="align-middle">Entity Type</th>
+                        <th class="align-middle">Status</th>
+                        <th class="align-middle">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      @for (workflow of workflows?.data; track $index) {
+                      <tr id="w_{{workflow.id}}">
+                        <td>
+                          <a href="javascript: void(0);" class="text-body fw-bold">{{workflow.name}}</a>
+                        </td>
+                        <td>{{workflow.code}}</td>
+                        <td>{{workflow.entity_type}}</td>
+                        <td>
+                          <span class="badge badge-pill badge-soft-success font-size-11" [ngClass]="{'badge-soft-danger': !workflow.active}">
+                            {{workflow.active ? 'Active' : 'Inactive'}}
+                          </span>
+                        </td>
+                        <td>
+                          <div class="d-flex gap-2">
+                            <button type="button" class="btn btn-primary btn-sm btn-rounded" (click)="navigateToDetails(workflow.id)">View Details</button>
+                          </div>
+                        </td>
+                      </tr>}
+                    </tbody>
+                  </table>
+                }
+              </div>
+  
+              <!-- No View Permission Message -->
+              <div *ngIf="!canViewWorkflows()" class="text-center">
+                <div class="alert alert-info" role="alert">
+                  <i class="mdi mdi-information font-size-24 me-2"></i>
+                  <strong>No View Permission</strong>
+                  <p class="mb-0 mt-2">You don't have permission to view workflows.</p>
+                </div>
+              </div>
+            </ng-container>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div> 

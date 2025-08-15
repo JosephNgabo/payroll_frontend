@@ -34,12 +34,123 @@ export class PayrollDetailsComponent implements OnInit, OnChanges {
     'July', 'August', 'September', 'October', 'November', 'December'
   ];
 
+  // Payroll status mapping based on PHP enum
+  payrollStatusMap: { [key: number]: string } = {
+    1: 'Draft',
+    2: 'Pending',
+    3: 'Approved',
+    4: 'Rejected',
+    5: 'Paid',
+    8: 'Processing',
+    9: 'Cancelled',
+    10: 'Failed',
+    11: 'Closed',
+    12: 'Archived'
+  };
+
+  // Payroll status badge classes
+  payrollStatusBadgeMap: { [key: number]: string } = {
+    1: 'bg-secondary', // Draft
+    2: 'bg-warning',   // Pending
+    3: 'bg-success',   // Approved
+    4: 'bg-danger',    // Rejected
+    5: 'bg-primary',   // Paid
+    8: 'bg-info',      // Processing
+    9: 'bg-dark',      // Cancelled
+    10: 'bg-danger',   // Failed
+    11: 'bg-secondary', // Closed
+    12: 'bg-light text-dark' // Archived
+  };
+
   constructor(
     private route: ActivatedRoute,
     private payrollService: PayrollService,
     private router: Router,
     private modalService: BsModalService
   ) {}
+
+  // Get payroll status label
+  getPayrollStatusLabel(status: number): string {
+    return this.payrollStatusMap[status] || 'Unknown';
+  }
+
+  // Get payroll status badge class
+  getPayrollStatusBadgeClass(status: number): string {
+    return this.payrollStatusBadgeMap[status] || 'bg-secondary';
+  }
+
+  // Get suspended employees count
+  getSuspendedCount(): number {
+    return this.payrollEmployees.filter(emp => emp.employee?.is_active === false).length;
+  }
+
+  // Total calculation methods
+  getTotalBasicSalary(): number {
+    return this.filteredPayrollEmployees.reduce((sum, emp) => {
+      const basicSalary = emp.basic_salary || 0;
+      return sum + (typeof basicSalary === 'string' ? parseFloat(basicSalary.replace(/,/g, '')) : basicSalary);
+    }, 0);
+  }
+
+
+
+  getTotalRSSBEE(): number {
+    return this.filteredPayrollEmployees.reduce((sum, emp) => sum + (emp.total_rssb_employee_deductions || 0), 0);
+  }
+
+  getTotalRSSBER(): number {
+    return this.filteredPayrollEmployees.reduce((sum, emp) => sum + (emp.total_rssb_employer_deductions || 0), 0);
+  }
+
+  getTotalOtherDeductions(): number {
+    return this.filteredPayrollEmployees.reduce((sum, emp) => sum + (emp.total_other_deductions || 0), 0);
+  }
+
+  getTotalPAYE(): number {
+    return this.filteredPayrollEmployees.reduce((sum, emp) => sum + (emp.total_paye_deductions || 0), 0);
+  }
+
+  getTotalNetSalary(): number {
+    return this.filteredPayrollEmployees.reduce((sum, emp) => {
+      const netSalary = emp.net_salary || emp.total_net_salary || 0;
+      return sum + (typeof netSalary === 'string' ? parseFloat(netSalary.replace(/,/g, '')) : netSalary);
+    }, 0);
+  }
+
+  getTotalMassSalary(): number {
+    return this.filteredPayrollEmployees.reduce((sum, emp) => sum + (emp.total_mass_salary || 0), 0);
+  }
+
+  // New calculation methods for updated data structure
+  getTotalAllowances(): number {
+    return this.filteredPayrollEmployees.reduce((sum, emp) => {
+      const allowances = emp.total_allowances || 0;
+      return sum + (typeof allowances === 'string' ? parseFloat(allowances.replace(/,/g, '')) : allowances);
+    }, 0);
+  }
+
+
+
+  getTotalGrossSalary(): number {
+    return this.filteredPayrollEmployees.reduce((sum, emp) => {
+      const grossSalary = emp.total_gross_salary || 0;
+      return sum + (typeof grossSalary === 'string' ? parseFloat(grossSalary.replace(/,/g, '')) : grossSalary);
+    }, 0);
+  }
+
+  getTotalDeductions(): number {
+    return this.filteredPayrollEmployees.reduce((sum, emp) => {
+      const rssbEE = emp.total_rssb_employee_deductions || 0;
+      const otherDeductions = emp.total_other_deductions || 0;
+      const paye = emp.total_paye_deductions || 0;
+      
+      const totalRssbEE = typeof rssbEE === 'string' ? parseFloat(rssbEE.replace(/,/g, '')) : rssbEE;
+      const totalOtherDeductions = typeof otherDeductions === 'string' ? parseFloat(otherDeductions.replace(/,/g, '')) : otherDeductions;
+      const totalPaye = typeof paye === 'string' ? parseFloat(paye.replace(/,/g, '')) : paye;
+      
+      return sum + totalRssbEE + totalOtherDeductions + totalPaye;
+    }, 0);
+  }
 
   ngOnInit(): void {
     this.route.paramMap.subscribe(params => {
@@ -90,6 +201,67 @@ export class PayrollDetailsComponent implements OnInit, OnChanges {
       error: (err) => {
         this.error = 'Failed to load payroll details.';
         this.loading = false;
+      }
+    });
+  }
+
+  requestApproval() {
+    if (!this.payrollId) {
+      Swal.fire({
+        title: 'Error',
+        text: 'Payroll ID not found',
+        icon: 'error',
+        confirmButtonText: 'OK'
+      });
+      return;
+    }
+
+    Swal.fire({
+      title: 'Request Approval',
+      text: 'Are you sure you want to request approval for this payroll?',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#198754',
+      cancelButtonColor: '#6c757d',
+      confirmButtonText: 'Yes, Request Approval',
+      cancelButtonText: 'Cancel'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.loading = true;
+        
+        // Prepare the request payload
+        const payload = {
+          workflow_code: "PAYROLL_APPROVAL", // Payroll Approval workflow
+          entity_type: "payroll",
+          entity_id: this.payrollId
+        };
+
+        // Make API call to initiate workflow
+        this.payrollService.initiateWorkflow(payload).subscribe({
+          next: (response) => {
+            this.loading = false;
+            console.log('Workflow initiated successfully:', response);
+            Swal.fire({
+              title: 'Success!',
+              text: 'Workflow approval request has been initiated successfully',
+              icon: 'success',
+              confirmButtonColor: '#198754',
+              confirmButtonText: 'OK'
+            }).then(() => {
+              this.fetchDetails();
+            });
+          },
+          error: (error) => {
+            this.loading = false;
+            console.error('Error initiating workflow:', error);
+            Swal.fire({
+              title: 'Error',
+              text: error,
+              icon: 'error',
+              confirmButtonText: 'OK'
+            });
+          }
+        });
       }
     });
   }
@@ -256,5 +428,67 @@ export class PayrollDetailsComponent implements OnInit, OnChanges {
   }
   getTotalPaySlip(): number {
     return this.getRssbEmployeeTotal() + this.getRssbEmployerTotal() + this.getAllowanceTotal() + this.getOtherDeductionTotal();
+  }
+
+  exportPayroll() {
+    if (!this.filteredPayrollEmployees || this.filteredPayrollEmployees.length === 0) {
+      Swal.fire({
+        title: 'No Data',
+        text: 'No payroll data available to export',
+        icon: 'warning',
+        confirmButtonText: 'OK'
+      });
+      return;
+    }
+
+    // Create CSV content
+    const headers = [
+      'Employee Name',
+      'Phone',
+      'Basic Salary',
+      'Total Allowances',
+      'Gross Salary',
+      'RSSB EE',
+      'RSSB ER',
+      'Other Deductions',
+      'PAYE',
+      'Net Salary',
+      'Mass Salary'
+    ];
+
+    const csvContent = [
+      headers.join(','),
+      ...this.filteredPayrollEmployees.map(emp => [
+        `"${emp.employee?.first_name} ${emp.employee?.last_name}"`,
+        emp.employee?.personal_mobile || '',
+        emp.basic_salary || 0,
+        emp.total_allowances || 0,
+        emp.total_gross_salary || 0,
+        emp.total_rssb_employee_deductions || 0,
+        emp.total_rssb_employer_deductions || 0,
+        emp.total_other_deductions || 0,
+        emp.total_paye_deductions || 0,
+        emp.total_net_salary || 0,
+        emp.total_mass_salary || 0
+      ].join(','))
+    ].join('\n');
+
+    // Create and download file
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `payroll_${this.payrollDate || 'export'}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    Swal.fire({
+      title: 'Export Successful',
+      text: 'Payroll data has been exported successfully',
+      icon: 'success',
+      confirmButtonText: 'OK'
+    });
   }
 } 

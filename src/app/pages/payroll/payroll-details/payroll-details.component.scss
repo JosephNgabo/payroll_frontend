@@ -1,4 +1,486 @@
-// Styles for PayrollDetailsComponent
-.payroll-details-page {
-  padding-bottom: 2rem;
-} 
+.main-container {
+  font-family: Arial, sans-serif;
+  background-color: #f8f9fa;
+  font-size: 14px;
+  margin: 0;
+  padding: 0;
+}
+
+.container {
+  max-width: 1200px;
+  margin: auto;
+  padding: 20px;
+}
+
+.card {
+  background: white;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 2px 2px rgba(0,0,0,0.01);
+}
+
+/* Header with status badge */
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 15px;
+}
+
+.card-title {
+  font-size: 18px;
+  font-weight: bold;
+  margin: 0;
+}
+
+/* Status badge styles */
+.status-badge {
+  padding: 4px 10px;
+  border-radius: 9999px;
+  font-size: 12px;
+  font-weight: bold;
+  color: white;
+}
+
+.status-badge.draft {
+  background-color: #6c757d;
+}
+.status-badge.submitted {
+  background-color: #0d6efd;
+}
+.status-badge.approved {
+  background-color: #198754;
+}
+.status-badge.rejected {
+  background-color: #dc3545;
+}
+
+/* Status badge color variants for payroll status */
+.status-badge.bg-success {
+  background-color: #198754;
+}
+.status-badge.bg-warning {
+  background-color: #ffc107;
+  color: #212529;
+}
+.status-badge.bg-danger {
+  background-color: #dc3545;
+}
+.status-badge.bg-primary {
+  background-color: #0d6efd;
+}
+.status-badge.bg-info {
+  background-color: #0dcaf0;
+}
+.status-badge.bg-secondary {
+  background-color: #6c757d;
+}
+.status-badge.bg-dark {
+  background-color: #212529;
+}
+.status-badge.bg-light {
+  background-color: #f8f9fa;
+  color: #212529;
+}
+
+/* Flex row for search + buttons */
+.action-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 15px;
+}
+
+.search-input {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+.action-btn {
+  padding: 8px 14px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+}
+
+.action-btn:hover {
+  background: #f1f1f1;
+}
+
+button {
+  padding: 8px 14px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background: white;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #f1f1f1;
+}
+
+.table-wrapper {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th, td {
+  padding: 10px;
+  border: 1px solid #e0e0e0;
+  text-align: left;
+}
+
+thead {
+  background: #f5f5f5;
+}
+
+/* Table header styling */
+.employee-details-header {
+  background: #f8f9fa;
+}
+
+.earnings-header {
+  background: #e3f2fd;
+}
+
+.additions-header {
+  background: #e8f5e8;
+}
+
+.deductions-header {
+  background: #ffebee;
+}
+
+.total-header {
+  background: #fff3cd;
+  color: #856404;
+  font-weight: 600;
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+}
+
+.header-actions {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.header-actions i {
+  font-size: 12px;
+  cursor: pointer;
+  color: #6c757d;
+}
+
+.header-actions i:hover {
+  color: #495057;
+}
+
+.sub-header {
+  background: #f8f9fa;
+  border-top: 1px solid #dee2e6;
+}
+
+.sub-header th {
+  padding: 8px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #6c757d;
+}
+
+/* Employee info styling */
+.employee-cell {
+  padding: 12px;
+}
+
+.employee-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.employee-checkbox {
+  margin: 0;
+}
+
+.employee-details {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.employee-id {
+  font-size: 11px;
+  color: #6c757d;
+  font-weight: 400;
+}
+
+.employee-name {
+  font-weight: 600;
+  color: #212529;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.employee-name i {
+  font-size: 12px;
+  color: #6c757d;
+}
+
+.employee-phone {
+  font-size: 12px;
+  color: #6c757d;
+}
+
+.select-all-checkbox {
+  margin-right: 8px;
+}
+
+/* Net salary styling */
+.net-salary {
+  font-weight: 700;
+  color: #198754;
+}
+
+/* Actions cell styling */
+.actions-cell {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.detail-btn {
+  font-size: 12px;
+  padding: 4px 8px;
+}
+
+.delete-btn {
+  font-size: 12px;
+  padding: 4px 6px;
+}
+
+/* Total row styling */
+.total-row {
+  font-weight: bold;
+  background: #f8f9fa;
+}
+
+.total-row td {
+  border-top: 2px solid #dee2e6;
+}
+
+/* Pagination styling */
+.pagination-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 0;
+  border-top: 1px solid #dee2e6;
+}
+
+.pagination-info {
+  font-size: 14px;
+  color: #6c757d;
+}
+
+.pagination-controls {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.pagination-controls .btn {
+  font-size: 12px;
+  padding: 6px 10px;
+  min-width: 32px;
+}
+
+.pagination-dots {
+  padding: 0 8px;
+  color: #6c757d;
+}
+
+/* Submit section styling */
+.submit-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 15px;
+}
+
+.submit-btn {
+  background: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.submit-btn:hover {
+  background: #0056b3;
+}
+
+.submit-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.back-btn {
+  background: #6c757d;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.back-btn:hover {
+  background: #5a6268;
+  color: white;
+  text-decoration: none;
+}
+
+/* Dropdown styling */
+.dropdown {
+  position: relative;
+}
+
+.dropdown-toggle {
+  background: transparent;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 6px 10px;
+  color: #6c757d;
+  cursor: pointer;
+}
+
+.dropdown-toggle:hover {
+  background: #f8f9fa;
+}
+
+.dropdown-menu {
+  min-width: 160px;
+  padding: 8px 0;
+  margin: 0;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  background: white;
+}
+
+.dropdown-item {
+  padding: 8px 16px;
+  color: #495057;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+}
+
+.dropdown-item:hover {
+  background: #f8f9fa;
+  color: #212529;
+  text-decoration: none;
+}
+
+.dropdown-item.text-danger:hover {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .container {
+    padding: 10px;
+  }
+  
+  .card {
+    padding: 15px;
+  }
+  
+  .card-header {
+    flex-direction: column;
+    gap: 10px;
+    text-align: center;
+  }
+  
+  .action-row {
+    flex-direction: column;
+  }
+  
+  .search-input {
+    min-width: auto;
+  }
+  
+  .submit-section {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .submit-btn,
+  .back-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* Skeleton loading styles */
+.skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 37%, #f0f0f0 63%);
+  background-size: 400% 100%;
+  animation: skeleton-loading 1.2s ease-in-out infinite;
+  border-radius: 4px;
+  min-height: 1.2em;
+}
+
+.skeleton-text {
+  height: 1.2em;
+  margin-bottom: 0.2em;
+}
+
+.skeleton-action {
+  height: 2em;
+  border-radius: 0.5em;
+}
+
+.skeleton-row {
+  gap: 0.5em;
+}
+
+@keyframes skeleton-loading {
+  0% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0 50%;
+  }
+}

@@ -71,16 +71,19 @@ export class PayrollService {
       .pipe(catchError(this.handleError));
   }
 
+  initiateWorkflow(payload: any): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/workflow-processes/payroll/initiate`, payload)
+      .pipe(catchError(this.handleError));
+  }
+
   /**
    * Handle HTTP errors and extract backend validation messages
    */
   private handleError(error: any) {
-    let errorMessage = 'An unexpected error occurred. Please try again.';
+        let errorMessage = 'An unexpected error occurred. Please try again.';
     if (error && error.error) {
-      if (error.error.errors) {
+      if (error.error.message || error.error.errors) {
         // Laravel validation errors
-        errorMessage = error.error.errors;
-      } else if (error.error.message) {
         errorMessage = error.error.message;
       }
     } else if (error && error.message) {

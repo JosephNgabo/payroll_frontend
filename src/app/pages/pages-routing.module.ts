@@ -19,7 +19,8 @@ const routes: Routes = [
   { path: 'allowance-benefits', loadChildren: () => import('./allowance-benefits/allowance-benefits.module').then(m => m.AllowanceBenefitsModule)},
   { path: 'departments', loadChildren: () => import('./department-management/department-management.module').then(m => m.DepartmentManagementModule)},
   { path: 'payroll', loadChildren: () => import('./payroll/payroll.module').then(m => m.PayrollModule)},
-  { path: 'employee-portal', loadChildren: () => import('./employee-portal/employee-portal.module').then(m => m.EmployeePortalModule)}
+  { path: 'employee-portal', loadChildren: () => import('./employee-portal/employee-portal.module').then(m => m.EmployeePortalModule)},
+  { path: 'workflow-management', loadChildren: () => import('./workflow-management/workflow-management.module').then(m => m.WorkflowManagementModule)}
 
   // { path: 'users', redirectTo: 'users/users', pathMatch: 'full' },
   // { path: 'blog', loadChildren: () => import('./blog/blog.module').then(m => m.BlogModule) },

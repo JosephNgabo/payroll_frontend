@@ -94,6 +94,13 @@ export const MENU: MenuItem[] = [
     },
     {
         id: 10,
+        label: 'Workflow Management',
+        icon: 'bx-git-branch',
+        link: '/workflow-management',
+        p_id:8001,
+    },
+    {
+        id: 11,
         isLayout: true
     },
 //employee portal
@@ -102,7 +109,7 @@ export const MENU: MenuItem[] = [
         label: 'Time off',
         icon: 'bx-calendar',
         link: '/employee-portal/leave-management',
-        parentId: 11,
+        parentId: 12,
         p_id:7003
     },
     {
@@ -110,7 +117,7 @@ export const MENU: MenuItem[] = [
         label: 'Payslips',
         icon: 'bx-file-blank',
         link: '/employee-portal/payslips',
-        parentId: 11,
+        parentId: 12,
         p_id:7001
     },
     {
@@ -118,7 +125,7 @@ export const MENU: MenuItem[] = [
         label: 'Profile',
         icon: 'bx-user',
         link: '/employee-portal/profile',
-        parentId: 11,
+        parentId: 12,
         p_id:7004
     }
 
