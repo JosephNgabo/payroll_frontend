@@ -15,6 +15,7 @@ import { getLayoutMode } from 'src/app/store/layouts/layout.selector';
 import { RootReducerState } from 'src/app/store';
 import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 import { SimplebarAngularModule } from 'simplebar-angular';
+import { EmployeeTimeOffRequestsAdminService } from '../../core/services/employee-time-off-requests-admin.service';
 
 @Component({
   selector: 'app-topbar',
@@ -48,7 +49,8 @@ export class TopbarComponent implements OnInit {
     public languageService: LanguageService,
     public translate: TranslateService,
     public _cookiesService: CookieService, 
-    public store: Store<RootReducerState>
+    public store: Store<RootReducerState>,
+    private employeeTimeOffRequestsAdminService: EmployeeTimeOffRequestsAdminService
   ) {
 
   }
@@ -62,6 +64,7 @@ export class TopbarComponent implements OnInit {
   ];
 
   openMobileMenu: boolean;
+  pendingRequestsCount: number = 5; // Hardcoded for now
 
   @Output() settingsButtonClicked = new EventEmitter();
   @Output() mobileMenuButtonClicked = new EventEmitter();
@@ -82,6 +85,9 @@ export class TopbarComponent implements OnInit {
     } else {
       this.flagvalue = val.map(element => element.flag);
     }
+
+    // Load pending requests count
+    this.loadPendingRequestsCount();
   }
 
   setLanguage(text: string, lang: string, flag: string) {
@@ -96,6 +102,29 @@ export class TopbarComponent implements OnInit {
    */
   toggleRightSidebar() {
     this.settingsButtonClicked.emit();
+  }
+
+  /**
+   * Navigate to pending requests page
+   */
+  navigateToPendingRequests() {
+    this.router.navigate(['/pending-requests']);
+  }
+
+  /**
+   * Load pending requests count from API
+   */
+  loadPendingRequestsCount() {
+    this.employeeTimeOffRequestsAdminService.getPendingEmployeeTimeOffRequests()
+      .subscribe({
+        next: (requests) => {
+          this.pendingRequestsCount = requests.length;
+        },
+        error: (error) => {
+          console.error('Error loading pending requests count:', error);
+          // Keep the default count if API fails
+        }
+      });
   }
 
   /**

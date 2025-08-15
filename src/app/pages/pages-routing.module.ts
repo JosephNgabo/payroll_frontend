@@ -19,17 +19,10 @@ const routes: Routes = [
   { path: 'allowance-benefits', loadChildren: () => import('./allowance-benefits/allowance-benefits.module').then(m => m.AllowanceBenefitsModule)},
   { path: 'departments', loadChildren: () => import('./department-management/department-management.module').then(m => m.DepartmentManagementModule)},
   { path: 'payroll', loadChildren: () => import('./payroll/payroll.module').then(m => m.PayrollModule)},
-  { path: 'employee-portal', loadChildren: () => import('./employee-portal/employee-portal.module').then(m => m.EmployeePortalModule)}
+  { path: 'time-off-types', loadChildren: () => import('./time-off-types/time-off-types.module').then(m => m.TimeOffTypesModule)},
+  { path: 'employee-portal', loadChildren: () => import('./employee-portal/employee-portal.module').then(m => m.EmployeePortalModule)},
+  { path: 'pending-requests', loadChildren: () => import('./pending-requests/pending-requests.module').then(m => m.PendingRequestsModule)}
 
-  // { path: 'users', redirectTo: 'users/users', pathMatch: 'full' },
-  // { path: 'blog', loadChildren: () => import('./blog/blog.module').then(m => m.BlogModule) },
-  // { path: 'pages', loadChildren: () => import('./utility/utility.module').then(m => m.UtilityModule) },
-  // { path: 'ui', loadChildren: () => import('./ui/ui.module').then(m => m.UiModule) },
-  // { path: 'form', loadChildren: () => import('./form/form.module').then(m => m.FormModule) },
-  // { path: 'tables', loadChildren: () => import('./tables/tables.module').then(m => m.TablesModule) },
-  // { path: 'icons', loadChildren: () => import('./icons/icons.module').then(m => m.IconsModule) },
-  // { path: 'maps', loadChildren: () => import('./maps/maps.module').then(m => m.MapsModule) },
-  // { path: 'jobs', loadChildren: () => import('./jobs/jobs.module').then(m => m.JobsModule) }
 ];
 
 @NgModule({

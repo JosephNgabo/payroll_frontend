@@ -64,8 +64,9 @@
                       </td>
                       <td>
                         <div class="d-flex gap-3">
-                          <a href="javascript:void(0);" class="text-success" (click)="editModal(data)"><i class="mdi mdi-pencil font-size-18"></i></a>
-                          <a href="javascript:void(0);" class="text-danger" (click)="confirm(data.id)"><i class="mdi mdi-delete font-size-18"></i></a>
+                          <a href="javascript:void(0);" class="text-success" (click)="editModal(data)" title="Edit Department"><i class="mdi mdi-pencil font-size-18"></i></a>
+                          <a href="javascript:void(0);" class="text-info" (click)="openManagerModal(data)" title="Assign Manager"><i class="mdi mdi-account-plus font-size-18"></i></a>
+                          <a href="javascript:void(0);" class="text-danger" (click)="confirm(data.id)" title="Delete Department"><i class="mdi mdi-delete font-size-18"></i></a>
                         </div>
                       </td>
                     </tr>}
@@ -178,3 +179,120 @@
     </div>
   </div>
   <!-- end removeItemModal -->
+
+  <!-- Department Manager Assignment Modal -->
+  <div bsModal #managerModal="bs-modal" class="modal fade" id="managerModal" tabindex="-1" aria-labelledby="managerModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="managerModalLabel">
+            <i class="mdi mdi-account-plus me-2"></i>Assign Manager to {{ selectedDepartment?.name }}
+          </h5>
+          <button type="button" class="btn-close" (click)="closeManagerModal()"></button>
+        </div>
+        <div class="modal-body">
+          <!-- Assign New Manager Section -->
+          <div class="row mb-4">
+            <div class="col-12">
+              <h6 class="mb-3">Assign New Manager</h6>
+              <div class="row">
+                <div class="col-md-8">
+                  <label for="managerSelect" class="form-label">Select Manager</label>
+                  <select 
+                    class="form-select" 
+                    id="managerSelect" 
+                    [(ngModel)]="selectedManagerId"
+                    [disabled]="assigningManager || isLoadingAvailableManagers">
+                    <option value="">
+                      {{ isLoadingAvailableManagers ? 'Loading managers...' : 'Choose a manager...' }}
+                    </option>
+                    <option 
+                      *ngFor="let manager of availableManagers" 
+                      [value]="manager.id"
+                      [disabled]="isManagerAlreadyAssigned(manager.id)">
+                      {{ manager.firstname }} {{ manager.lastname }} ({{ manager.email }})
+                      {{ isManagerAlreadyAssigned(manager.id) ? ' - Already assigned' : '' }}
+                    </option>
+                  </select>
+                  <small *ngIf="isLoadingAvailableManagers" class="form-text text-muted">
+                    <i class="fas fa-spinner fa-spin me-1"></i>Loading available managers...
+                  </small>
+                  <small *ngIf="!isLoadingAvailableManagers && availableManagers.length === 0" class="form-text text-warning">
+                    <i class="fas fa-exclamation-triangle me-1"></i>No employees available for assignment
+                  </small>
+                </div>
+                <div class="col-md-4 d-flex align-items-end">
+                  <button 
+                    type="button" 
+                    class="btn btn-primary" 
+                    (click)="assignManager()" 
+                    [disabled]="!selectedManagerId || assigningManager">
+                    <span *ngIf="assigningManager" class="spinner-border spinner-border-sm me-2" role="status"></span>
+                    <i *ngIf="!assigningManager" class="mdi mdi-plus me-2"></i>
+                    {{ assigningManager ? 'Assigning...' : 'Assign Manager' }}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Current Managers Section -->
+          <div class="row">
+            <div class="col-12">
+              <h6 class="mb-3">Current Department Managers</h6>
+              
+              <!-- Loading State -->
+              <div *ngIf="isLoadingManagers" class="text-center py-4">
+                <div class="spinner-border text-primary" role="status">
+                  <span class="visually-hidden">Loading...</span>
+                </div>
+                <p class="mt-2 text-muted">Loading department managers...</p>
+              </div>
+
+              <!-- Managers Table -->
+              <div *ngIf="!isLoadingManagers">
+                <div *ngIf="departmentManagers.length > 0" class="table-responsive">
+                  <table class="table table-hover">
+                    <thead class="table-light">
+                      <tr>
+                        <th>Manager Name</th>
+                        <th>Email</th>
+                        <th>Assigned Date</th>
+                        <th>Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let manager of departmentManagers">
+                        <td>{{ manager.manager?.firstname }} {{ manager.manager?.lastname }}</td>
+                        <td>{{ manager.manager?.email || 'N/A' }}</td>
+                        <td>{{ manager.assigned_at | date:'mediumDate' }}</td>
+                        <td>
+                          <button 
+                            type="button" 
+                            class="btn btn-outline-danger btn-sm" 
+                            (click)="removeManager(manager.id)"
+                            title="Remove Manager">
+                            <i class="mdi mdi-delete"></i>
+                          </button>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                <!-- Empty State -->
+                <div *ngIf="departmentManagers.length === 0" class="text-center py-4">
+                  <i class="mdi mdi-account-off text-muted" style="font-size: 3rem;"></i>
+                  <p class="text-muted mt-2">No managers assigned to this department yet.</p>
+                  <small class="text-muted">Use the form above to assign a manager.</small>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="closeManagerModal()">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
