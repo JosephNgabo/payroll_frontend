@@ -80,13 +80,35 @@ export class EmployeeTimeOffBalanceService {
 
   // Get employee time-off balances
   getEmployeeTimeOffBalances(employeeId: string): Observable<EmployeeTimeOffBalance[]> {
-    return this.http.get<EmployeeTimeOffBalanceResponse>(`${this.apiUrl}/employee-time-off-balances/employee/${employeeId}`)
+    return this.http.get(`${this.apiUrl}/employee-time-off-balances/employee/${employeeId}`, { responseType: 'text' })
       .pipe(
         map(response => {
-          if (response.status) {
-            return response.data;
+          // Handle malformed JSON response from backend
+          let jsonResponse: any;
+          
+          if (typeof response === 'string') {
+            // Try to extract JSON from malformed response
+            const jsonMatch = response.match(/\{.*\}/s);
+            if (jsonMatch) {
+              try {
+                jsonResponse = JSON.parse(jsonMatch[0]);
+                console.log('✅ Successfully parsed malformed JSON response for balances:', jsonResponse);
+              } catch (e) {
+                console.error('❌ Failed to parse extracted JSON for balances:', e);
+                throw new Error('Invalid JSON response from server');
+              }
+            } else {
+              console.error('❌ No JSON found in response for balances:', response);
+              throw new Error('No valid JSON found in response');
+            }
           } else {
-            throw new Error(response.message || 'Failed to fetch employee time-off balances');
+            jsonResponse = response;
+          }
+          
+          if (jsonResponse.status && jsonResponse.data) {
+            return jsonResponse.data;
+          } else {
+            throw new Error(jsonResponse.message || 'Failed to fetch employee time-off balances');
           }
         }),
         catchError(this.handleError)

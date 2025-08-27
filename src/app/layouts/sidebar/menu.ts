@@ -90,7 +90,7 @@ export const MENU: MenuItem[] = [
         label: 'Time Off Types',
         icon: 'bx-calendar-check',
         link: '/time-off-types',
-        p_id:6005,
+        p_id:9005,
     },
     {
         id: 10,

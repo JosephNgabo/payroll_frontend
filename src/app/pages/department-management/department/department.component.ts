@@ -334,7 +334,7 @@ export class DepartmentComponent {
       next: (response) => {
         // Filter users to only include employees
         this.availableManagers = response.data.filter(user => 
-          user.user_profile === 'employee' && user.is_active === true
+         user.is_active === true
         );
         this.isLoadingAvailableManagers = false;
       },

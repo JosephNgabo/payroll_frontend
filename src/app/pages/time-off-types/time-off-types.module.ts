@@ -6,6 +6,7 @@ import { HttpClientModule } from '@angular/common/http';
 
 // UI Components
 import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgSelectModule } from '@ng-select/ng-select';
 
 // Components
 import { TimeOffTypesComponent } from './time-off-types.component';
@@ -31,6 +32,7 @@ const routes = [
     ReactiveFormsModule,
     HttpClientModule,
     NgbModalModule,
+    NgSelectModule,
     RouterModule.forChild(routes)
   ]
 })

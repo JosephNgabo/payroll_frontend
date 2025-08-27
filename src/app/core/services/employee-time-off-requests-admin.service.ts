@@ -94,12 +94,15 @@ export interface EmployeeTimeOffRequestsResponse {
   };
 }
 
-export interface ApproveRejectRequest {
-  request_id: string;
-  action: 'approve' | 'reject';
+export interface ApproveRequestPayload {
   notes?: string;
-  rejection_reason?: string;
 }
+
+export interface RejectRequestPayload {
+  reason: string;
+}
+
+
 
 @Injectable({
   providedIn: 'root'
@@ -113,9 +116,37 @@ export class EmployeeTimeOffRequestsAdminService {
    * Get all employee time-off requests (for admin)
    */
   getAllEmployeeTimeOffRequests(page: number = 1): Observable<EmployeeTimeOffRequestAdmin[]> {
-    return this.http.get<EmployeeTimeOffRequestsResponse>(`${this.apiUrl}/employee-time-off-requests?page=${page}`)
+    return this.http.get(`${this.apiUrl}/employee-time-off-requests?page=${page}`, { responseType: 'text' })
       .pipe(
-        map(response => response.data.data),
+        map(response => {
+          // Handle malformed JSON response from backend
+          let jsonResponse: any;
+          
+          if (typeof response === 'string') {
+            // Try to extract JSON from malformed response
+            const jsonMatch = response.match(/\{.*\}/s);
+            if (jsonMatch) {
+              try {
+                jsonResponse = JSON.parse(jsonMatch[0]);
+                console.log('✅ Successfully parsed malformed JSON response for admin requests:', jsonResponse);
+              } catch (e) {
+                console.error('❌ Failed to parse extracted JSON for admin requests:', e);
+                throw new Error('Invalid JSON response from server');
+              }
+            } else {
+              console.error('❌ No JSON found in response for admin requests:', response);
+              throw new Error('No valid JSON found in response');
+            }
+          } else {
+            jsonResponse = response;
+          }
+          
+          if (jsonResponse.data && jsonResponse.data.data) {
+            return jsonResponse.data.data;
+          } else {
+            throw new Error(jsonResponse.message || 'Invalid response format');
+          }
+        }),
         catchError(this.handleError)
       );
   }
@@ -124,44 +155,106 @@ export class EmployeeTimeOffRequestsAdminService {
    * Get pending employee time-off requests only
    */
   getPendingEmployeeTimeOffRequests(page: number = 1): Observable<EmployeeTimeOffRequestAdmin[]> {
-    return this.http.get<EmployeeTimeOffRequestsResponse>(`${this.apiUrl}/employee-time-off-requests?page=${page}&status=1`)
+    return this.http.get(`${this.apiUrl}/employee-time-off-requests?page=${page}&status=1`, { responseType: 'text' })
       .pipe(
-        map(response => response.data.data),
+        map(response => {
+          // Handle malformed JSON response from backend
+          let jsonResponse: any;
+          
+          if (typeof response === 'string') {
+            // Try to extract JSON from malformed response
+            const jsonMatch = response.match(/\{.*\}/s);
+            if (jsonMatch) {
+              try {
+                jsonResponse = JSON.parse(jsonMatch[0]);
+                console.log('✅ Successfully parsed malformed JSON response for pending requests:', jsonResponse);
+              } catch (e) {
+                console.error('❌ Failed to parse extracted JSON for pending requests:', e);
+                throw new Error('Invalid JSON response from server');
+              }
+            } else {
+              console.error('❌ No JSON found in response for pending requests:', response);
+              throw new Error('No valid JSON found in response');
+            }
+          } else {
+            jsonResponse = response;
+          }
+          
+          if (jsonResponse.data && jsonResponse.data.data) {
+            return jsonResponse.data.data;
+          } else {
+            throw new Error(jsonResponse.message || 'Invalid response format');
+          }
+        }),
         catchError(this.handleError)
       );
   }
 
   /**
    * Approve a time-off request
+   * POST /api/employee-time-off-requests/{id}/approve
    */
-  approveRequest(requestId: string, notes?: string): Observable<any> {
-    const payload: ApproveRejectRequest = {
-      request_id: requestId,
-      action: 'approve',
-      notes: notes
-    };
-    
-    return this.http.post(`${this.apiUrl}/employee-time-off-requests/approve`, payload)
+  approveRequest(requestId: string, payload?: ApproveRequestPayload): Observable<any> {
+    return this.http.post(`${this.apiUrl}/employee-time-off-requests/${requestId}/approve`, payload || {}, { responseType: 'text' })
       .pipe(
+        map(response => {
+          // Handle malformed JSON response from backend
+          if (typeof response === 'string') {
+            // Try to extract JSON from malformed response
+            const jsonMatch = response.match(/\{.*\}/s);
+            if (jsonMatch) {
+              try {
+                const jsonResponse = JSON.parse(jsonMatch[0]);
+                console.log('✅ Successfully parsed malformed JSON response for approve:', jsonResponse);
+                return jsonResponse;
+              } catch (e) {
+                console.error('❌ Failed to parse extracted JSON for approve:', e);
+                throw new Error('Invalid JSON response from server');
+              }
+            } else {
+              console.error('❌ No JSON found in response for approve:', response);
+              throw new Error('No valid JSON found in response');
+            }
+          }
+          return response;
+        }),
         catchError(this.handleError)
       );
   }
 
   /**
    * Reject a time-off request
+   * POST /api/employee-time-off-requests/{id}/reject
    */
-  rejectRequest(requestId: string, rejection_reason: string): Observable<any> {
-    const payload: ApproveRejectRequest = {
-      request_id: requestId,
-      action: 'reject',
-      rejection_reason: rejection_reason
-    };
-    
-    return this.http.post(`${this.apiUrl}/employee-time-off-requests/reject`, payload)
+  rejectRequest(requestId: string, payload?: RejectRequestPayload): Observable<any> {
+    return this.http.post(`${this.apiUrl}/employee-time-off-requests/${requestId}/reject`, payload || {}, { responseType: 'text' })
       .pipe(
+        map(response => {
+          // Handle malformed JSON response from backend
+          if (typeof response === 'string') {
+            // Try to extract JSON from malformed response
+            const jsonMatch = response.match(/\{.*\}/s);
+            if (jsonMatch) {
+              try {
+                const jsonResponse = JSON.parse(jsonMatch[0]);
+                console.log('✅ Successfully parsed malformed JSON response for reject:', jsonResponse);
+                return jsonResponse;
+              } catch (e) {
+                console.error('❌ Failed to parse extracted JSON for reject:', e);
+                throw new Error('Invalid JSON response from server');
+              }
+            } else {
+              console.error('❌ No JSON found in response for reject:', response);
+              throw new Error('No valid JSON found in response');
+            }
+          }
+          return response;
+        }),
         catchError(this.handleError)
       );
   }
+
+
 
   /**
    * Handle errors from API calls

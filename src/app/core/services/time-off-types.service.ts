@@ -60,13 +60,35 @@ export class TimeOffTypesService {
 
   // Get all time off types
   getTimeOffTypes(): Observable<TimeOffType[]> {
-    return this.http.get<TimeOffTypeResponse>(`${this.apiUrl}/time-off-types`)
+    return this.http.get(`${this.apiUrl}/time-off-types`, { responseType: 'text' })
       .pipe(
         map(response => {
-          if (response.status) {
-            return response.data;
+          // Handle malformed JSON response from backend
+          let jsonResponse: any;
+          
+          if (typeof response === 'string') {
+            // Try to extract JSON from malformed response
+            const jsonMatch = response.match(/\{.*\}/s);
+            if (jsonMatch) {
+              try {
+                jsonResponse = JSON.parse(jsonMatch[0]);
+                console.log('✅ Successfully parsed malformed JSON response for time-off types:', jsonResponse);
+              } catch (e) {
+                console.error('❌ Failed to parse extracted JSON for time-off types:', e);
+                throw new Error('Invalid JSON response from server');
+              }
+            } else {
+              console.error('❌ No JSON found in response for time-off types:', response);
+              throw new Error('No valid JSON found in response');
+            }
           } else {
-            throw new Error(response.message || 'Failed to fetch time off types');
+            jsonResponse = response;
+          }
+          
+          if (jsonResponse.status && jsonResponse.data) {
+            return jsonResponse.data;
+          } else {
+            throw new Error(jsonResponse.message || 'Failed to fetch time off types');
           }
         }),
         catchError(this.handleError)

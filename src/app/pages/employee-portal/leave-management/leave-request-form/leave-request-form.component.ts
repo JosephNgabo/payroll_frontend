@@ -1,11 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { EmployeeTimeOffRequestsService, EmployeeTimeOffRequest, CreateEmployeeTimeOffRequestRequest } from '../../../../core/services/employee-time-off-requests.service';
+import { EmployeeTimeOffRequestsService, EmployeeTimeOffRequest, CreateEmployeeTimeOffRequestRequest, CancelRequestPayload } from '../../../../core/services/employee-time-off-requests.service';
 import { TimeOffTypesService, TimeOffType } from '../../../../core/services/time-off-types.service';
 import { EmployeeProfileService } from '../../../../core/services/employee-profile.service';
 import { EmployeeTimeOffBalanceService, EmployeeTimeOffBalance } from '../../../../core/services/employee-time-off-balance.service';
 import { ToastrService } from 'ngx-toastr';
+import Swal from 'sweetalert2';
+import { environment } from '../../../../../environments/environment';
 
 interface PendingRequest {
   id: string;
@@ -48,6 +50,10 @@ export class LeaveRequestFormComponent implements OnInit {
   leaveBalances: EmployeeTimeOffBalance[] = [];
   isLoadingBalances: boolean = false;
 
+  // Permission tracking
+  hasTimeOffManagementPermission: boolean = false;
+  permissions: number[] = [];
+
   constructor(
     private formBuilder: FormBuilder,
     private router: Router,
@@ -86,6 +92,9 @@ export class LeaveRequestFormComponent implements OnInit {
       timeOffPeriodControl?.updateValueAndValidity();
       endDateControl?.updateValueAndValidity();
     });
+
+    // Load user permissions from session storage
+    this.loadUserPermissions();
   }
 
   ngOnInit(): void {
@@ -97,6 +106,53 @@ export class LeaveRequestFormComponent implements OnInit {
     this.loadEmployeeProfile();
     this.loadTimeOffTypes();
   }
+
+  /**
+   * Load user permissions from session storage
+   */
+  private loadUserPermissions(): void {
+    const user = sessionStorage.getItem('current_user');
+    
+    if (user) {
+      try {
+        const userData = JSON.parse(user);
+        this.permissions = userData.permissions || [];
+        
+        // Convert permissions to numbers if they're strings
+        this.permissions = this.permissions.map(p => typeof p === 'string' ? parseInt(p, 10) : p);
+        
+        // Check if user has employee time off requests permission (p_id: 7002)
+        this.hasTimeOffManagementPermission = this.permissions.includes(7002);
+        
+        console.log('User permissions loaded:', this.permissions);
+        console.log('Has time off management permission:', this.hasTimeOffManagementPermission);
+      } catch (e) {
+        console.error('Error parsing user permissions:', e);
+        this.permissions = [];
+        this.hasTimeOffManagementPermission = false;
+      }
+    } else {
+      console.warn('No user data found in session storage');
+      this.hasTimeOffManagementPermission = false;
+    }
+  }
+
+  /**
+   * Check if user can create leave requests
+   */
+  canCreateLeaveRequest(): boolean {
+    return this.hasTimeOffManagementPermission;
+  }
+
+  /**
+   * Check if user can cancel leave requests
+   * For now, assuming same permission as creating requests
+   */
+  canCancelLeaveRequest(): boolean {
+    return this.hasTimeOffManagementPermission;
+  }
+
+
 
   /**
    * Get form control for easy access in template
@@ -157,6 +213,11 @@ export class LeaveRequestFormComponent implements OnInit {
    * Open request modal
    */
   openRequestModal(): void {
+    if (!this.canCreateLeaveRequest()) {
+      this.toastr.warning('You need "Employee Time Off Requests" permission (ID: 7002) to create leave requests. Please contact HR to request this permission.', 'Permission Required');
+      return;
+    }
+    
     this.showRequestModal = true;
     this.leaveRequestForm.reset({
       halfDay: false,
@@ -185,6 +246,10 @@ export class LeaveRequestFormComponent implements OnInit {
         console.log('Employee ID loaded:', this.currentEmployeeId);
         this.isLoadingEmployee = false;
         
+        // Reload permissions after employee profile is loaded
+        // This ensures we have the latest permission data
+        this.loadUserPermissions();
+        
         // Load pending requests and balances after getting employee ID
         this.loadPendingRequests();
         this.loadLeaveBalances();
@@ -208,16 +273,44 @@ export class LeaveRequestFormComponent implements OnInit {
     
     this.isLoadingBalances = true;
     
+    // Debug API call
+    console.log('🔍 API Debug - Loading leave balances:');
+    console.log('  - Employee ID:', this.currentEmployeeId);
+    console.log('  - API URL:', `${environment.apiUrl}/employee-time-off-balances/employee/${this.currentEmployeeId}`);
+    console.log('  - User permissions:', this.permissions);
+    console.log('  - Has permission 7002:', this.hasTimeOffManagementPermission);
+    
     this.employeeTimeOffBalanceService.getEmployeeTimeOffBalances(this.currentEmployeeId).subscribe({
       next: (balances) => {
         this.leaveBalances = balances;
-        console.log('Leave balances loaded:', balances);
+        console.log('✅ Leave balances loaded successfully:', balances);
         this.isLoadingBalances = false;
       },
       error: (error) => {
-        console.error('Error loading leave balances:', error);
+        console.error('❌ Error loading leave balances:', error);
+        console.log('🔍 Error details:', {
+          message: error.message,
+          status: error.status,
+          statusText: error.statusText,
+          url: error.url,
+          error: error.error
+        });
         this.isLoadingBalances = false;
-        // Don't show error toast as balances might not be set up yet
+        
+        // Check for permission error specifically
+        if (error.message && error.message.includes('Time Off Management permissions required')) {
+          console.log('🚫 Permission error detected for leave balances - user needs permission 7002');
+          console.log('🔍 Current permission state:', {
+            permissions: this.permissions,
+            hasPermission7002: this.hasTimeOffManagementPermission,
+            permission7002Included: this.permissions.includes(7002)
+          });
+          // Don't show error toast as this is expected when user lacks permission
+          // The UI will show appropriate messaging based on permission status
+        } else {
+          // Show error for other types of errors (network, server, etc.)
+          this.toastr.error('Failed to load leave balances. Please try again later.', 'Error');
+        }
       }
     });
   }
@@ -236,7 +329,14 @@ export class LeaveRequestFormComponent implements OnInit {
       error: (error) => {
         console.error('Error loading time-off types:', error);
         this.isLoadingTimeOffTypes = false;
-        this.toastr.error('Failed to load time-off types', 'Error');
+        
+        // Check for permission error specifically
+        if (error.message && error.message.includes('Time Off Management permissions required')) {
+          console.log('Permission error detected for time-off types - user needs permission 7002');
+          // Don't show error toast as this is expected when user lacks permission
+        } else {
+          this.toastr.error('Failed to load time-off types', 'Error');
+        }
       }
     });
   }
@@ -253,18 +353,44 @@ export class LeaveRequestFormComponent implements OnInit {
     this.isLoading = true;
     this.error = null;
     
-    console.log('Loading pending requests for employee:', this.currentEmployeeId);
+    // Debug API call
+    console.log('🔍 API Debug - Loading pending requests:');
+    console.log('  - Employee ID:', this.currentEmployeeId);
+    console.log('  - API URL:', `${environment.apiUrl}/employee-time-off-requests/employee/${this.currentEmployeeId}`);
+    console.log('  - User permissions:', this.permissions);
+    console.log('  - Has permission 7002:', this.hasTimeOffManagementPermission);
     
     this.employeeTimeOffRequestsService.getEmployeeTimeOffRequests(this.currentEmployeeId)
       .subscribe({
         next: (requests) => {
           this.pendingRequests = requests;
+          console.log('✅ Pending requests loaded successfully:', requests);
           this.isLoading = false;
         },
         error: (error) => {
-          this.error = error.message || 'Failed to load pending requests';
+          console.error('❌ Error loading pending requests:', error);
+          console.log('🔍 Error details:', {
+            message: error.message,
+            status: error.status,
+            statusText: error.statusText,
+            url: error.url,
+            error: error.error
+          });
+          
+          // Check for permission error specifically
+          if (error.message && error.message.includes('Time Off Management permissions required')) {
+            this.error = 'You need "Employee Time Off Requests" permission (ID: 7002) to view leave requests. Please contact HR to request this permission.';
+            console.log('🚫 Permission error detected for pending requests - user needs permission 7002');
+            console.log('🔍 Current permission state:', {
+              permissions: this.permissions,
+              hasPermission7002: this.hasTimeOffManagementPermission,
+              permission7002Included: this.permissions.includes(7002)
+            });
+          } else {
+            this.error = error.message || 'Failed to load pending requests';
+          }
           this.isLoading = false;
-          this.toastr.error(this.error, 'Error');
+          // Don't show toast error as the error will be displayed in the UI
         }
       });
   }
@@ -275,24 +401,59 @@ export class LeaveRequestFormComponent implements OnInit {
   getStatusClass(status: string | number | null | undefined): string {
     // Handle null, undefined values
     if (status === null || status === undefined) {
+      console.log('🔍 Status is null/undefined, defaulting to pending');
       return 'pending';
     }
     
     // Convert to number if it's a string
     const statusNum = typeof status === 'string' ? parseInt(status, 10) : status;
     
+    console.log(`🔍 getStatusClass called with status: ${status} (type: ${typeof status}), converted to: ${statusNum}`);
+    
     switch (statusNum) {
       case 1: // PENDING
+        console.log('🔍 Status 1: PENDING');
         return 'pending';
       case 2: // APPROVED
+        console.log('🔍 Status 2: APPROVED');
         return 'approved';
       case 3: // REJECTED
+        console.log('🔍 Status 3: REJECTED');
         return 'rejected';
       case 4: // CANCELLED
+        console.log('🔍 Status 4: CANCELLED');
         return 'cancelled';
       default:
+        console.log(`🔍 Status ${statusNum}: UNKNOWN, defaulting to pending`);
         return 'pending';
     }
+  }
+
+  /**
+   * Get the correct status for a request (prioritize approval_status over status)
+   */
+  getRequestStatus(request: any): string | number | null | undefined {
+    // Special handling for cancellation - if either status is 4, show as cancelled
+    if (request.status === '4' || request.status === 4 || 
+        request.approval_status === '4' || request.approval_status === 4) {
+      console.log(`🔍 Request ${request.id} is cancelled (status: ${request.status}, approval_status: ${request.approval_status})`);
+      return 4; // Return as number for consistency
+    }
+    
+    // Check if request has approval_status first (this is the correct field for approval state)
+    if (request.approval_status !== undefined && request.approval_status !== null) {
+      console.log(`🔍 Using approval_status: ${request.approval_status} for request ${request.id}`);
+      return request.approval_status;
+    }
+    
+    // Fallback to status field
+    if (request.status !== undefined && request.status !== null) {
+      console.log(`🔍 Using status: ${request.status} for request ${request.id}`);
+      return request.status;
+    }
+    
+    console.log(`🔍 No status found for request ${request.id}, defaulting to null`);
+    return null;
   }
 
   /**
@@ -301,22 +462,30 @@ export class LeaveRequestFormComponent implements OnInit {
   getStatusLabel(status: string | number | null | undefined): string {
     // Handle null, undefined values
     if (status === null || status === undefined) {
+      console.log('🔍 Status is null/undefined, defaulting to Pending');
       return 'Pending';
     }
     
     // Convert to number if it's a string
     const statusNum = typeof status === 'string' ? parseInt(status, 10) : status;
     
+    console.log(`🔍 getStatusLabel called with status: ${status} (type: ${typeof status}), converted to: ${statusNum}`);
+    
     switch (statusNum) {
       case 1: // PENDING
+        console.log('🔍 Status 1: Pending');
         return 'Pending';
       case 2: // APPROVED
+        console.log('🔍 Status 2: Approved');
         return 'Approved';
       case 3: // REJECTED
+        console.log('🔍 Status 3: Rejected');
         return 'Rejected';
       case 4: // CANCELLED
+        console.log('🔍 Status 4: Cancelled');
         return 'Cancelled';
       default:
+        console.log(`🔍 Status ${statusNum}: UNKNOWN, defaulting to Pending`);
         return 'Pending';
     }
   }
@@ -359,8 +528,83 @@ export class LeaveRequestFormComponent implements OnInit {
    * Cancel request
    */
   cancelRequest(request: EmployeeTimeOffRequest): void {
-    console.log('Canceling request:', request);
-    // TODO: Implement cancel functionality
+    if (!this.canCancelLeaveRequest()) {
+      this.toastr.error('You need "Employee Time Off Requests" permission (ID: 7002) to cancel leave requests. Please contact HR to request this permission.', 'Permission Denied');
+      return;
+    }
+    
+    Swal.fire({
+      title: 'Cancel Leave Request?',
+      text: `Are you sure you want to cancel your ${request.time_off_type?.name || 'leave'} request?`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#ffc107',
+      cancelButtonColor: '#6c757d',
+      confirmButtonText: 'Yes, cancel it!',
+      cancelButtonText: 'No, keep it',
+      input: 'text',
+      inputPlaceholder: 'Enter cancellation reason (required)',
+      inputValidator: (value) => {
+        if (!value || value.trim() === '') {
+          return 'You need to provide a cancellation reason!';
+        }
+        return null;
+      }
+    }).then((result) => {
+      if (result.isConfirmed) {
+        const payload: CancelRequestPayload = {
+          reason: result.value
+        };
+        
+        this.employeeTimeOffRequestsService.cancelEmployeeTimeOffRequest(request.id, payload)
+          .subscribe({
+            next: (response) => {
+              // Debug the cancellation response
+              console.log('✅ Cancellation successful - Response:', response);
+              console.log('🔍 Response data:', response);
+              
+              // Check if response has status information
+              if (response && response.data) {
+                // For cancellation, we should update both status and approval_status
+                if (response.data.status !== undefined) {
+                  console.log('🔍 Using status from API response:', response.data.status);
+                  request.status = response.data.status;
+                }
+                if (response.data.approval_status !== undefined) {
+                  console.log('🔍 Using approval_status from API response:', response.data.approval_status);
+                  request.approval_status = response.data.approval_status;
+                }
+              } else {
+                // Fallback: set both status fields to cancelled
+                console.log('🔍 No response data, setting status to 4 (CANCELLED)');
+                request.status = '4'; // Cancelled status
+                request.approval_status = '4'; // Cancelled status
+              }
+              
+              console.log('🔍 Final request status after cancellation:', {
+                status: request.status,
+                approval_status: request.approval_status,
+                displayStatus: this.getRequestStatus(request)
+              });
+              
+              this.toastr.success('Your leave request has been cancelled successfully!', 'Success');
+              this.loadPendingRequests(); // Refresh the list
+            },
+            error: (error) => {
+              let errorMessage = 'Failed to cancel request. Please try again.';
+              if (error.error && error.error.errors) {
+                // Show validation errors
+                const errors = Object.values(error.error.errors).flat();
+                errorMessage = errors.join(', ');
+              } else if (error.error && error.error.message) {
+                errorMessage = error.error.message;
+              }
+              
+              this.toastr.error(errorMessage, 'Error');
+            }
+          });
+      }
+    });
   }
 
   /**
@@ -368,6 +612,12 @@ export class LeaveRequestFormComponent implements OnInit {
    */
   onSubmit(): void {
     if (this.leaveRequestForm.valid) {
+      // Check permission before submitting
+      if (!this.canCreateLeaveRequest()) {
+        this.toastr.error('You need "Employee Time Off Requests" permission (ID: 7002) to create leave requests. Please contact HR to request this permission.', 'Permission Denied');
+        return;
+      }
+      
       this.isSubmitting = true;
       
       const formData = this.leaveRequestForm.value;
@@ -417,6 +667,13 @@ export class LeaveRequestFormComponent implements OnInit {
           },
           error: (error) => {
             this.isSubmitting = false;
+            
+            // Check for permission error specifically
+            if (error.message && error.message.includes('Time Off Management permissions required')) {
+              this.toastr.error('You need "Employee Time Off Requests" permission (ID: 7002) to create leave requests. Please contact HR to request this permission.', 'Permission Required');
+              this.closeRequestModal();
+              return;
+            }
             
             if (error.errors) {
               // Handle validation errors
@@ -555,6 +812,171 @@ export class LeaveRequestFormComponent implements OnInit {
    */
   onCancel(): void {
     this.router.navigate(['/employee-portal/dashboard']);
+  }
+
+  /**
+   * Debug method to analyze pending requests status
+   */
+  debugPendingRequestsStatus(): void {
+    console.log('🧪 Debugging pending requests status...');
+    console.log('🔍 Current pending requests:', this.pendingRequests);
+    
+    this.pendingRequests.forEach((request, index) => {
+      console.log(`🔍 Request ${index + 1}:`, {
+        id: request.id,
+        status: request.status,
+        approval_status: request.approval_status,
+        correctStatus: this.getRequestStatus(request),
+        statusType: typeof request.status,
+        statusLabel: this.getStatusLabel(this.getRequestStatus(request)),
+        statusClass: this.getStatusClass(this.getRequestStatus(request)),
+        timeOffType: request.time_off_type?.name,
+        startDate: request.start_date,
+        endDate: request.end_date
+      });
+    });
+  }
+
+  /**
+   * Debug method to test pending requests API directly
+   */
+  debugPendingRequestsAPI(): void {
+    console.log('🧪 Testing pending requests API directly...');
+    
+    if (!this.currentEmployeeId) {
+      console.log('❌ No employee ID available');
+      return;
+    }
+    
+    const url = `${environment.apiUrl}/employee-time-off-requests/employee/${this.currentEmployeeId}`;
+    console.log('🔍 API URL:', url);
+    
+    fetch(url, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        'Content-Type': 'application/json'
+      }
+    })
+    .then(response => {
+      console.log('🔍 Response status:', response.status);
+      console.log('🔍 Response headers:', response.headers);
+      return response.text();
+    })
+    .then(data => {
+      console.log('🔍 Raw response data:', data);
+      try {
+        const jsonData = JSON.parse(data);
+        console.log('✅ Parsed JSON response:', jsonData);
+        console.log('✅ Requests count:', jsonData.data?.length || 0);
+        
+        if (jsonData.data) {
+          jsonData.data.forEach((request: any, index: number) => {
+            console.log(`🔍 API Request ${index + 1}:`, {
+              id: request.id,
+              status: request.status,
+              statusType: typeof request.status,
+              timeOffType: request.time_off_type?.name,
+              startDate: request.start_date,
+              endDate: request.end_date
+            });
+          });
+        }
+      } catch (e) {
+        console.error('❌ Error parsing JSON:', e);
+        console.log('🔍 Raw data that failed to parse:', data);
+      }
+    })
+    .catch(error => {
+      console.error('❌ Fetch error:', error);
+    });
+  }
+
+  /**
+   * Refresh all data (for testing after admin approval)
+   */
+  refreshAllData(): void {
+    console.log('🔄 Refreshing all data...');
+    this.loadEmployeeProfile();
+    this.loadTimeOffTypes();
+    this.loadPendingRequests();
+    this.loadLeaveBalances();
+  }
+
+  /**
+   * Test cancellation API response structure
+   */
+  testCancellationAPIResponse(): void {
+    console.log('🧪 Testing cancellation API response structure...');
+    
+    // Find a pending request to test with
+    const pendingRequest = this.pendingRequests.find(r => this.getRequestStatus(r) === 1);
+    
+    if (!pendingRequest) {
+      console.log('❌ No pending requests available for testing cancellation');
+      Swal.fire({
+        icon: 'warning',
+        title: 'No Test Data',
+        text: 'No pending requests available for testing cancellation response.',
+        confirmButtonText: 'OK'
+      });
+      return;
+    }
+    
+    console.log('🧪 Testing cancellation with request:', {
+      id: pendingRequest.id,
+      currentStatus: this.getRequestStatus(pendingRequest),
+      statusLabel: this.getStatusLabel(this.getRequestStatus(pendingRequest))
+    });
+    
+    const payload = {
+      reason: 'Test cancellation - checking API response structure'
+    };
+    
+    console.log('🧪 Sending test cancellation payload:', payload);
+    
+    this.employeeTimeOffRequestsService.cancelEmployeeTimeOffRequest(pendingRequest.id, payload)
+      .subscribe({
+        next: (response) => {
+          console.log('✅ Test cancellation successful!');
+          console.log('🔍 Full response object:', response);
+          console.log('🔍 Response type:', typeof response);
+          console.log('🔍 Response keys:', Object.keys(response || {}));
+          
+          // Check for status in different possible locations
+          if (response) {
+            console.log('🔍 response.status:', response.status);
+            console.log('🔍 response.data?.status:', response.data?.status);
+            console.log('🔍 response.data?.approval_status:', response.data?.approval_status);
+          }
+          
+          // Show detailed response info
+          Swal.fire({
+            icon: 'success',
+            title: 'Test Cancellation Successful',
+            html: `
+              <div class="text-start">
+                <p><strong>Response Type:</strong> ${typeof response}</p>
+                <p><strong>Response Keys:</strong> ${Object.keys(response || {}).join(', ')}</p>
+                <p><strong>Status Field:</strong> ${response?.data?.status || 'Not found'}</p>
+                <p><strong>Approval Status Field:</strong> ${response?.data?.approval_status || 'Not found'}</p>
+              </div>
+            `,
+            confirmButtonText: 'OK'
+          });
+        },
+        error: (error) => {
+          console.log('❌ Test cancellation failed:', error);
+          console.log('❌ Error response:', error.error);
+          
+          Swal.fire({
+            icon: 'error',
+            title: 'Test Cancellation Failed',
+            text: error.error?.message || error.message || 'Unknown error',
+            confirmButtonText: 'OK'
+          });
+        }
+      });
   }
 }
 

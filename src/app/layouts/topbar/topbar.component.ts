@@ -16,6 +16,7 @@ import { RootReducerState } from 'src/app/store';
 import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 import { SimplebarAngularModule } from 'simplebar-angular';
 import { EmployeeTimeOffRequestsAdminService } from '../../core/services/employee-time-off-requests-admin.service';
+import { WorkflowService } from '../../core/services/workflow.service';
 
 @Component({
   selector: 'app-topbar',
@@ -50,7 +51,8 @@ export class TopbarComponent implements OnInit {
     public translate: TranslateService,
     public _cookiesService: CookieService, 
     public store: Store<RootReducerState>,
-    private employeeTimeOffRequestsAdminService: EmployeeTimeOffRequestsAdminService
+    private employeeTimeOffRequestsAdminService: EmployeeTimeOffRequestsAdminService,
+    private workflowService: WorkflowService
   ) {
 
   }
@@ -65,6 +67,7 @@ export class TopbarComponent implements OnInit {
 
   openMobileMenu: boolean;
   pendingRequestsCount: number = 5; // Hardcoded for now
+  pendingPayrollsCount: number = 0; // Pending payroll approvals count
 
   @Output() settingsButtonClicked = new EventEmitter();
   @Output() mobileMenuButtonClicked = new EventEmitter();
@@ -88,6 +91,7 @@ export class TopbarComponent implements OnInit {
 
     // Load pending requests count
     this.loadPendingRequestsCount();
+    this.loadPendingPayrollsCount();
   }
 
   setLanguage(text: string, lang: string, flag: string) {
@@ -112,6 +116,13 @@ export class TopbarComponent implements OnInit {
   }
 
   /**
+   * Navigate to pending payroll approvals page
+   */
+  navigateToPendingPayrollApprovals() {
+    this.router.navigate(['/pending-payroll-approvals']);
+  }
+
+  /**
    * Load pending requests count from API
    */
   loadPendingRequestsCount() {
@@ -123,6 +134,23 @@ export class TopbarComponent implements OnInit {
         error: (error) => {
           console.error('Error loading pending requests count:', error);
           // Keep the default count if API fails
+        }
+      });
+  }
+
+  /**
+   * Load pending payrolls count from API
+   */
+  loadPendingPayrollsCount() {
+    this.workflowService.getPendingPayrollApprovalsCount()
+      .subscribe({
+        next: (count) => {
+          this.pendingPayrollsCount = count;
+        },
+        error: (error) => {
+          console.error('Error loading pending payrolls count:', error);
+          // Keep the default count if API fails
+          this.pendingPayrollsCount = 0;
         }
       });
   }

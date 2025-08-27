@@ -22,7 +22,8 @@ const routes: Routes = [
   { path: 'employee-portal', loadChildren: () => import('./employee-portal/employee-portal.module').then(m => m.EmployeePortalModule)},
   { path: 'workflow-management', loadChildren: () => import('./workflow-management/workflow-management.module').then(m => m.WorkflowManagementModule)},
   { path: 'time-off-types', loadChildren: () => import('./time-off-types/time-off-types.module').then(m => m.TimeOffTypesModule)},
-  { path: 'pending-requests', loadChildren: () => import('./pending-requests/pending-requests.module').then(m => m.PendingRequestsModule)}
+  { path: 'pending-requests', loadChildren: () => import('./pending-requests/pending-requests.module').then(m => m.PendingRequestsModule)},
+  { path: 'pending-payroll-approvals', loadChildren: () => import('./pending-payroll-approvals/pending-payroll-approvals.module').then(m => m.PendingPayrollApprovalsModule)}
 
 ];
 
