@@ -78,6 +78,18 @@ export class EmployeeDashboardComponent implements OnInit {
   // Search functionality
   searchTerm: string = '';
 
+  // Chart properties to prevent undefined errors
+  chartOptions: any = {
+    series: [],
+    chart: {},
+    legend: {},
+    colors: [],
+    fill: {},
+    dataLabels: {},
+    xaxis: {},
+    plotOptions: {}
+  };
+
   constructor(private laravelAuthService: LaravelAuthService) { }
 
   ngOnInit(): void {

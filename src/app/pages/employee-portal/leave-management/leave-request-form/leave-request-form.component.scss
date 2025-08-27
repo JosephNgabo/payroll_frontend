@@ -1,8 +1,8 @@
-// Leave Request Form Styles
-.leave-request-form {
+// Leave Management Styles
+.leave-management {
   .form-header {
     .form-title {
-      color: #2c3e50;
+      color: #495057;
       font-size: 1.75rem;
       font-weight: 600;
     }
@@ -10,34 +10,36 @@
   
   .leave-form {
     background: white;
-    border-radius: 12px;
+    border-radius: 0.5rem;
     padding: 2rem;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    border: 1px solid #dee2e6;
     
     .form-label {
-      font-weight: 600;
+      font-weight: 500;
       color: #495057;
       margin-bottom: 0.5rem;
       font-size: 0.875rem;
     }
     
     .form-control, .form-select {
-      border: 1px solid #e9ecef;
-      border-radius: 8px;
+      border: 1px solid #ced4da;
+      border-radius: 0.375rem;
       padding: 0.75rem 1rem;
       font-size: 0.875rem;
-      transition: all 0.3s ease;
+      transition: all 0.15s ease-in-out;
       
       &:focus {
-        box-shadow: 0 0 0 0.2rem rgba(59, 77, 115, 0.25);
-        border-color: #3b4d73;
+        border-color: #556ee6;
+        box-shadow: 0 0 0 0.2rem rgba(85, 110, 230, 0.25);
       }
       
       &.is-invalid {
         border-color: #dc3545;
         
         &:focus {
-          box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+          border-color: #dc3545;
+          box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25);
         }
       }
     }
@@ -58,25 +60,324 @@
     .invalid-feedback {
       font-size: 0.75rem;
       margin-top: 0.25rem;
+      color: #dc3545;
     }
     
     .btn-primary {
-      background: #3b4d73;
-      border-color: #3b4d73;
-      border-radius: 8px;
+      background: #556ee6;
+      border-color: #556ee6;
+      border-radius: 0.375rem;
       padding: 0.75rem 2rem;
       font-weight: 500;
+      transition: all 0.15s ease-in-out;
       
       &:hover {
-        background: #2c3a5c;
-        border-color: #2c3a5c;
+        background: #485ec4;
+        border-color: #485ec4;
+      }
+      
+      &:focus {
+        background: #485ec4;
+        border-color: #485ec4;
+        box-shadow: 0 0 0 0.2rem rgba(85, 110, 230, 0.25);
       }
       
       &:disabled {
         background: #6c757d;
         border-color: #6c757d;
+        opacity: 0.65;
       }
     }
+    
+    .btn-outline-danger {
+      border-color: #dc3545;
+      color: #dc3545;
+      border-radius: 0.375rem;
+      font-weight: 500;
+      transition: all 0.15s ease-in-out;
+      
+      &:hover {
+        background: #dc3545;
+        border-color: #dc3545;
+        color: white;
+      }
+      
+      &:focus {
+        box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+      }
+    }
+    
+    .btn-outline-secondary {
+      border-color: #6c757d;
+      color: #6c757d;
+      border-radius: 0.375rem;
+      font-weight: 500;
+      transition: all 0.15s ease-in-out;
+      
+      &:hover {
+        background: #6c757d;
+        border-color: #6c757d;
+        color: white;
+      }
+      
+      &:focus {
+        box-shadow: 0 0 0 0.2rem rgba(108, 117, 125, 0.25);
+      }
+    }
+    
+    .input-group {
+      .input-group-text {
+        background-color: #f8f9fa;
+        border: 1px solid #ced4da;
+        color: #6c757d;
+      }
+    }
+    
+    .form-text {
+      font-size: 0.75rem;
+      color: #6c757d;
+    }
+    
+    .text-primary {
+      color: #556ee6 !important;
+    }
+  }
+}
+
+// Summary cards styling (matching employee time-off component)
+.summary-card {
+  border-radius: 8px;
+  padding: 20px;
+  background-color: #e7f0fe;
+  text-align: center;
+  border: 1px solid #dee2e6;
+  
+  &.pending {
+    background-color: #fffde7;
+  }
+  
+  &.upcoming {
+    background-color: #e0f2f7;
+  }
+  
+  &.extra {
+    background-color: #e6ffe6;
+  }
+  
+  &.low-balance {
+    background-color: #fff3cd;
+    border-color: #ffeaa7;
+    
+    h5 {
+      color: #856404;
+    }
+  }
+}
+
+.icon-circle {
+  width: 40px;
+  height: 40px;
+  background-color: #fff;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto 10px auto;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+// Status badges
+.status-badge {
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  cursor: help;
+  
+  &.pending {
+    background-color: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeaa7;
+  }
+  
+  &.approved {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+  }
+  
+  &.rejected {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+  }
+  
+  &.cancelled {
+    background-color: #e2e3e5;
+    color: #383d41;
+    border: 1px solid #d6d8db;
+  }
+}
+
+// Modal styles
+.modal-header {
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #dee2e6;
+  padding: 1rem 1.5rem;
+  
+  .modal-title {
+    color: #495057;
+    font-weight: 600;
+  }
+}
+
+.modal-body {
+  padding: 1.5rem;
+}
+
+.modal-footer {
+  background-color: #f8f9fa;
+  border-top: 1px solid #dee2e6;
+  padding: 1rem 1.5rem;
+}
+
+// Card styles
+.card {
+  border: 1px solid #dee2e6;
+  border-radius: 0.5rem;
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+  
+  .card-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+    padding: 1rem 1.5rem;
+    
+    .card-title {
+      color: #495057;
+      font-weight: 600;
+      margin: 0;
+    }
+  }
+  
+  .card-body {
+    padding: 1.5rem;
+  }
+}
+
+// Table styles
+.table {
+  th {
+    background-color: #f8f9fa;
+    font-weight: 500;
+    color: #495057;
+    border-color: #dee2e6;
+  }
+  
+  td {
+    vertical-align: middle;
+    border-color: #dee2e6;
+  }
+}
+
+// Badge styles
+.badge {
+  font-size: 11px;
+  padding: 0.35em 0.65em;
+  
+  &.badge-soft-primary {
+    background-color: rgba(85, 110, 230, 0.1);
+    color: #556ee6;
+  }
+  
+  &.badge-soft-info {
+    background-color: rgba(13, 202, 240, 0.1);
+    color: #0dcaf0;
+  }
+  
+  &.badge-soft-warning {
+    background-color: rgba(255, 193, 7, 0.1);
+    color: #ffc107;
+  }
+  
+  &.badge-soft-success {
+    background-color: rgba(25, 135, 84, 0.1);
+    color: #198754;
+  }
+}
+
+// NgSelect Custom Styling
+::ng-deep .ng-select {
+  .ng-select-container {
+    border: 1px solid #ced4da;
+    border-radius: 0.375rem;
+    transition: all 0.15s ease-in-out;
+    
+    &:hover {
+      border-color: #adb5bd;
+    }
+    
+    &.ng-has-value {
+      border-color: #556ee6;
+    }
+  }
+  
+  &.ng-select-focused .ng-select-container {
+    border-color: #556ee6;
+    box-shadow: 0 0 0 0.2rem rgba(85, 110, 230, 0.25);
+  }
+  
+  &.is-invalid .ng-select-container {
+    border-color: #dc3545;
+    
+    &.ng-select-focused {
+      border-color: #dc3545;
+      box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25);
+    }
+  }
+  
+  .ng-dropdown-panel {
+    border: 1px solid #ced4da;
+    border-radius: 0.375rem;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    
+    .ng-dropdown-panel-items {
+      .ng-option {
+        padding: 0.5rem 0.75rem;
+        
+        &:hover {
+          background-color: #f8f9fa;
+        }
+        
+        &.ng-option-selected {
+          background-color: #e3f2fd;
+          color: #1976d2;
+        }
+        
+        &.ng-option-disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+        }
+      }
+    }
+  }
+  
+  .ng-clear-wrapper {
+    color: #6c757d;
+    
+    &:hover {
+      color: #495057;
+    }
+  }
+  
+  .ng-arrow-wrapper {
+    color: #6c757d;
+  }
+  
+  &.ng-select-disabled .ng-select-container {
+    background-color: #e9ecef;
+    opacity: 0.65;
   }
 }
 

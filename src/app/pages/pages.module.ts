@@ -28,7 +28,8 @@ import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 
 @NgModule(
         {
-                declarations: [],
+                declarations: [
+                ],
                 imports: [CommonModule,
                         FormsModule,
                         BsDropdownModule.forRoot(),

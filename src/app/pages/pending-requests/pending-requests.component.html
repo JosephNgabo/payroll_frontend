@@ -1,0 +1,330 @@
+<div class="row">
+  <div class="col-12">
+    <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+      <h4 class="mb-sm-0 font-size-18">Pending Requests</h4>
+      <div class="page-title-right">
+        <ol class="breadcrumb m-0">
+          <li class="breadcrumb-item"><a href="javascript: void(0);">Dashboard</a></li>
+          <li class="breadcrumb-item active">Pending Requests</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+<div class="row">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-header">
+        <div class="row align-items-center">
+          <div class="col-md-6">
+            <h4 class="card-title mb-0">
+              Leave Requests Pending Approval
+              <span *ngIf="usingFallback" class="badge bg-info ms-2">
+                <i class="fas fa-sync me-1"></i>Fallback Mode
+              </span>
+            </h4>
+          </div>
+          <div class="col-md-6">
+            <div class="d-flex justify-content-end">
+              <div class="input-group me-2" style="max-width: 300px;">
+                <input 
+                  type="text" 
+                  class="form-control" 
+                  placeholder="Search requests..." 
+                  [(ngModel)]="searchTerm"
+                  (input)="filterRequests()">
+                <button class="btn btn-outline-secondary" type="button">
+                  <i class="bx bx-search"></i>
+                </button>
+              </div>
+              <button class="btn btn-outline-info btn-sm" (click)="testApprovalAPIResponse()">
+                <i class="fas fa-bug me-1"></i>Test Approval Response
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card-body">
+        
+        <!-- Loading State -->
+        <div *ngIf="isLoading" class="text-center py-4">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+          <p class="mt-2 text-muted">Loading pending requests...</p>
+        </div>
+
+        <!-- Table -->
+        <div *ngIf="!isLoading" class="table-responsive">
+          <table class="table table-hover">
+            <thead class="table-light">
+              <tr>
+                <th>Employee</th>
+                <th>Request Type</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let request of filteredRequests">
+                <td>
+                  <div>
+                    <h6 class="mb-0">{{ request.employee.first_name }} {{ request.employee.last_name }}</h6>
+                    <small class="text-muted">{{ request.employee.personal_email }}</small>
+                  </div>
+                </td>
+                <td>
+                  <span class="badge bg-info">{{ request.time_off_type.name }}</span>
+                </td>
+                <td>
+                  <span [class]="getStatusClass(request.status)">
+                    {{ getStatusLabel(request.status) }}
+                  </span>
+                </td>
+                <td>
+                  <div class="d-flex gap-1">
+                    <button 
+                      type="button" 
+                      class="btn btn-primary btn-sm" 
+                      (click)="viewRequestDetails(request)"
+                      title="View Details">
+                      <i class="bx bx-show"></i>
+                    </button>
+                    <button 
+                      *ngIf="request.status === 1 && hasApproveTimeOffRequestsPermission"
+                      type="button" 
+                      class="btn btn-success btn-sm" 
+                      (click)="approveRequest(request)"
+                      title="Approve Request">
+                      <i class="bx bx-check"></i>
+                    </button>
+                    <button 
+                      *ngIf="request.status === 1 && hasApproveTimeOffRequestsPermission"
+                      type="button" 
+                      class="btn btn-danger btn-sm" 
+                      (click)="rejectRequest(request)"
+                      title="Reject Request">
+                      <i class="bx bx-x"></i>
+                    </button>
+                    <small *ngIf="request.status === 1 && !hasApproveTimeOffRequestsPermission" class="text-muted">
+                      <i class="fas fa-lock me-1"></i>No approval permission
+                    </small>
+
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <!-- Empty State -->
+          <div *ngIf="filteredRequests.length === 0 && !isLoading" class="text-center py-4">
+            <i class="bx bx-check-circle text-muted" style="font-size: 3rem;"></i>
+            <p class="text-muted mt-2">
+              {{ searchTerm ? 'No requests found matching your search.' : 'No pending requests found.' }}
+            </p>
+            <small class="text-muted">
+              {{ searchTerm ? 'Try adjusting your search terms.' : 'All requests have been processed.' }}
+            </small>
+          </div>
+        </div>
+
+        <!-- Summary -->
+        <div *ngIf="!isLoading && filteredRequests.length > 0" class="mt-3">
+          <div class="row">
+            <div class="col-md-6">
+              <small class="text-muted">
+                Showing {{ filteredRequests.length }} of {{ pendingRequests.length }} requests
+              </small>
+            </div>
+            <div class="col-md-6 text-end">
+              <small class="text-muted">
+                Pending: {{ getPendingCount() }} | 
+                Approved: {{ getApprovedCount() }} | 
+                Rejected: {{ getRejectedCount() }} |
+                Rejected: {{ getRejectedCount() }}
+              </small>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Request Details Modal -->
+<div class="modal fade" id="requestDetailsModal" tabindex="-1" aria-labelledby="requestDetailsModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="requestDetailsModalLabel">
+          <i class="bx bx-info-circle text-primary me-2"></i>
+          Request Details
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" *ngIf="selectedRequest">
+        <div class="row">
+          <!-- Employee Information -->
+          <div class="col-md-6">
+            <div class="card border-0 bg-light">
+              <div class="card-body">
+                <h4 class="card-title text-primary mb-3">
+                  <i class="bx bx-user me-2"></i>Employee Information
+                </h4>
+                <div class="mb-2">
+                  <strong>Name:</strong> {{ selectedRequest.employee.first_name }} {{ selectedRequest.employee.last_name }}
+                </div>
+                <div class="mb-2">
+                  <strong>Email:</strong> {{ selectedRequest.employee.personal_email }}
+                </div>
+                <div class="mb-2">
+                  <strong>Phone:</strong> {{ selectedRequest.employee.personal_mobile }}
+                </div>
+                <div class="mb-2">
+                  <strong>Status:</strong> 
+                  <span class="badge bg-success">Active</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Request Information -->
+          <div class="col-md-6">
+            <div class="card border-0 bg-light">
+              <div class="card-body">
+                <h4 class="card-title text-primary mb-3">
+                  <i class="bx bx-calendar me-2"></i>Request Information
+                </h4>
+                <div class="mb-2">
+                  <strong>Type:</strong> 
+                  <span class="badge bg-info">{{ selectedRequest.time_off_type.name }}</span>
+                </div>
+                <div class="mb-2">
+                  <strong>Status:</strong> 
+                  <span [class]="getStatusClass(selectedRequest.status)">
+                    {{ getStatusLabel(selectedRequest.status) }}
+                  </span>
+                </div>
+                <div class="mb-2">
+                  <strong>Submitted:</strong> {{ selectedRequest.created_at | date:'medium' }}
+                </div>
+                <div class="mb-2" *ngIf="selectedRequest.approved_at">
+                  <strong>Approved:</strong> {{ selectedRequest.approved_at | date:'medium' }}
+                </div>
+                <div class="mb-2" *ngIf="selectedRequest.rejected_at">
+                  <strong>Rejected:</strong> {{ selectedRequest.rejected_at | date:'medium' }}
+                </div>
+                <div class="mb-2" *ngIf="selectedRequest.status === 4">
+                  <strong>Cancelled:</strong> {{ selectedRequest.updated_at | date:'medium' }}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dates and Duration -->
+        <div class="row mt-3">
+          <div class="col-12">
+            <div class="card border-0 bg-light">
+              <div class="card-body">
+                <h4 class="card-title text-primary mb-3">
+                  <i class="bx bx-calendar-check me-2"></i>Leave Period
+                </h4>
+                <div class="row">
+                  <div class="col-md-4">
+                    <div class="text-center p-3 bg-white rounded">
+                      <div class="text-muted mb-1">Start Date</div>
+                      <div class="h5 mb-0 text-primary">{{ selectedRequest.start_date | date:'mediumDate' }}</div>
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="text-center p-3 bg-white rounded">
+                      <div class="text-muted mb-1">End Date</div>
+                      <div class="h5 mb-0 text-primary">{{ selectedRequest.end_date | date:'mediumDate' }}</div>
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="text-center p-3 bg-white rounded">
+                      <div class="text-muted mb-1">Duration</div>
+                      <div class="h5 mb-0 text-success">{{ selectedRequest.requested_days }} day(s)</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="mt-3" *ngIf="selectedRequest.time_off_period">
+                  <strong>Time Period:</strong> 
+                  <span class="badge bg-secondary">
+                    {{ selectedRequest.time_off_period === 1 ? 'Morning' : 'Afternoon' }}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Reason -->
+        <div class="row mt-3">
+          <div class="col-12">
+            <div class="card border-0 bg-light">
+              <div class="card-body">
+                <h4 class="card-title text-primary mb-3">
+                  <i class="bx bx-message-square-detail me-2"></i>Reason for Leave
+                </h4>
+                <div class="p-3 bg-white rounded">
+                  <p class="mb-0">{{ selectedRequest.reason }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Additional Information -->
+        <div class="row mt-3" *ngIf="selectedRequest.rejection_reason || selectedRequest.approver_notes || selectedRequest.status === 4">
+          <div class="col-12">
+            <div class="card border-0 bg-light">
+              <div class="card-body">
+                <h6 class="card-title text-primary mb-3">
+                  <i class="bx bx-note me-2"></i>Additional Information
+                </h6>
+                <div class="p-3 bg-white rounded" *ngIf="selectedRequest.rejection_reason">
+                  <strong class="text-danger">Rejection Reason:</strong>
+                  <p class="mb-0 mt-1">{{ selectedRequest.rejection_reason }}</p>
+                </div>
+                <div class="p-3 bg-white rounded mt-2" *ngIf="selectedRequest.approver_notes">
+                  <strong class="text-info">Approver Notes:</strong>
+                  <p class="mb-0 mt-1">{{ selectedRequest.approver_notes }}</p>
+                </div>
+                <div class="p-3 bg-white rounded mt-2" *ngIf="selectedRequest.status === 4">
+                  <strong class="text-warning">Cancellation Reason:</strong>
+                  <p class="mb-0 mt-1">{{ selectedRequest.rejection_reason || 'No reason provided' }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button 
+          *ngIf="selectedRequest?.status === 1 && hasApproveTimeOffRequestsPermission"
+          type="button" 
+          class="btn btn-success" 
+          (click)="approveRequest(selectedRequest); closeModal()">
+          <i class="bx bx-check me-1"></i>Approve
+        </button>
+        <button 
+          *ngIf="selectedRequest?.status === 1 && hasApproveTimeOffRequestsPermission"
+          type="button" 
+          class="btn btn-danger" 
+          (click)="rejectRequest(selectedRequest); closeModal()">
+          <i class="bx bx-x me-1"></i>Reject
+        </button>
+
+      </div>
+    </div>
+  </div>
+</div>

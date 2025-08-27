@@ -1,0 +1,257 @@
+<div class="container-fluid">
+  <!-- Page Header -->
+  <div class="row">
+    <div class="col-12">
+      <div class="page-title-box d-flex align-items-center justify-content-between">
+        <h4 class="mb-0">
+          <i class="bx bx-money me-2"></i>
+          Pending Payroll Approvals
+        </h4>
+        <div class="page-title-right">
+          <ol class="breadcrumb m-0">
+            <li class="breadcrumb-item">
+              <a routerLink="/dashboard">Dashboard</a>
+            </li>
+            <li class="breadcrumb-item active">Pending Payroll Approvals</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="row mb-4">
+    <div class="col-xl-3 col-md-6">
+      <div class="card mini-stats-wid">
+        <div class="card-body">
+          <div class="d-flex">
+            <div class="flex-grow-1">
+              <p class="text-muted fw-medium">Total Pending</p>
+              <h4 class="mb-0">{{ pendingPayrolls.length }}</h4>
+            </div>
+            <div class="flex-shrink-0 align-self-center">
+              <div class="mini-stat-icon avatar-sm rounded-circle bg-primary align-self-center">
+                <span class="avatar-title">
+                  <i class="bx bx-time font-size-24"></i>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+      <div class="card mini-stats-wid">
+        <div class="card-body">
+          <div class="d-flex">
+            <div class="flex-grow-1">
+              <p class="text-muted fw-medium">Payroll Month</p>
+              <h4 class="mb-0">{{ getCurrentPayrollMonth() }}</h4>
+            </div>
+            <div class="flex-shrink-0 align-self-center">
+              <div class="mini-stat-icon avatar-sm rounded-circle bg-success align-self-center">
+                <span class="avatar-title">
+                  <i class="bx bx-calendar font-size-24"></i>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+      <div class="card mini-stats-wid">
+        <div class="card-body">
+          <div class="d-flex">
+            <div class="flex-grow-1">
+              <p class="text-muted fw-medium">Workflow Type</p>
+              <h4 class="mb-0">{{ getWorkflowType() }}</h4>
+            </div>
+            <div class="flex-shrink-0 align-self-center">
+              <div class="mini-stat-icon avatar-sm rounded-circle bg-info align-self-center">
+                <span class="avatar-title">
+                  <i class="bx bx-cog font-size-24"></i>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+      <div class="card mini-stats-wid">
+        <div class="card-body">
+          <div class="d-flex">
+            <div class="flex-grow-1">
+              <p class="text-muted fw-medium">Action Level</p>
+              <h4 class="mb-0">{{ getActionLevel() }}</h4>
+            </div>
+            <div class="flex-shrink-0 align-self-center">
+              <div class="mini-stat-icon avatar-sm rounded-circle bg-warning align-self-center">
+                <span class="avatar-title">
+                  <i class="bx bx-layer font-size-24"></i>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <div class="row align-items-center">
+            <div class="col-md-6">
+              <h4 class="card-title mb-0">
+                <i class="bx bx-list-ul me-2"></i>
+                Pending Payroll Workflows
+              </h4>
+            </div>
+            <!-- <div class="col-md-6">
+              <div class="d-flex justify-content-end">
+                <div class="search-box me-2">
+                  <input 
+                    type="text" 
+                    class="form-control" 
+                    placeholder="Search workflows..."
+                    [(ngModel)]="searchTerm"
+                    (input)="filterPayrolls()">
+                  <i class="bx bx-search search-icon"></i>
+                </div>
+                <button 
+                  class="btn btn-primary" 
+                  (click)="loadPendingPayrolls()"
+                  [disabled]="isLoading">
+                  <i class="bx bx-refresh me-1"></i>
+                  {{ isLoading ? 'Loading...' : 'Refresh' }}
+                </button>
+                <button 
+                  class="btn btn-secondary ms-2" 
+                  (click)="debugAPI()"
+                  [disabled]="isLoading">
+                  <i class="bx bx-bug me-1"></i>
+                  Debug API
+                </button>
+                <button 
+                  class="btn btn-warning ms-2" 
+                  (click)="debugApproval()"
+                  [disabled]="isLoading || pendingPayrolls.length === 0">
+                  <i class="bx bx-check me-1"></i>
+                  Debug Approve
+                </button>
+                <button 
+                  class="btn btn-danger ms-2" 
+                  (click)="debugRejection()"
+                  [disabled]="isLoading || pendingPayrolls.length === 0">
+                  <i class="bx bx-x me-1"></i>
+                  Debug Reject
+                </button>
+              </div>
+            </div> -->
+          </div>
+        </div>
+        <div class="card-body">
+          <!-- Loading State -->
+          <div *ngIf="isLoading" class="text-center py-4">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="mt-2 text-muted">Loading pending payroll approvals...</p>
+          </div>
+
+          <!-- Empty State -->
+          <div *ngIf="!isLoading && filteredPayrolls.length === 0" class="text-center py-4">
+            <i class="bx bx-check-circle text-success" style="font-size: 4rem;"></i>
+            <h5 class="mt-3 text-muted">No Pending Payroll Approvals</h5>
+            <p class="text-muted">All payroll workflows have been processed or there are no pending approvals.</p>
+          </div>
+
+          <!-- Workflows Table -->
+          <div *ngIf="!isLoading && filteredPayrolls.length > 0" class="table-responsive">
+            <table class="table table-hover mb-0">
+              <thead class="table-light">
+                <tr>
+                  <th>Workflow ID</th>
+                  <th>Payroll Date</th>
+                  <th>Payroll Number</th>
+                  <th>Workflow Code</th>
+                  <th>Action Type</th>
+                  <th>Status</th>
+                  <th>Created Date</th>
+                  <th class="text-center">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let payroll of filteredPayrolls">
+                  <td>
+                    <div class="d-flex align-items-center">
+                      <i class="bx bx-hash me-2 text-primary"></i>
+                      <small class="text-muted">{{ payroll.id_process | slice:0:8 }}...</small>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="d-flex align-items-center">
+                      <i class="bx bx-calendar me-2 text-primary"></i>
+                      <strong>{{ formatDate(payroll.payroll?.payroll_date) }}</strong>
+                    </div>
+                  </td>
+                  <td>
+                    <span class="badge bg-light text-dark">{{ payroll.payroll?.payroll_number || 'N/A' }}</span>
+                  </td>
+                  <td>
+                    <span class="badge bg-info">{{ payroll.workflow_configuration?.code }}</span>
+                  </td>
+                  <td>
+                    <div class="d-flex align-items-center">
+                      <i class="bx bx-layer me-2 text-warning"></i>
+                      {{ payroll.workflow_action_configuration?.action_identifier }}
+                    </div>
+                  </td>
+                  <td>
+                    <span class="badge" [ngClass]="getWorkflowStatusBadgeClass(payroll.is_approved ? 'approved' : 'pending')">
+                      {{ getWorkflowStatusLabel(payroll.is_approved ? 'approved' : 'pending') }}
+                    </span>
+                  </td>
+                  <td>
+                    <small class="text-muted">{{ formatDate(payroll.created_at) }}</small>
+                  </td>
+                  <td class="text-center">
+                    <div class="btn-group" role="group">
+                      <button 
+                        type="button" 
+                        class="btn btn-sm btn-outline-primary"
+                        (click)="viewPayrollDetails(payroll)"
+                        title="View Details">
+                        <i class="bx bx-eye"></i>
+                      </button>
+                      <button 
+                        type="button" 
+                        class="btn btn-sm btn-outline-success"
+                        (click)="approvePayroll(payroll)"
+                        title="Approve Payroll"
+                        *ngIf="!payroll.is_approved">
+                        <i class="bx bx-check"></i>
+                      </button>
+                      <button 
+                        type="button" 
+                        class="btn btn-sm btn-outline-danger"
+                        (click)="rejectPayroll(payroll)"
+                        title="Reject Payroll"
+                        *ngIf="!payroll.is_approved">
+                        <i class="bx bx-x"></i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

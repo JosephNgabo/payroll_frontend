@@ -22,17 +22,13 @@ export class ErrorInterceptor implements HttpInterceptor {
                     window.location.href = "/";
                 }, 3000);
             }
-            if (err?.error?.hint) {
-                error = `<section class="errorStyle">
-                 <h2>Code:&nbsp;${err?.error?.errorCode}</h2>
-                 <small>${err?.error?.message || err.statusText}</small>
-                 ${err.error?.hint ? `<small class="hint">Hint:&nbsp;${err?.error?.hint}</small>` : ''}
-               </section>`;
+            else if (err?.error?.message || err?.error?.errors) {
+                error = err.error.message || err.error.errors;
             }
             else {
-                error = err.error || err.statusText;
+                error = err.error || err.statusText || err.message;
             }
-            return throwError(error);
+            return throwError(() => error);
         }));
     }
 }

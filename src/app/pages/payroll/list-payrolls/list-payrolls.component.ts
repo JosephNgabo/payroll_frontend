@@ -1,6 +1,6 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { PayrollService } from 'src/app/core/services/payroll.service';
-import { NgbModal, NgbDateStruct } from '@ng-bootstrap/ng-bootstrap';
+import { NgbDateStruct } from '@ng-bootstrap/ng-bootstrap';
 import Swal from 'sweetalert2';
 import { timer } from 'rxjs';
 
@@ -31,14 +31,10 @@ export class ListPayrollsComponent implements OnInit {
     altFormat: 'F j, Y H:i',
     allowInput: true
   };
-  selectedRegenerateMonth: number | null = null;
-  selectedRegeneratePayroll: any = null;
   selectedPayrollDate: NgbDateStruct | null = null;
-  @ViewChild('regenerateModal') regenerateModal: any;
 
   constructor(
-    private payrollService: PayrollService, 
-    private modalService: NgbModal
+    private payrollService: PayrollService
   ) {}
 
   ngOnInit(): void {
@@ -78,9 +74,33 @@ export class ListPayrollsComponent implements OnInit {
 
   getStatusText(status: number): string {
     switch (status) {
-      case 1: return 'Active';
-      case 0: return 'Inactive';
+      case 1: return 'Draft';
+      case 2: return 'Pending';
+      case 3: return 'Approved';
+      case 4: return 'Rejected';
+      case 5: return 'Paid';
+      case 8: return 'Processing';
+      case 9: return 'Cancelled';
+      case 10: return 'Failed';
+      case 11: return 'Closed';
+      case 12: return 'Archived';
       default: return 'Unknown';
+    }
+  }
+
+  getStatusBadgeClass(status: number): string {
+    switch (status) {
+      case 1: return 'badge bg-secondary'; // Draft
+      case 2: return 'badge bg-warning';   // Pending
+      case 3: return 'badge bg-success';   // Approved
+      case 4: return 'badge bg-danger';    // Rejected
+      case 5: return 'badge bg-primary';   // Paid
+      case 8: return 'badge bg-info';      // Processing
+      case 9: return 'badge bg-dark';      // Cancelled
+      case 10: return 'badge bg-danger';   // Failed
+      case 11: return 'badge bg-secondary'; // Closed
+      case 12: return 'badge bg-light text-dark'; // Archived
+      default: return 'badge bg-secondary';
     }
   }
 
@@ -96,38 +116,40 @@ export class ListPayrollsComponent implements OnInit {
     return match ? parseInt(match[1], 10) : this.currentPage;
   }
 
-  openRegenerateModal(payroll: any) {
-    this.selectedRegeneratePayroll = payroll;
-    this.selectedRegenerateMonth = payroll.month;
-    this.modalService.open(this.regenerateModal, { size: 'lg' });
-  }
-
-  confirmRegenerate(modal: any) {
-    if (!this.selectedRegeneratePayroll || !this.selectedRegenerateMonth) {
-      return;
-    }
-
-    this.loading = true;
-    this.payrollService.regeneratePayroll(this.selectedRegeneratePayroll.id).subscribe({
-      next: () => {
-        modal.close();
-        this.loading = false;
-        this.fetchPayrolls(this.currentPage);
-        Swal.fire({
-          title: 'Success!',
-          text: 'Payroll regenerated successfully.',
-          icon: 'success',
-          confirmButtonColor: '#34c38f',
-        });
-      },
-      error: (err) => {
-        this.loading = false;
-        console.error('Error regenerating payroll:', err);
-        Swal.fire({
-          title: 'Error!',
-          text: 'Failed to regenerate payroll. Please try again.',
-          icon: 'error',
-          confirmButtonColor: '#f46a6a',
+  regeneratePayroll(payroll: any) {
+    Swal.fire({
+      title: 'Regenerate Payroll',
+      text: `Are you sure you want to regenerate the payroll for ${this.getMonthName(payroll.payroll_month)} ${payroll.payroll_year}? This will refresh all payslip data.`,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#ffc107',
+      cancelButtonColor: '#6c757d',
+      confirmButtonText: 'Yes, regenerate',
+      cancelButtonText: 'Cancel'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.loading = true;
+        this.payrollService.regeneratePayroll(payroll.id).subscribe({
+          next: () => {
+            this.loading = false;
+            this.fetchPayrolls(this.currentPage);
+            Swal.fire({
+              title: 'Success!',
+              text: 'Payroll regenerated successfully.',
+              icon: 'success',
+              confirmButtonColor: '#34c38f',
+            });
+          },
+          error: (err) => {
+            this.loading = false;
+            console.error('Error regenerating payroll:', err);
+            Swal.fire({
+              title: 'Error!',
+              text: 'Failed to regenerate payroll. Please try again.',
+              icon: 'error',
+              confirmButtonColor: '#f46a6a',
+            });
+          }
         });
       }
     });
@@ -174,6 +196,7 @@ export class ListPayrollsComponent implements OnInit {
   }
 
   generatePayroll() {
+    console.log(this.selectedPayrollDate);
     if (!this.selectedPayrollDate) {
       Swal.fire('Error!', 'Please select a payroll date.', 'error');
       return;

@@ -1,0 +1,264 @@
+<!-- Employee Dashboard -->
+<div class="container-fluid">
+  <!-- Page Title -->
+  <div class="row">
+    <div class="col-12">
+      <div class="page-title-box d-flex align-items-center justify-content-between">
+        <h4 class="mb-0">Employee Dashboard</h4>
+        <div class="page-title-right">
+          <ol class="breadcrumb m-0">
+            <li class="breadcrumb-item"><a href="javascript: void(0);">Dashboard</a></li>
+            <li class="breadcrumb-item active">Employee</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-body text-center py-5">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+          <p class="mt-3 mb-0">Loading your dashboard...</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error && !isLoading" class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-body text-center py-5">
+          <i class="bx bx-error-circle font-size-48 text-danger"></i>
+          <h5 class="mt-3 text-danger">Dashboard Error</h5>
+          <p class="text-muted">{{ error }}</p>
+          <button class="btn btn-primary" (click)="loadDashboardData()">
+            <i class="bx bx-refresh me-2"></i>Try Again
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dashboard Content -->
+  <div *ngIf="!isLoading && !error && dashboardData" class="row">
+    
+    <!-- Summary Cards -->
+    <div class="col-12 mb-4">
+      <div class="row">
+        <div class="col-md-6 col-lg-3" *ngFor="let card of summaryCards">
+          <div class="card mini-stats-wid">
+            <div class="card-body">
+              <div class="d-flex">
+                <div class="flex-grow-1">
+                  <p class="text-muted fw-medium">{{ card.title }}</p>
+                  <h4 class="mb-0">{{ card.value }}</h4>
+                </div>
+                <div class="flex-shrink-0 align-self-center">
+                  <div class="mini-stat-icon avatar-sm rounded-circle bg-primary align-self-center overflow-hidden">
+                    <span class="avatar-title">
+                      <i [ngClass]="card.icon + ' ' + card.color"></i>
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Latest Payslip Information -->
+    <div class="col-xl-6">
+      <div class="card">
+        <div class="card-header">
+          <h4 class="card-title mb-0">
+            <i class="bx bx-receipt me-2"></i>Latest Payslip
+          </h4>
+        </div>
+        <div class="card-body">
+          <div *ngIf="payslipInfo.latest" class="payslip-details">
+            <div class="row">
+              <div class="col-md-6">
+                <p class="text-muted mb-1">Payslip Number</p>
+                <h6 class="mb-3">{{ payslipInfo.latest.payslip_number }}</h6>
+                
+                <p class="text-muted mb-1">Payroll Date</p>
+                <h6 class="mb-3">{{ formatDate(payslipInfo.latest.payroll_date) }}</h6>
+                
+                <p class="text-muted mb-1">Basic Salary</p>
+                <h6 class="mb-3">{{ formatCurrency(payslipInfo.latest.basic_salary) }}</h6>
+              </div>
+              <div class="col-md-6">
+                <p class="text-muted mb-1">Total Allowances</p>
+                <h6 class="mb-3 text-success">{{ formatCurrency(payslipInfo.latest.total_allowances) }}</h6>
+                
+                <p class="text-muted mb-1">Total Deductions</p>
+                <h6 class="mb-3 text-danger">{{ formatCurrency(payslipInfo.latest.total_paye_deductions + payslipInfo.latest.total_rssb_employee_deductions) }}</h6>
+                
+                <p class="text-muted mb-1">Net Salary</p>
+                <h6 class="mb-3 text-primary fw-bold">{{ formatCurrency(payslipInfo.latest.total_net_salary) }}</h6>
+              </div>
+            </div>
+            <div class="mt-3">
+              <button class="btn btn-primary btn-sm" (click)="downloadPayslip()">
+                <i class="bx bx-download me-1"></i>Download Payslip
+              </button>
+            </div>
+          </div>
+          <div *ngIf="!payslipInfo.latest" class="text-center py-4">
+            <i class="bx bx-receipt font-size-48 text-muted"></i>
+            <p class="text-muted mt-2">No payslip available</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Leave Requests -->
+    <div class="col-xl-6">
+      <div class="card">
+        <div class="card-header">
+          <h4 class="card-title mb-0">
+            <i class="bx bx-calendar-check me-2"></i>Recent Leave Requests
+          </h4>
+        </div>
+        <div class="card-body">
+          <div *ngIf="dashboardData.time_off?.requests?.recent?.length" class="table-responsive">
+            <table class="table table-nowrap mb-0">
+              <thead>
+                <tr>
+                  <th scope="col">Type</th>
+                  <th scope="col">Date</th>
+                  <th scope="col">Days</th>
+                  <th scope="col">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let request of dashboardData.time_off.requests.recent.slice(0, 5)">
+                  <td>
+                    <div class="d-flex align-items-center">
+                      <div class="avatar-xs me-3">
+                        <span class="avatar-title rounded-circle bg-primary-subtle">
+                          <i class="bx bx-calendar text-primary"></i>
+                        </span>
+                      </div>
+                      <div>
+                        <h6 class="mb-0">{{ request.time_off_type_name }}</h6>
+                        <small class="text-muted">{{ request.time_off_type_code }}</small>
+                      </div>
+                    </div>
+                  </td>
+                  <td>{{ formatDate(request.start_date) }}</td>
+                  <td>{{ request.requested_days }}</td>
+                  <td>
+                    <span [class]="'badge ' + getApprovalStatusBadgeClass(request.approval_status)">
+                      {{ getApprovalStatusLabel(request.approval_status) }}
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div *ngIf="!dashboardData.time_off?.requests?.recent?.length" class="text-center py-4">
+            <i class="bx bx-calendar font-size-48 text-muted"></i>
+            <p class="text-muted mt-2">No recent leave requests</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Leave Statistics Chart -->
+    <div class="col-xl-12">
+      <div class="card">
+        <div class="card-header">
+          <h4 class="card-title mb-0">
+            <i class="bx bx-bar-chart me-2"></i>Leave Request Statistics
+          </h4>
+        </div>
+        <div class="card-body">
+          <apx-chart 
+            [series]="emailSentBarChart.series" 
+            [chart]="emailSentBarChart.chart" 
+            [colors]="emailSentBarChart.colors"
+            [plotOptions]="emailSentBarChart.plotOptions"
+            [dataLabels]="emailSentBarChart.dataLabels"
+            [stroke]="emailSentBarChart.stroke"
+            [xaxis]="emailSentBarChart.xaxis"
+            [yaxis]="emailSentBarChart.yaxis"
+            [fill]="emailSentBarChart.fill"
+            [tooltip]="emailSentBarChart.tooltip">
+          </apx-chart>
+        </div>
+      </div>
+    </div>
+
+    <!-- Leave Balances -->
+    <div class="col-xl-12" *ngIf="dashboardData.time_off?.balances?.length">
+      <div class="card">
+        <div class="card-header">
+          <h4 class="card-title mb-0">
+            <i class="bx bx-calendar me-2"></i>Leave Balances
+          </h4>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-nowrap mb-0">
+              <thead>
+                <tr>
+                  <th scope="col">Leave Type</th>
+                  <th scope="col">Total Days</th>
+                  <th scope="col">Used Days</th>
+                  <th scope="col">Pending Days</th>
+                  <th scope="col">Remaining Days</th>
+                  <th scope="col">Usage %</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let balance of dashboardData.time_off.balances">
+                  <td>
+                    <div class="d-flex align-items-center">
+                      <div class="avatar-xs me-3">
+                        <span class="avatar-title rounded-circle bg-primary-subtle">
+                          <i class="bx bx-calendar text-primary"></i>
+                        </span>
+                      </div>
+                      <div>
+                        <h6 class="mb-0">{{ balance.time_off_type_name }}</h6>
+                        <small class="text-muted">{{ balance.time_off_type_code }}</small>
+                      </div>
+                    </div>
+                  </td>
+                  <td>{{ balance.total_days }}</td>
+                  <td>
+                    <span class="text-danger">{{ balance.used_days }}</span>
+                  </td>
+                  <td>
+                    <span class="text-warning">{{ balance.pending_days }}</span>
+                  </td>
+                  <td>
+                    <span class="text-success">{{ balance.remaining_days }}</span>
+                  </td>
+                  <td>
+                    <div class="progress" style="height: 6px;">
+                      <div class="progress-bar" 
+                           [style.width.%]="(balance.used_days / balance.total_days) * 100"
+                           [class]="(balance.used_days / balance.total_days) * 100 > 80 ? 'bg-danger' : 'bg-success'">
+                      </div>
+                    </div>
+                    <small class="text-muted">{{ ((balance.used_days / balance.total_days) * 100).toFixed(1) }}%</small>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

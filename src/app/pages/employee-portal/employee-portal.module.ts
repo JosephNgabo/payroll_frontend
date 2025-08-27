@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
+import { NgSelectModule } from '@ng-select/ng-select';
 
 import { EmployeePortalRoutingModule } from './employee-portal-routing.module';
 
@@ -11,7 +12,7 @@ import { LeaveRequestFormComponent } from './leave-management/leave-request-form
 
 import { AttendanceComponent } from './attendance/attendance.component';
 import { EmployeeProfileComponent } from './profile/employee-profile.component';
-import { LeaveManagementComponent } from './leave-management/leave-management.component';
+
 
 // Shared modules and components
 import { SharedModule } from '../../shared/shared.module';
@@ -20,7 +21,6 @@ import { PagetitleComponent } from '../../shared/ui/pagetitle/pagetitle.componen
 @NgModule({
   declarations: [
     EmployeeDashboardComponent,
-    LeaveManagementComponent,
     LeaveRequestFormComponent,
     AttendanceComponent,
     EmployeeProfileComponent
@@ -30,6 +30,7 @@ import { PagetitleComponent } from '../../shared/ui/pagetitle/pagetitle.componen
     FormsModule,
     ReactiveFormsModule,
     RouterModule,
+    NgSelectModule,
     EmployeePortalRoutingModule,
     SharedModule,
     PagetitleComponent

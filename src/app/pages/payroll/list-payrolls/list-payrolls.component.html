@@ -87,7 +87,7 @@
                   </button>
                   <ul class="dropdown-menu">
                     <li><a class="dropdown-item" [routerLink]="['/payroll/details', payroll.id]">View Details</a></li>
-                    <li><button class="dropdown-item" type="button" (click)="openRegenerateModal(payroll)"><i class="bx bx-refresh me-2"></i>Regenerate</button></li>
+                    <li><button class="dropdown-item" type="button" (click)="regeneratePayroll(payroll)"><i class="bx bx-refresh me-2"></i>Regenerate</button></li>
                     <li><button class="dropdown-item text-danger fw-bold" type="button" (click)="deletePayroll(payroll)"><i class="bx bx-trash me-2"></i>Delete</button></li>
                   </ul>
                 </div>
@@ -128,30 +128,4 @@
   </div>
 </div>
 
-<!-- Regenerate Payroll Modal -->
-<ng-template #regenerateModal let-modal>
-  <div class="modal-header">
-    <h5 class="modal-title">Regenerate Payroll</h5>
-    <button type="button" class="btn-close" aria-hidden="true" (click)="modal.dismiss()"></button>
-  </div>
-  <div class="modal-body">
-    <div class="mb-3">
-      <label for="regenerateMonth" class="form-label">Select Month</label>
-      <ng-select
-        id="regenerateMonth"
-        [items]="monthOptions"
-        bindLabel="label"
-        bindValue="value"
-        placeholder="Select Month"
-        [(ngModel)]="selectedRegenerateMonth"
-        [clearable]="false">
-      </ng-select>
-    </div>
-  </div>
-  <div class="modal-footer">
-    <button type="button" class="btn btn-secondary" (click)="modal.dismiss()">Cancel</button>
-    <button type="button" class="btn btn-warning" (click)="confirmRegenerate(modal)">
-      <i class="bx bx-refresh"></i> Regenerate
-    </button>
-  </div>
-</ng-template> 
+ 
